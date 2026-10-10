@@ -224,8 +224,21 @@
   }
   .dd-chip.empty { border-color: var(--line-bright); color: var(--muted); }
   body.m-splash .dd-chip, body.m-still .dd-chip { display: none; }
-  .dd-btn { color: #FFC72C; }
-  .dd-big { font-size: 15px; letter-spacing: 0.04em; }
+  .down-btn { font-size: 17px; color: #FFC72C; letter-spacing: 0.02em; text-transform: none; }
+  .down-btn.active { background: #FFC72C; color: #111; border-color: #FFC72C; }
+  .dist-block { grid-column: 1 / -1; display: grid; grid-template-columns: var(--b) var(--b); grid-template-rows: repeat(4, var(--b)); gap: var(--gap); }
+  .vslider {
+    grid-row: 1 / 5; position: relative; border-radius: 12px; touch-action: none; cursor: ns-resize;
+    background: rgba(18, 21, 27, 0.78); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border: 1px solid rgba(255, 199, 44, 0.5); overflow: hidden;
+  }
+  .vs-fill { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(255, 199, 44, 0.35); }
+  .vs-thumb { position: absolute; left: 4px; right: 4px; height: 10px; margin-bottom: -5px; border-radius: 6px; background: #FFC72C; box-shadow: 0 0 10px rgba(255,199,44,0.7); }
+  #dist-plus, #dist-minus { font-size: 26px; color: #FFC72C; }
+  .dist-val { display: grid; place-items: center; align-content: center; font-family: var(--display); font-weight: 700; color: #FFC72C; font-size: 26px; line-height: 1; }
+  .dist-val small { font-family: var(--body); font-size: 10px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 2px; }
+  .dist-goal { font-size: 13px; color: #FFC72C; }
+  .dist-goal.active { background: #FFC72C; color: #111; border-color: #FFC72C; }
+  body.lay-phone .dist-block { display: none !important; }
   .dd-pop {
     position: fixed; z-index: 26; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(460px, calc(100vw - 24px));
     background: rgba(18, 21, 27, 0.97); border: 1px solid #FFC72C; border-radius: 16px; padding: 14px; display: grid; gap: 12px;
@@ -373,7 +386,10 @@
     <svg viewBox="0 0 24 24" id="ic-play"><path d="M6 4l14 8-14 8V4z" fill="currentColor"/></svg>
     <svg viewBox="0 0 24 24" id="ic-pause" style="display:none"><rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/></svg>
   </button>
-  <button class="rb wide only-live dd-btn" id="btn-dd" title="Set down and distance for the next play"><span class="dd-big" id="dd-btn-lbl">Down &amp; Dist</span></button>
+  <button class="rb only-live down-btn" data-rdown="1">1st</button>
+  <button class="rb only-live down-btn" data-rdown="2">2nd</button>
+  <button class="rb only-live down-btn" data-rdown="3">3rd</button>
+  <button class="rb only-live down-btn" data-rdown="4">4th</button>
   <button class="rb wide big only-live" id="btn-freeze" title="Freeze this moment to draw on it (F)"><svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>Freeze</button>
 </nav>
 
@@ -397,6 +413,15 @@
     <svg viewBox="0 0 24 24"><path d="M1 4v6h6"/><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/></svg>
     <span>Replay<small class="sub" id="replay-sub">10 s · ½×</small></span>
   </button>
+  <div class="dist-block only-live" id="dist-block">
+    <div class="vslider" id="vslider" role="slider" aria-label="Yards to go" aria-valuemin="0" aria-valuemax="25" tabindex="0">
+      <div class="vs-fill" id="vs-fill"></div><div class="vs-thumb" id="vs-thumb"></div>
+    </div>
+    <button class="rb" id="dist-plus" aria-label="One more yard">+</button>
+    <div class="dist-val"><span id="dist-val">10</span><small>to go</small></div>
+    <button class="rb" id="dist-minus" aria-label="One less yard">−</button>
+    <button class="rb dist-goal" id="dist-goal">Goal</button>
+  </div>
   <button class="rb wide big primary play-btn only-live" id="btn-mark" disabled title="Start / end recording a play (Enter)">
     <span class="rec-dot"></span>
     <span><span id="mark-lbl">Start Play</span><small class="sub num" id="mark-sub">Play 1</small></span>
@@ -535,7 +560,7 @@
   <div class="dlg-body help-list">
     <p><b>1. Always recording.</b> Once the camera is on, it records nonstop in the background. Nothing is uploaded; it all stays on this device.</p>
     <p><b>Record every play.</b> Tap <b>Start Play</b> (big button, bottom right) when the teams line up, and <b>End Play</b> at the whistle. Each play is saved as its own numbered clip on this device. In the tray (grid button), tap ★ on the ones you want to keep, then save them to Photos.</p>
-    <p><b>Down &amp; distance.</b> Tap the gold <b>Down &amp; Dist</b> button (left side) or the chip in the top strip. Pick the down, slide the yards (or Inches / Goal), then tap Done. The next play you start gets that label. While watching a play, the chip edits that play. The label goes in the clip's file name, and <b>Save Clip</b> writes it onto the video itself in a gold box.</p>
+    <p><b>Down &amp; distance.</b> On the live view, tap the down (1st–4th) with your left thumb and slide the yards with your right thumb (+ / − for fine steps, Goal for goal-to-go). Tapping 1st resets to 10 yards. On a phone, or to edit a play you're watching, tap the gold chip in the top strip. The next play you start gets that label. While watching a play, the chip edits that play. The label goes in the clip's file name, and <b>Save Clip</b> writes it onto the video itself in a gold box.</p>
     <p><b>Last Play</b> (under Start Play) opens the most recent play straight away. Tapping it during a play ends that play and shows it.</p>
     <p><b>2. Or tap Replay after the whistle.</b> It jumps back to just before the snap and plays it in slow motion. The camera keeps recording in the small tile in the corner. Tap that tile, or <b>Live</b>, to go back.</p>
     <p><b>3. Review.</b> Tap the video to pause or play. Drag across it to scrub. Use the arrow buttons to step one frame at a time. Pinch with two fingers to zoom in on a player, and drag with two fingers to move around. Tap the zoom label at the top to reset.</p>
@@ -855,7 +880,14 @@
     chip.hidden = dd === undefined;
     chip.textContent = ddLabel(dd) || 'Set down';
     chip.classList.toggle('empty', !ddLabel(dd));
-    $('dd-btn-lbl').textContent = ddLabel(playRec ? playRec.dd : curDD) || 'Down & Dist';
+    const ld = playRec ? playRec.dd : curDD;
+    document.querySelectorAll('[data-rdown]').forEach((b) => b.classList.toggle('active', !!(ld && ld.down === Number(b.dataset.rdown))));
+    const dist = ld ? (ld.goal ? null : ld.dist) : 10;
+    $('dist-val').textContent = ld && ld.goal ? 'G' : dist === 0 ? 'In.' : dist;
+    $('dist-goal').classList.toggle('active', !!(ld && ld.goal));
+    const f = (ld && ld.goal) ? 1 : Math.min(1, (dist || 0) / 25);
+    $('vs-fill').style.height = (f * 100) + '%'; $('vs-thumb').style.bottom = (f * 100) + '%';
+    $('vslider').setAttribute('aria-valuenow', ld && !ld.goal ? ld.dist : '');
     // panel
     if (!$('dd-pop').hidden) {
       const v = ddValue();
@@ -885,7 +917,31 @@
   $('dd-clear').onclick = () => setDD(null);
   $('dd-done').onclick = () => { $('dd-pop').hidden = true; };
   $('dd-chip').onclick = () => { if ($('dd-pop').hidden) openDD(); else $('dd-pop').hidden = true; };
-  $('btn-dd').onclick = openDD;
+  // Thumb controls on the live view: downs on the left rail, yards slider on the right rail.
+  const DIST_MAX = 25;
+  function liveDDEdit(patch) {
+    ddTarget = playRec ? 'rec' : 'next';
+    const base = Object.assign({ down: 1, dist: 10, goal: false }, (playRec ? playRec.dd : curDD) || {});
+    setDD(Object.assign(base, patch));
+  }
+  document.querySelectorAll('[data-rdown]').forEach((b) => b.onclick = () => {
+    const d = Number(b.dataset.rdown);
+    liveDDEdit(d === 1 ? { down: 1, dist: 10, goal: false } : { down: d });
+  });
+  $('dist-plus').onclick = () => { const v = (playRec ? playRec.dd : curDD); liveDDEdit({ dist: Math.min(DIST_MAX, ((v && !v.goal) ? v.dist : 10) + 1), goal: false }); };
+  $('dist-minus').onclick = () => { const v = (playRec ? playRec.dd : curDD); liveDDEdit({ dist: Math.max(0, ((v && !v.goal) ? v.dist : 10) - 1), goal: false }); };
+  $('dist-goal').onclick = () => { const v = (playRec ? playRec.dd : curDD); liveDDEdit({ goal: !(v && v.goal) }); };
+  const vs = $('vslider');
+  let vsDrag = false;
+  function vsSet(e) {
+    const r = vs.getBoundingClientRect();
+    const f = Math.max(0, Math.min(1, (r.bottom - e.clientY) / r.height));
+    liveDDEdit({ dist: Math.round(f * DIST_MAX), goal: false });
+  }
+  vs.addEventListener('pointerdown', (e) => { vsDrag = true; vs.setPointerCapture(e.pointerId); vsSet(e); });
+  vs.addEventListener('pointermove', (e) => { if (vsDrag) vsSet(e); });
+  const vsEnd = (e) => { vsDrag = false; try { vs.releasePointerCapture(e.pointerId); } catch (_) {} };
+  vs.addEventListener('pointerup', vsEnd); vs.addEventListener('pointercancel', vsEnd);
 
   // ---------- Play-by-play recording ----------
   function dayKey(d) { return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
