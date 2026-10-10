@@ -61,6 +61,10 @@
 
   /* ---------- Full-screen stage ---------- */
   .stage { position: fixed; inset: 0; background: #000; overflow: hidden; touch-action: none; }
+  body.side-rails:not(.portrait) .stage { left: calc(var(--edge) * 2 + var(--sal) + var(--rail-w)); right: calc(var(--edge) * 2 + var(--sar) + var(--rail-w)); }
+  body.side-rails:not(.portrait) .stage.mode-replay #live, body.side-rails:not(.portrait) .stage.mode-still #live,
+  body.side-rails:not(.portrait) .pip-hit { left: 8px; }
+  body.side-rails:not(.portrait) .pip-label { left: 14px; }
   body.portrait .stage { bottom: 44dvh; }
   .stage video, .stage img.still { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
   .zoomer { position: absolute; inset: 0; transform-origin: 0 0; z-index: 2; }
@@ -102,6 +106,7 @@
     font-family: var(--display); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; font-size: 13px;
     opacity: 0; transition: opacity .18s, transform .18s; pointer-events: none; white-space: nowrap; max-width: 60%; overflow: hidden; text-overflow: ellipsis;
   }
+  body.m-replay:not(.zoom-in-rail) .toast { bottom: calc(var(--edge) + var(--sab) + var(--b) * 2 + var(--gap) * 2 + 14px); }
   body.portrait .toast { bottom: calc(44dvh + 10px); max-width: 90%; }
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
@@ -161,7 +166,7 @@
   /* ---------- Thumb rails (left and right edges, anchored to the bottom corners) ---------- */
   .rail {
     position: fixed; z-index: 15; bottom: calc(var(--edge) + var(--sab));
-    display: grid; grid-template-columns: repeat(var(--cols), var(--b)); gap: var(--gap); align-content: end;
+    display: grid; grid-template-columns: repeat(var(--cols), var(--b)); gap: var(--gap);
     max-height: calc(100dvh - var(--hud) - var(--sat) - var(--sab) - var(--edge) * 2 - 6px);
     overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none;
   }
@@ -170,6 +175,9 @@
   .rail-right { right: calc(var(--edge) + var(--sar)); }
   body.portrait .rail { max-height: calc(44dvh - 22px - var(--b) * 2 - var(--gap) - var(--sab)); }
   body.portrait:not(.m-replay) .rail { max-height: calc(44dvh - 18px - var(--b) - var(--sab)); }
+  body.portrait.zoom-in-rail .rail { max-height: calc(44dvh - 14px - var(--sab)); }
+  body.portrait.zoom-in-rail.m-replay .rail { max-height: calc(44dvh - 22px - var(--b) - var(--sab)); }
+  body.portrait .brand-name, body.portrait .mode-tag span:not(.tag-main) { display: none; }
   body.m-splash .rail, body.m-splash .scrubbar { display: none; }
   .rb {
     width: var(--b); height: var(--b); border-radius: 12px; display: grid; place-items: center; position: relative;
@@ -194,9 +202,14 @@
   .play-btn.recording .rec-dot { border-radius: 4px; background: var(--scarlet); border-color: var(--scarlet); }
   @keyframes recpulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(224, 20, 56, 0.7); } 50% { box-shadow: 0 0 0 10px rgba(224, 20, 56, 0); } }
   .rb[disabled] { opacity: 0.45; }
-  #btn-replay, #btn-lastplay { flex-direction: column; gap: 2px; height: calc(var(--b) * 1.15); font-size: 13px; text-align: center; line-height: 1.05; }
+  #btn-replay, #btn-lastplay { display: flex; flex-direction: column; gap: 1px; align-items: center; justify-content: center; font-size: 12px; text-align: center; line-height: 1.05; padding: 2px; overflow: hidden; }
+  #btn-replay .sub, #btn-lastplay .sub { font-size: 9.5px; white-space: nowrap; }
+  .pair { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }
+  .pair .rb { width: auto; height: calc(var(--b) * 1.1); }
+  .freeze-btn { display: flex; flex-direction: column; gap: 1px; align-items: center; justify-content: center; font-size: 11px; }
+  .freeze-btn svg { width: 20px; height: 20px; }
+  body.cols3 .freeze-btn { grid-column: span 2; width: auto; }
   #btn-replay svg, #btn-lastplay svg { width: 20px; height: 20px; }
-  #btn-freeze { height: calc(var(--bb) * 1.2); }
   .color-dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #fff; }
   .speed-lbl { font-size: 17px; letter-spacing: 0.02em; }
 
@@ -229,9 +242,9 @@
   body.m-live:not(.lay-phone) .dd-chip { pointer-events: none; }
   .down-btn { font-size: 17px; color: #FFC72C; letter-spacing: 0.02em; text-transform: none; }
   .down-btn.active { background: #FFC72C; color: #111; border-color: #FFC72C; }
-  .dist-block { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr var(--b); grid-template-rows: repeat(4, var(--b)); gap: var(--gap); }
+  .dist-block { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr var(--b); grid-template-rows: repeat(3, var(--b)); gap: var(--gap); }
   .vslider {
-    grid-row: 1 / 5; position: relative; border-radius: 12px; touch-action: none; cursor: ns-resize;
+    grid-row: 1 / 4; position: relative; border-radius: 12px; touch-action: none; cursor: ns-resize;
     background: rgba(18, 21, 27, var(--ctl-a)); -webkit-backdrop-filter: blur(var(--ctl-blur)); backdrop-filter: blur(var(--ctl-blur)); border: 1px solid rgba(255, 199, 44, 0.5); overflow: hidden;
   }
   .vs-fill { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(255, 199, 44, 0.35); }
@@ -241,6 +254,7 @@
   .dist-val small { font-family: var(--body); font-size: 10px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 2px; }
   .dist-goal { font-size: 13px; color: #FFC72C; }
   body.cols3 .dist-block { grid-template-columns: 1fr var(--b) var(--b); grid-template-rows: repeat(2, var(--b)); }
+  body.cols3 .dist-block .dist-val { grid-row: 1 / 3; grid-column: 3; }
   body.cols3 .dist-block .vslider { grid-row: 1 / 3; }
   body.lay-phone.portrait .mode-tag { display: none; }
   body.lay-phone.portrait .dd-chip { margin-left: auto; }
@@ -256,6 +270,16 @@
   body.m-splash .zoombar { display: none; }
   body.portrait .zoombar { left: calc(var(--edge) + var(--sal)); right: calc(var(--edge) + var(--sar)); bottom: auto; top: calc(56dvh + 8px); }
   body.portrait.m-replay .zoombar { top: calc(56dvh + 8px + var(--b) + var(--gap)); bottom: auto; }
+  /* Docked at the bottom of the left thumb column (iPad default): slider on top, − / level / + below */
+  .rail .zoombar {
+    position: static; grid-column: 1 / -1; height: auto; padding: 6px; display: grid; gap: 6px;
+    grid-template-columns: 1fr 1.3fr 1fr; grid-template-areas: "s s s" "m r p";
+  }
+  .rail .zoombar #zslider { grid-area: s; height: calc(var(--b) - 10px); }
+  .rail .zoombar #zoom-out { grid-area: m; width: auto; }
+  .rail .zoombar #zoom-reset { grid-area: r; width: auto; min-width: 0; padding: 0; }
+  .rail .zoombar #zoom-in { grid-area: p; width: auto; }
+  body.m-replay .rail .zoombar, body.portrait .rail .zoombar { position: static; top: auto; bottom: auto; }
   .zb-btn { flex: none; width: calc(var(--b) - 8px); height: calc(var(--b) - 8px); border-radius: 9px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); font-size: 22px; color: var(--silver); display: grid; place-items: center; }
   .zb-reset { width: auto; min-width: calc(var(--b) + 8px); padding: 0 8px; font-family: var(--display); font-weight: 700; font-size: 14px; }
   .zb-reset.zoomed { border-color: #fff; color: #fff; }
@@ -428,7 +452,8 @@
   <button class="rb only-live down-btn" data-rdown="2">2nd</button>
   <button class="rb only-live down-btn" data-rdown="3">3rd</button>
   <button class="rb only-live down-btn" data-rdown="4">4th</button>
-  <button class="rb wide big only-live" id="btn-freeze" title="Freeze this moment to draw on it (F)"><svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>Freeze</button>
+  <button class="rb only-live dist-goal" id="dist-goal">Goal</button>
+  <button class="rb only-live freeze-btn" id="btn-freeze" title="Freeze this moment to draw on it (F)"><svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>Freeze</button>
 </nav>
 
 <!-- RIGHT THUMB: replay button, drawing, saving -->
@@ -448,10 +473,6 @@
   <button class="rb only-review" id="btn-photo" title="Save photo of this frame with drawings" aria-label="Save photo"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></button>
   <button class="rb only-replay" id="btn-saveclip" title="Save this replay as a video (with your drawings, if any)" aria-label="Save clip"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 4v16M17 4v16M2 9h5M2 15h5M17 9h5M17 15h5"/></svg></button>
   <button class="rb wide only-review" id="btn-vertical" title="Save a vertical (9:16) version for social media, cropped to what's on screen"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg><span>9:16</span></button>
-  <button class="rb wide only-live" id="btn-replay" disabled title="Instant replay of the last few seconds (Space)">
-    <svg viewBox="0 0 24 24"><path d="M1 4v6h6"/><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/></svg>
-    <span>Replay<small class="sub" id="replay-sub">10 s · ½×</small></span>
-  </button>
   <div class="dist-block only-live" id="dist-block">
     <div class="vslider" id="vslider" role="slider" aria-label="Yards to go" aria-valuemin="0" aria-valuemax="25" tabindex="0">
       <div class="vs-fill" id="vs-fill"></div><div class="vs-thumb" id="vs-thumb"></div>
@@ -459,16 +480,21 @@
     <button class="rb" id="dist-plus" aria-label="One more yard">+</button>
     <div class="dist-val"><span id="dist-val">10</span><small>to go</small></div>
     <button class="rb" id="dist-minus" aria-label="One less yard">−</button>
-    <button class="rb dist-goal" id="dist-goal">Goal</button>
   </div>
   <button class="rb wide big primary play-btn only-live" id="btn-mark" disabled title="Start / end recording a play (Enter)">
     <span class="rec-dot"></span>
     <span><span id="mark-lbl">Start Play</span><small class="sub num" id="mark-sub">Play 1</small></span>
   </button>
-  <button class="rb wide only-live" id="btn-lastplay" disabled title="Watch the most recent play">
-    <svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg>
-    <span>Last Play<small class="sub num" id="lastplay-sub">none yet</small></span>
+  <div class="pair only-live">
+  <button class="rb only-live" id="btn-replay" disabled title="Instant replay of the last few seconds (Space)">
+    <svg viewBox="0 0 24 24"><path d="M1 4v6h6"/><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/></svg>
+    <span>Replay<small class="sub" id="replay-sub">10 s · ½×</small></span>
   </button>
+  <button class="rb only-live" id="btn-lastplay" disabled title="Watch the most recent play">
+    <svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg>
+    <span>Last<small class="sub num" id="lastplay-sub">none yet</small></span>
+  </button>
+  </div>
 </nav>
 
 <div class="dd-pop" id="dd-pop" hidden role="dialog" aria-label="Down and distance">
@@ -600,6 +626,10 @@
     <div class="field"><span>Columns of controls on each side · Phone</span>
       <div class="seg" data-setting="colsPhone"><button data-v="2">2 columns</button><button data-v="3">3 columns</button></div>
     </div>
+    <div class="field"><span>Zoom slider</span>
+      <div class="seg" data-setting="zoomPos"><button data-v="auto">Auto</button><button data-v="rail">Bottom of left thumb column</button><button data-v="bottom">Bottom of screen</button></div>
+      <p class="note">Auto puts it in the left thumb column on an iPad (thumbs can't reach the middle of a big screen) and along the bottom on a phone.</p>
+    </div>
     <div class="field"><span>Control see-through</span>
       <input type="range" id="ctl-alpha" min="0" max="100" step="5" aria-label="How solid the controls are">
       <p class="note">Left = see-through (more video shows), right = solid.</p>
@@ -627,11 +657,11 @@
   <div class="dlg-body help-list">
     <p><b>1. Always recording.</b> Once the camera is on, it records nonstop in the background. Nothing is uploaded; it all stays on this device.</p>
     <p><b>Record every play.</b> Tap <b>Start Play</b> (big button, bottom right) when the teams line up, and <b>End Play</b> at the whistle. Each play is saved as its own numbered clip on this device. In the tray (grid button), tap ★ on the ones you want to keep, then save them to Photos.</p>
-    <p><b>Down &amp; distance.</b> On the live view, tap the down (1st–4th) with your left thumb and slide the yards with your right thumb (+ / − for fine steps, Goal for goal-to-go). Tapping 1st resets to 10 yards. When you end a play, the down moves on by one automatically (4th goes back to 1st &amp; 10). A gold <b>Undo</b> button shows next to Start Play for 3 seconds if it shouldn't have (timeout, penalty). On a phone, or to edit a play you're watching, tap the gold chip in the top strip. The next play you start gets that label. While watching a play, the chip edits that play. The label goes in the clip's file name, and <b>Save Clip</b> writes it onto the video itself in a gold box.</p>
-    <p><b>Last Play</b> (under Start Play) opens the most recent play straight away. Tapping it during a play ends that play and shows it.</p>
+    <p><b>Down &amp; distance.</b> On the live view, tap the down (1st–4th, or Goal for goal-to-go) with your left thumb and slide the yards with your right thumb (+ / − for fine steps). Tapping 1st resets to 10 yards. When you end a play, the down moves on by one automatically (4th goes back to 1st &amp; 10). A gold <b>Undo</b> button shows next to Start Play for 3 seconds if it shouldn't have (timeout, penalty). On a phone, or to edit a play you're watching, tap the gold chip in the top strip. The next play you start gets that label. While watching a play, the chip edits that play. The label goes in the clip's file name, and <b>Save Clip</b> writes it onto the video itself in a gold box.</p>
+    <p><b>Last</b> (under Start Play, next to Replay) opens the most recent play straight away. Tapping it during a play ends that play and shows it.</p>
     <p><b>2. Or tap Replay after the whistle.</b> It jumps back to just before the snap and plays it in slow motion. The camera keeps recording in the small tile in the corner. Tap that tile, or <b>Live</b>, to go back.</p>
     <p><b>3. Review.</b> Tap the video to pause or play. Drag across it to scrub. Use the arrow buttons to step one frame at a time. Pinch with two fingers to zoom in on a player, and drag with two fingers to move around. Tap the zoom label at the top to reset.</p>
-    <p><b>Zoom slider.</b> The see-through bar along the bottom zooms too (with − and +). The button at its right end shows the zoom level; tap it to reset to 1×.</p>
+    <p><b>Zoom slider.</b> On an iPad it sits at the bottom of the left thumb column; on a phone it runs along the bottom. The button showing the level (e.g. 2.0×) resets to 1×. Change where it goes in Settings → Zoom slider.</p>
     <p><b>Zoom while filming.</b> Pinch on the live view. On devices that allow it, this zooms the camera itself, so the recording is zoomed too and the label says "Camera". Otherwise only the screen picture zooms and the recording stays wide.</p>
     <p><b>4. Draw.</b> Pick a pen, arrow, circle, or stamp. Touching the video pauses it. Each drawing sticks to the moment you drew it: when the replay plays past that moment, it pauses briefly so the drawing can be seen. Each replay keeps its own drawings. On the live view, tap <b>Freeze</b> first to draw on that moment. Pinching the live view always zooms; it never freezes it.</p>
     <p><b>5. Save.</b> <b>Photo</b> saves the frame with your drawings. <b>Save Clip</b> saves the replay as a video. If you drew on it, the drawings are recorded into the video and it pauses for a beat at each one, like a TV telestrator. Everything lands in the tray (grid button). Tap <b>Save</b> there to put it in Photos or Files.</p>
@@ -670,7 +700,7 @@
   $('brand-logo').src = LOGO; $('fav').href = LOGO; $('touch-icon').href = LOGO; $('splash-logo').src = LOGO;
 
   // ---------- Settings ----------
-  const DEFAULTS = { replayLen: 10, speed: 0.5, facing: 'environment', res: 1080, fps: 60, layout: 'auto', afterPlay: 'live', railY: 50, colsTablet: 2, colsPhone: 3, ctlAlpha: 45 };
+  const DEFAULTS = { replayLen: 10, speed: 0.5, facing: 'environment', res: 1080, fps: 60, layout: 'auto', afterPlay: 'live', railY: 50, colsTablet: 2, colsPhone: 3, ctlAlpha: 45, zoomPos: 'auto' };
   let settings = Object.assign({}, DEFAULTS);
   try { Object.assign(settings, JSON.parse(localStorage.getItem('sentinels-live-settings') || '{}')); } catch (_) {}
   function saveSettings() { try { localStorage.setItem('sentinels-live-settings', JSON.stringify(settings)); } catch (_) {} }
@@ -827,10 +857,23 @@
         measuredFps = (meta.presentedFrames - lastFrames) * 1000 / (t - lastT);
         lastFrames = meta.presentedFrames; lastT = t;
         reportActual();
+        checkLowFps();
       }
       live.requestVideoFrameCallback(cb);
     };
     live.requestVideoFrameCallback(cb);
+  }
+  // 4K can drop some devices to a few frames per second. If that happens, step down to 1080p
+  // (never in the middle of a play).
+  let lowFpsCount = 0;
+  function checkLowFps() {
+    if (measuredFps && measuredFps < 15 && settings.res >= 2160) lowFpsCount++; else lowFpsCount = 0;
+    if (lowFpsCount >= 4 && !playRec && mode === 'live') {
+      lowFpsCount = 0;
+      settings.res = 1080; saveSettings(); syncSettingsUI();
+      toast('4K was only giving ' + Math.round(measuredFps) + ' fps here. Switched to 1080p.', 4000);
+      restartCamera();
+    }
   }
   function reportActual() {
     if (!stream) return;
@@ -1093,7 +1136,7 @@
     $('mark-sub').textContent = playRec ? '0:00' : 'Play ' + nextNumber('play');
     const lp = latestPlay(), lb = $('btn-lastplay');
     lb.disabled = !lp && !playRec;
-    $('lastplay-sub').textContent = playRec ? 'ends this play' : lp ? 'Play ' + lp.n + ' · ' + fmtShort(lp.duration || lp.est || 0) : 'none yet';
+    $('lastplay-sub').textContent = playRec ? 'ends play' : lp ? '#' + lp.n + ' · ' + fmtShort(lp.duration || lp.est || 0) : 'none yet';
   }
   function latestPlay() {
     let best = null;
@@ -2109,6 +2152,20 @@
     const cols = phone ? settings.colsPhone : settings.colsTablet;
     bs.setProperty('--cols', String(cols));
     document.body.classList.toggle('cols3', cols === 3);
+    const zb = $('zoombar'), leftRail = document.querySelector('.rail-left');
+    const inRail = settings.zoomPos === 'rail' || (settings.zoomPos !== 'bottom' && !phone);
+    if (inRail && zb.parentElement !== leftRail) leftRail.appendChild(zb);
+    if (!inRail && zb.parentElement === leftRail) document.body.insertBefore(zb, $('toast'));
+    document.body.classList.toggle('zoom-in-rail', inRail);
+    // On screens wider than the video (phones sideways), put the video between the thumb columns
+    // instead of under them.
+    if (!(h > w * 1.1)) {
+      const csb = getComputedStyle(document.body);
+      const b = parseFloat(csb.getPropertyValue('--b')) || 44, gap = parseFloat(csb.getPropertyValue('--gap')) || 6, edge = parseFloat(csb.getPropertyValue('--edge')) || 8;
+      const railW = b * cols + gap * (cols - 1);
+      const inner = w - 2 * (railW + edge * 2);
+      document.body.classList.toggle('side-rails', inner / h >= 1.5);
+    } else document.body.classList.remove('side-rails');
     const a = Math.max(0, Math.min(100, settings.ctlAlpha)) / 100;
     bs.setProperty('--ctl-a', (0.05 + a * 0.85).toFixed(2));
     bs.setProperty('--ctl-a2', (0.35 + a * 0.6).toFixed(2));
@@ -2145,7 +2202,7 @@
       const key = g.dataset.setting;
       g.querySelectorAll('button').forEach((b) => b.classList.toggle('active', String(settings[key]) === b.dataset.v));
     });
-    replaySub.textContent = settings.replayLen + ' s · ' + (settings.speed === 1 ? '1×' : speedLabel(settings.speed).replace(' slow', ''));
+    replaySub.textContent = settings.replayLen + 's · ' + (settings.speed === 1 ? '1×' : speedLabel(settings.speed).replace(' slow', ''));
     const ry = $('rail-y'); if (ry && Number(ry.value) !== settings.railY) ry.value = settings.railY;
     const ca = $('ctl-alpha'); if (ca && Number(ca.value) !== settings.ctlAlpha) ca.value = settings.ctlAlpha;
     applyLayout();
