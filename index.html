@@ -217,6 +217,32 @@
   .scrub-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--scarlet-bright); width: 0; }
   .scrub-knob { position: absolute; top: 50%; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; background: #fff; border: 3px solid var(--scarlet); left: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.5); }
 
+  /* Down & distance */
+  .dd-chip {
+    height: 28px; padding: 0 12px; border-radius: 999px; background: rgba(9, 11, 14, 0.85); border: 1px solid #FFC72C; color: #FFC72C;
+    font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
+  }
+  .dd-chip.empty { border-color: var(--line-bright); color: var(--muted); }
+  body.m-splash .dd-chip, body.m-still .dd-chip { display: none; }
+  .dd-btn { color: #FFC72C; }
+  .dd-big { font-size: 15px; letter-spacing: 0.04em; }
+  .dd-pop {
+    position: fixed; z-index: 26; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(460px, calc(100vw - 24px));
+    background: rgba(18, 21, 27, 0.97); border: 1px solid #FFC72C; border-radius: 16px; padding: 14px; display: grid; gap: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+  }
+  .dd-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+  .dd-head b { font-family: var(--display); font-size: 28px; color: #FFC72C; letter-spacing: 0.04em; }
+  .dd-downs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .dd-downs button, .dd-opt, .dd-step { height: 56px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); font-family: var(--display); font-weight: 700; font-size: 20px; letter-spacing: 0.04em; }
+  .dd-downs button.active, .dd-opt.active { background: #FFC72C; color: #111; border-color: #FFC72C; }
+  .dd-dist { display: grid; grid-template-columns: 56px 1fr 56px; gap: 10px; align-items: center; }
+  .dd-step { font-size: 28px; }
+  #dd-range { width: 100%; height: 40px; accent-color: #FFC72C; }
+  .dd-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .dd-opt { font-size: 15px; height: 48px; }
+  .dd-done { background: var(--scarlet); border-color: var(--scarlet-bright); }
+
   /* Color + size picker that pops out beside the right rail */
   .color-pop {
     position: fixed; z-index: 25; right: calc(var(--edge) * 2 + var(--sar) + var(--rail-w)); bottom: calc(var(--edge) + var(--sab));
@@ -322,6 +348,7 @@
     <div class="brand-name">Sentinels <b>Live</b></div>
   </div>
   <div class="mode-tag" id="mode-tag"></div>
+  <button class="dd-chip" id="dd-chip" title="Set down and distance">Set down</button>
   <span class="pill" id="rec-pill"><span class="dot"></span><span id="rec-text" class="num">Camera off</span></span>
   <span class="pill" id="spec-pill"><span id="spec-text" class="num">—</span></span>
   <button class="icon-btn" id="btn-settings" aria-label="Settings" title="Settings">
@@ -346,6 +373,7 @@
     <svg viewBox="0 0 24 24" id="ic-play"><path d="M6 4l14 8-14 8V4z" fill="currentColor"/></svg>
     <svg viewBox="0 0 24 24" id="ic-pause" style="display:none"><rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/></svg>
   </button>
+  <button class="rb wide only-live dd-btn" id="btn-dd" title="Set down and distance for the next play"><span class="dd-big" id="dd-btn-lbl">Down &amp; Dist</span></button>
   <button class="rb wide big only-live" id="btn-freeze" title="Freeze this moment to draw on it (F)"><svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>Freeze</button>
 </nav>
 
@@ -379,6 +407,24 @@
   </button>
 </nav>
 
+<div class="dd-pop" id="dd-pop" hidden role="dialog" aria-label="Down and distance">
+  <div class="dd-head"><span id="dd-target">Next play</span><b id="dd-preview">—</b></div>
+  <div class="dd-downs" id="dd-downs">
+    <button data-down="1">1st</button><button data-down="2">2nd</button><button data-down="3">3rd</button><button data-down="4">4th</button>
+  </div>
+  <div class="dd-dist">
+    <button class="dd-step" id="dd-minus" aria-label="Less">−</button>
+    <input type="range" id="dd-range" min="0" max="30" step="1" value="10" aria-label="Yards to go">
+    <button class="dd-step" id="dd-plus" aria-label="More">+</button>
+  </div>
+  <div class="dd-row">
+    <button class="dd-opt" id="dd-inches">Inches</button>
+    <button class="dd-opt" id="dd-goal">Goal</button>
+    <button class="dd-opt" id="dd-clear">Clear</button>
+    <button class="dd-opt dd-done" id="dd-done">Done</button>
+  </div>
+</div>
+
 <div class="color-pop" id="color-pop" hidden>
   <button class="swatch active" data-color="#E01438" style="background:#E01438" aria-label="Scarlet"></button>
   <button class="swatch" data-color="#FFFF00" style="background:#FFFF00" aria-label="Yellow"></button>
@@ -402,9 +448,9 @@
 
 <div class="export-ov" id="export-ov" hidden>
   <div class="export-card">
-    <div class="display" style="font-weight:700;font-size:17px">Building marked-up clip</div>
+    <div class="display" style="font-weight:700;font-size:17px">Building your clip</div>
     <div class="export-track"><div class="export-bar" id="export-bar"></div></div>
-    <p class="note">It plays through once in real time to record your drawings into the video.</p>
+    <p class="note">It plays through once in real time to write your drawings and the down &amp; distance onto the video.</p>
     <button class="ctl" id="export-cancel">Cancel</button>
   </div>
 </div>
@@ -489,6 +535,7 @@
   <div class="dlg-body help-list">
     <p><b>1. Always recording.</b> Once the camera is on, it records nonstop in the background. Nothing is uploaded; it all stays on this device.</p>
     <p><b>Record every play.</b> Tap <b>Start Play</b> (big button, bottom right) when the teams line up, and <b>End Play</b> at the whistle. Each play is saved as its own numbered clip on this device. In the tray (grid button), tap ★ on the ones you want to keep, then save them to Photos.</p>
+    <p><b>Down &amp; distance.</b> Tap the gold <b>Down &amp; Dist</b> button (left side) or the chip in the top strip. Pick the down, slide the yards (or Inches / Goal), then tap Done. The next play you start gets that label. While watching a play, the chip edits that play. The label goes in the clip's file name, and <b>Save Clip</b> writes it onto the video itself in a gold box.</p>
     <p><b>Last Play</b> (under Start Play) opens the most recent play straight away. Tapping it during a play ends that play and shows it.</p>
     <p><b>2. Or tap Replay after the whistle.</b> It jumps back to just before the snap and plays it in slow motion. The camera keeps recording in the small tile in the corner. Tap that tile, or <b>Live</b>, to go back.</p>
     <p><b>3. Review.</b> Tap the video to pause or play. Drag across it to scrub. Use the arrow buttons to step one frame at a time. Pinch with two fingers to zoom in on a player, and drag with two fingers to move around. Tap the zoom label at the top to reset.</p>
@@ -552,6 +599,8 @@
   let playRec = null;             // the play being recorded right now
   let lastPlay = null, lastPlayEnd = 0;
   let trayFilter = 'all';
+  let curDD = null;               // down & distance for the next / current play
+  try { curDD = JSON.parse(localStorage.getItem('sentinels-live-dd') || 'null'); } catch (_) {}
   const frozen = document.createElement('canvas'); // native-res frozen frame for still mode
 
   // Drawing
@@ -581,13 +630,14 @@
     if (m !== 'splash') stage.classList.add('mode-' + m);
     document.body.classList.remove('m-splash', 'm-live', 'm-replay', 'm-still');
     document.body.classList.add('m-' + m);
-    $('color-pop').hidden = true;
+    $('color-pop').hidden = true; $('dd-pop').hidden = true;
     requestAnimationFrame(positionRails);
     if (m !== 'replay') { replay.pause(); }
     renderModeTag();
     requestAnimationFrame(fitInk);
   }
   function renderModeTag() {
+    if (typeof renderDD === 'function') { try { renderDD(); } catch (_) {} }
     let html = '';
     if (mode === 'replay' && currentClip) html = '<span class="tag-main">' + clipLabel(currentClip) + '</span><span>' + speedLabel(replay.playbackRate) + '</span>';
     else if (mode === 'still') html = '<span class="tag-main">Frozen</span>';
@@ -773,6 +823,70 @@
     openClip(clip, true);
   }
 
+  // ---------- Down & distance ----------
+  const ORD = ['', '1st', '2nd', '3rd', '4th'];
+  function ddLabel(dd) {
+    if (!dd || !dd.down) return '';
+    return ORD[dd.down] + ' & ' + (dd.goal ? 'Goal' : dd.dist === 0 ? 'Inches' : dd.dist);
+  }
+  function ddFile(dd) { return ddLabel(dd).replace(' & ', '-and-'); }
+  let ddTarget = 'next';
+  function ddValue() {
+    if (ddTarget === 'clip' && currentClip) return currentClip.dd || null;
+    if (ddTarget === 'rec' && playRec) return playRec.dd || null;
+    return curDD;
+  }
+  function setDD(dd) {
+    if (ddTarget === 'clip' && currentClip) { currentClip.dd = dd; saveMetaSoon(currentClip); renderModeTag(); }
+    else {
+      curDD = dd;
+      try { localStorage.setItem('sentinels-live-dd', JSON.stringify(dd)); } catch (_) {}
+      if (ddTarget === 'rec' && playRec) playRec.dd = dd ? Object.assign({}, dd) : null;
+    }
+    renderDD();
+  }
+  function renderDD() {
+    // chip in the top strip + live button
+    let dd = null;
+    if (mode === 'replay' && currentClip) dd = currentClip.kind === 'play' ? (currentClip.dd || null) : undefined;
+    else if (playRec) dd = playRec.dd || null;
+    else dd = curDD;
+    const chip = $('dd-chip');
+    chip.hidden = dd === undefined;
+    chip.textContent = ddLabel(dd) || 'Set down';
+    chip.classList.toggle('empty', !ddLabel(dd));
+    $('dd-btn-lbl').textContent = ddLabel(playRec ? playRec.dd : curDD) || 'Down & Dist';
+    // panel
+    if (!$('dd-pop').hidden) {
+      const v = ddValue();
+      $('dd-preview').textContent = ddLabel(v) || '—';
+      document.querySelectorAll('#dd-downs button').forEach((b) => b.classList.toggle('active', !!v && Number(b.dataset.down) === v.down));
+      $('dd-goal').classList.toggle('active', !!(v && v.goal));
+      $('dd-inches').classList.toggle('active', !!(v && !v.goal && v.dist === 0));
+      if (v && !v.goal) $('dd-range').value = v.dist;
+    }
+  }
+  function openDD() {
+    if (mode === 'replay' && currentClip && currentClip.kind === 'play') { ddTarget = 'clip'; $('dd-target').textContent = 'Play ' + currentClip.n; }
+    else if (playRec) { ddTarget = 'rec'; $('dd-target').textContent = 'Play ' + playRec.n + ' (recording)'; }
+    else { ddTarget = 'next'; $('dd-target').textContent = 'Next play'; }
+    $('dd-pop').hidden = false; renderDD();
+  }
+  function ddEdit(patch) {
+    const v = Object.assign({ down: 1, dist: 10, goal: false }, ddValue() || {}, patch);
+    setDD(v);
+  }
+  document.querySelectorAll('#dd-downs button').forEach((b) => b.onclick = () => ddEdit(Number(b.dataset.down) === 1 && !(ddValue() && ddValue().down) ? { down: 1, dist: 10, goal: false } : { down: Number(b.dataset.down) }));
+  $('dd-range').addEventListener('input', (e) => ddEdit({ dist: Number(e.target.value), goal: false }));
+  $('dd-minus').onclick = () => { const v = ddValue(); ddEdit({ dist: Math.max(0, ((v && !v.goal) ? v.dist : 10) - 1), goal: false }); };
+  $('dd-plus').onclick = () => { const v = ddValue(); ddEdit({ dist: Math.min(30, ((v && !v.goal) ? v.dist : 10) + 1), goal: false }); };
+  $('dd-goal').onclick = () => ddEdit({ goal: !(ddValue() && ddValue().goal) });
+  $('dd-inches').onclick = () => ddEdit({ dist: 0, goal: false });
+  $('dd-clear').onclick = () => setDD(null);
+  $('dd-done').onclick = () => { $('dd-pop').hidden = true; };
+  $('dd-chip').onclick = () => { if ($('dd-pop').hidden) openDD(); else $('dd-pop').hidden = true; };
+  $('btn-dd').onclick = openDD;
+
   // ---------- Play-by-play recording ----------
   function dayKey(d) { return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
   function nextNumber(kind) {
@@ -806,9 +920,10 @@
     stopRecorders();
     let seg;
     try { seg = startSegment(); } catch (_) { toast('Could not start recording.'); try { startSegment(); } catch (e) {} return; }
-    playRec = { seg, n: nextNumber('play'), start: now(), thumb: liveThumb() };
+    playRec = { seg, n: nextNumber('play'), start: now(), thumb: liveThumb(), dd: curDD ? Object.assign({}, curDD) : null };
+    renderDD();
     updateMarkUI();
-    toast('Recording play ' + playRec.n);
+    toast('Recording play ' + playRec.n + (playRec.dd ? ' · ' + ddLabel(playRec.dd) : ''));
   }
   async function endPlay(openAfter) {
     if (!playRec) return null;
@@ -821,10 +936,11 @@
     if (!segments.length) { try { startSegment(); } catch (_) {} }
     const secs = (now() - pr.start) / 1000;
     if (!blob.size) { toast('Nothing was recorded for that play.'); return null; }
-    const clip = addClip(blob, secs, pr.seg.fps, 'play', { n: pr.n, thumb: pr.thumb || '' });
+    const clip = addClip(blob, secs, pr.seg.fps, 'play', { n: pr.n, thumb: pr.thumb || '', dd: pr.dd || null });
+    renderDD();
     lastPlay = clip; lastPlayEnd = now();
     updateMarkUI();
-    toast('Play ' + pr.n + ' saved · ' + fmtShort(secs));
+    toast('Play ' + pr.n + (pr.dd ? ' (' + ddLabel(pr.dd) + ')' : '') + ' saved · ' + fmtShort(secs));
     if (openAfter || settings.afterPlay === 'replay') openClip(clip, true);
     return clip;
   }
@@ -877,7 +993,7 @@
   function metaOf(o) {
     const m = { id: o.id, kind: o.kind, n: o.n, at: o.at.getTime(), type: o.type, thumb: o.thumb || '', starred: !!o.starred };
     if (o.kind === 'photo') { m.label = o.label; }
-    else { m.est = o.est; m.duration = o.duration || 0; m.fps = o.fps; m.items = o.items || []; m.of = o.of || ''; }
+    else { m.est = o.est; m.duration = o.duration || 0; m.fps = o.fps; m.items = o.items || []; m.of = o.of || ''; m.dd = o.dd || null; m.playN = o.playN || 0; }
     return m;
   }
   function persist(o) {
@@ -919,7 +1035,7 @@
   function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 
   function clipLabel(c) {
-    if (c.kind === 'play') return 'Play ' + c.n;
+    if (c.kind === 'play') return 'Play ' + c.n + (ddLabel(c.dd) ? ' · ' + ddLabel(c.dd) : '');
     if (c.kind === 'markup') return (c.of || 'Clip') + ' ✎';
     return 'Replay ' + c.n;
   }
@@ -1098,12 +1214,25 @@
     x.restore();
   }
 
+  // Big down-and-distance box in the top-left corner of exported photos and clips
+  function drawDD(x, W, H, text) {
+    const s = W / 1280, pad = 18 * s;
+    x.save();
+    x.font = '700 ' + Math.round(34 * s) + 'px Oswald, Impact, "Arial Narrow", sans-serif';
+    const tw = x.measureText(text).width, bw = tw + 32 * s, bh = 56 * s;
+    x.fillStyle = 'rgba(9, 11, 14, 0.88)'; x.strokeStyle = '#FFC72C'; x.lineWidth = 3 * s;
+    x.beginPath(); if (x.roundRect) x.roundRect(pad, pad, bw, bh, 8 * s); else x.rect(pad, pad, bw, bh);
+    x.fill(); x.stroke();
+    x.fillStyle = '#FFC72C'; x.textBaseline = 'middle';
+    x.fillText(text, pad + 16 * s, pad + bh / 2 + 2 * s);
+    x.restore();
+  }
   let exportCancel = false;
   async function saveClip() {
     if (mode !== 'replay' || !currentClip || exporting) return;
     const timed = items.filter((it) => it.t != null);
-    if (!timed.length) {
-      // No drawings: hand the original clip straight to the share sheet.
+    if (!timed.length && !(currentClip.dd && currentClip.dd.down)) {
+      // No drawings and no down & distance: hand the original clip straight to the share sheet.
       shareClip(currentClip);
       return;
     }
@@ -1113,7 +1242,7 @@
     exporting = true; exportCancel = false; cancelHold();
     const ov = $('export-ov'); ov.hidden = false; $('export-bar').style.width = '0%';
     const rate = replay.playbackRate;
-    const firstT = Math.min.apply(null, timed.map((i) => i.t));
+    const firstT = timed.length ? Math.min.apply(null, timed.map((i) => i.t)) : Infinity;
     const start = Math.max(0, Math.min(windowStart, firstT - 1.5));
     const end = clipDuration();
     const vw = replay.videoWidth, vh = replay.videoHeight;
@@ -1123,6 +1252,7 @@
     const x = c.getContext('2d');
     const k = W / (parseFloat(ink.style.width) || W);
     const label = clipLabel(currentClip).toUpperCase() + (rate < 1 ? ' · ' + speedLabel(rate).toUpperCase() : '');
+    const ddText = ddLabel(currentClip.dd).toUpperCase();
     const holds = Array.from(new Set(timed.map((i) => Math.round(i.t * 1000) / 1000))).filter((h) => h >= start).sort((a, b) => a - b);
 
     replay.pause();
@@ -1132,6 +1262,7 @@
       x.drawImage(replay, 0, 0, W, H);
       visibleItems().forEach((it) => drawItem(it, x, W, H, k));
       drawBadge(x, W, H, label);
+      if (ddText) drawDD(x, W, H, ddText);
     };
     paint();
 
@@ -1171,9 +1302,9 @@
     if (exportCancel || !finished) { toast('Export canceled'); return; }
     const blob = new Blob(chunks, { type: mr.mimeType || mime || 'video/mp4' });
     if (!blob.size) { toast('Export failed. Try saving photos instead.', 3000); return; }
-    const clip = addClip(blob, (end - start) / rate + holds.length * HOLD_MS / 1000, currentClip.fps, 'markup', { of: clipLabel(currentClip), thumb: c.toDataURL('image/jpeg', 0.6) });
+    const clip = addClip(blob, (end - start) / rate + holds.length * HOLD_MS / 1000, currentClip.fps, 'markup', { of: clipLabel(currentClip), thumb: c.toDataURL('image/jpeg', 0.6), dd: currentClip.dd || null, playN: currentClip.kind === 'play' ? currentClip.n : 0 });
     renderTray();
-    openMedia({ blob: clip.blob, url: clip.url, name: fileName(clip), title: 'Marked-up clip ready', video: true });
+    openMedia({ blob: clip.blob, url: clip.url, name: fileName(clip), title: 'Clip ready', video: true });
   }
 
   // ---------- Freeze (still mode) ----------
@@ -1470,6 +1601,8 @@
     visibleItems().forEach((it) => drawItem(it, x, W, H, k));
     const stamp = mode === 'replay' ? clipLabel(currentClip).toUpperCase() + ' · ' + fmt(replay.currentTime) : clockStr(new Date());
     drawBadge(x, W, H, stamp);
+    const pdd = mode === 'replay' && currentClip ? currentClip.dd : (mode === 'live' ? (playRec ? playRec.dd : curDD) : null);
+    if (ddLabel(pdd)) drawDD(x, W, H, ddLabel(pdd).toUpperCase());
     c.toBlob((blob) => {
       if (!blob) { toast('Could not save the photo.'); return; }
       const thumbC = document.createElement('canvas'); thumbC.width = 320; thumbC.height = Math.round(320 * H / W);
@@ -1507,7 +1640,8 @@
   function extFor(type) { return /mp4/.test(type) ? 'mp4' : /webm/.test(type) ? 'webm' : 'mov'; }
   function fileName(o) {
     if (o.kind === 'photo') return 'Sentinels_Photo_' + stampName(o.at) + '.jpg';
-    return 'Sentinels_' + clipLabel(o).replace(/[^A-Za-z0-9]+/g, '_').replace(/_+$/, '') + '_' + stampName(o.at) + '.' + extFor(o.type || (o.blob && o.blob.type) || '');
+    const base = (o.kind === 'markup' && o.playN) ? 'Play_' + o.playN + (o.dd && o.dd.down ? '_' + ddFile(o.dd) : '') + '_edited' : o.kind === 'play' ? 'Play_' + o.n + (o.dd && o.dd.down ? '_' + ddFile(o.dd) : '') : clipLabel(o).replace(/[^A-Za-z0-9]+/g, '_').replace(/_+$/, '');
+    return 'Sentinels_' + base + (o.marked ? '_markup' : '') + '_' + stampName(o.at) + '.' + extFor(o.type || (o.blob && o.blob.type) || '');
   }
   async function shareClip(o) {
     if (!(await ensureBlob(o))) return;
@@ -1760,6 +1894,7 @@
   ['gesturestart', 'gesturechange'].forEach((ev) => document.addEventListener(ev, (e) => e.preventDefault(), { passive: false }));
   updateCounts();
   setMode('splash');
+  renderDD();
   loadStored();
   // Test hook for automated checks (harmless in normal use)
   window.__sentinels = { get state() { return { mode, plays: clips.filter((c) => c.kind === 'play').length, recordingPlay: !!playRec, clips: clips.length, photos: photos.length, segments: segments.length, items: items.length, zoom: view.s, dur: clipDuration(), t: replay.currentTime, rate: replay.playbackRate, windowStart }; } };
