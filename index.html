@@ -450,6 +450,43 @@
   .tray-sub { padding: 0 8px; font-size: 11px; color: #9ad9ff; min-height: 14px; }
   #btn-steady.on { border-color: #00C2FF; color: #00C2FF; }
 
+  /* Big "what happened" panel after each play */
+  .rb-panel {
+    position: fixed; z-index: 27; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: min(760px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow: auto;
+    background: rgba(12, 14, 18, 0.94); border: 2px solid #FFC72C; border-radius: 18px; padding: 14px; display: grid; gap: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7); font-family: var(--display); text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .rbp-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .rbp-head b { font-size: 26px; color: #fff; margin-right: 10px; }
+  .rbp-head span { font-size: 22px; color: #FFC72C; }
+  .rbp-x { width: 52px; height: 52px; border-radius: 12px; background: rgba(255,255,255,0.08); font-size: 30px; color: #fff; }
+  .rbp-gain { display: grid; grid-template-columns: minmax(84px, 1fr) 2.4fr minmax(84px, 1fr); gap: 10px; align-items: stretch; }
+  .rbp-step { min-height: 120px; border-radius: 16px; background: rgba(255, 199, 44, 0.16); border: 2px solid rgba(255,199,44,0.6); color: #FFC72C; font-size: 56px; font-weight: 700; }
+  .rbp-step:active, .rbp-quick button:active, .rbp-out button:active { transform: scale(0.97); }
+  .rbp-mid { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; }
+  .rbp-val { font-size: clamp(30px, 6vw, 52px); font-weight: 700; color: #fff; line-height: 1; }
+  .rbp-next { font-size: clamp(16px, 3vw, 24px); color: #FFC72C; min-height: 1.2em; }
+  .rbp-quick { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .rbp-quick button { min-width: 64px; height: 48px; border-radius: 12px; background: rgba(255,255,255,0.1); font-size: 20px; color: #fff; font-family: var(--display); }
+  .rbp-out { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .rbp-out button { min-height: 64px; border-radius: 14px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.18); color: #fff; font-family: var(--display); font-size: clamp(15px, 2.6vw, 21px); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+  .rbp-out button.on { background: #FFC72C; border-color: #FFC72C; color: #111; }
+  .rbp-foot { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 10px; }
+  .rbp-foot button { min-height: 60px; border-radius: 14px; background: rgba(255,255,255,0.1); color: #fff; font-family: var(--display); font-size: 20px; font-weight: 700; text-transform: uppercase; }
+  .rbp-foot .rbp-done { background: var(--scarlet); border: 2px solid var(--scarlet-bright); }
+  body.lay-phone .rbp-step { min-height: 84px; font-size: 44px; }
+  body.lay-phone .rbp-out button { min-height: 54px; }
+  body.lay-phone .rbp-foot button { min-height: 52px; }
+  body.lay-phone:not(.portrait) .rb-panel { gap: 8px; padding: 10px; }
+  body.lay-phone:not(.portrait) .rbp-out { grid-template-columns: repeat(6, 1fr); }
+  body.lay-phone:not(.portrait) .rbp-out button { font-size: 13px; min-height: 48px; }
+  body.lay-phone:not(.portrait) .rbp-head b { font-size: 20px; } body.lay-phone:not(.portrait) .rbp-head span { font-size: 17px; }
+  body.lay-phone:not(.portrait) .rbp-x { width: 44px; height: 44px; }
+  /* Controls that aren't needed while a play records are dimmed and switched off */
+  .gc.g-off { opacity: 0.28; filter: grayscale(0.7); pointer-events: none; }
+  .gc .g-res-sum { font-size: clamp(12px, calc(var(--cell) * 0.24), 18px); color: #FFC72C; }
+
   /* ---------- Tray sheet ---------- */
   .sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 50; display: none; }
   .sheet-backdrop.open { display: block; }
@@ -663,6 +700,24 @@
 <div id="grid-layer" aria-label="Live controls"></div>
 <div class="review-strip" id="review-strip" hidden></div>
 <div class="res-pop" id="res-pop" hidden></div>
+<section class="rb-panel" id="rbp" hidden aria-label="What happened on the play">
+  <div class="rbp-head"><div><b id="rbp-title">Play 1</b><span id="rbp-dd"></span></div><button type="button" class="rbp-x" id="rbp-close" aria-label="Close">×</button></div>
+  <div class="rbp-gain">
+    <button type="button" class="rbp-step" data-step="-1" aria-label="One yard less">−</button>
+    <div class="rbp-mid"><div class="rbp-val" id="rbp-val">Yards gained?</div><div class="rbp-next" id="rbp-next"></div>
+      <div class="rbp-quick"><button type="button" data-step="-5">−5</button><button type="button" data-step="5">+5</button><button type="button" data-step="10">+10</button><button type="button" data-step="20">+20</button></div></div>
+    <button type="button" class="rbp-step" data-step="1" aria-label="One yard more">+</button>
+  </div>
+  <div class="rbp-out">
+    <button type="button" data-rk="inc">Incomplete</button>
+    <button type="button" data-rk="first">1st Down</button>
+    <button type="button" data-rk="td">Touchdown</button>
+    <button type="button" data-rk="pen">Penalty</button>
+    <button type="button" data-rk="to">Turnover</button>
+    <button type="button" data-rk="nop">No play / timeout</button>
+  </div>
+  <div class="rbp-foot"><button type="button" id="rbp-clear">Clear</button><button type="button" id="rbp-done">Done</button><button type="button" class="rbp-done" id="rbp-next-play">● Start next play</button></div>
+</section>
 <div class="edit-bar" id="edit-bar">
   <span class="eb-key" id="eb-key"></span>
   <button class="ctl primary" id="eb-add">+ Add</button>
@@ -746,6 +801,10 @@
     <div class="field"><span>After End Play</span>
       <div class="seg" data-setting="afterPlay"><button data-v="live">Stay on live</button><button data-v="replay">Show the replay</button></div>
     </div>
+    <div class="field"><span>"What happened" panel after End Play</span>
+      <div class="seg" data-setting="resultPopup"><button data-v="on">Pop up</button><button data-v="off">Don't pop up</button></div>
+      <p class="note">Big buttons for yards gained, Incomplete, 1st Down, Touchdown, Penalty, Turnover or No play. It sets the next down &amp; distance and closes when you tap Done or start the next play.</p>
+    </div>
     <div class="field"><span>Jersey numbers to tag</span>
       <input type="text" id="set-players" class="txt" placeholder="e.g. 22, 7, 15" autocomplete="off">
       <p class="note">These become the buttons on the <b>Tag players</b> control and the filters in the tray.</p>
@@ -827,7 +886,8 @@
     <p><b>Your live controls.</b> Every control is a see-through block on a grid over the video. Tap <b>Layout</b> to arrange them: drag to move, <b>↻</b> changes shape or turns a slider, <b>⤡</b> stretches sliders, <b>×</b> removes, <b>+ Add</b> opens the catalog of every control (new controls show up there). Tap <b>Done</b> to save. There's a separate layout for phone and iPad, upright and sideways, and each block stays pinned to its nearest corner. <b>Export</b> shares your layouts as a file (also copied); a friend uses <b>Import file</b> or <b>Paste</b>. The see-through slider is in the edit bar and in Settings.</p>
     <p><b>Record every play.</b> <b>Start Play</b> when the teams line up, <b>End Play</b> at the whistle. Each play is saved as its own numbered clip in the current game. <b>Last</b> opens the most recent play; tapping it during a play ends and shows that play. <b>Replay</b> looks back at the last few seconds even if you didn't start a play.</p>
     <p><b>Down &amp; distance.</b> Tap the down on the <b>Downs</b> block (1st resets to 10 yards), or <b>Goal</b>. Set yards with the <b>Yards slider</b> or <b>Yards + / −</b>. The next play you start gets that label. When a play ends the down moves on by one (4th goes to 1st &amp; 10), and a gold <b>Undo</b> shows for 3 seconds for timeouts.</p>
-    <p><b>Play result.</b> After End Play, use the <b>Play result</b> block: slide or step the yards gained (negative for a loss), or tap Incomplete, 1st down, TD, Penalty or Turnover. The next down &amp; distance is worked out for you (1st &amp; 10 plus 4 yards becomes 2nd &amp; 6; gaining the distance resets to 1st &amp; 10; a penalty replays the down). The result is added to the play's label. While watching a play you can change it with <b>Result</b> at the top of the screen.</p>
+    <p><b>What happened on the play.</b> When you tap End Play, a big panel pops up. Use the big <b>−</b> / <b>+</b> (or −5, +5, +10, +20) for yards gained, or tap Incomplete, 1st Down, Touchdown, Penalty, Turnover or No play / timeout. It shows the next down &amp; distance and sets it for you (1st &amp; 10 plus 4 yards becomes 2nd &amp; 6; gaining the distance resets to 1st &amp; 10; a penalty or no play keeps the same down). Tap <b>Done</b>, or <b>Start next play</b> right from the panel. Reopen it from the <b>Play result</b> block, or from <b>Result</b> at the top while watching a play. You can turn the pop-up off in Settings.</p>
+    <p><b>While a play records</b>, controls you don't need (result, replay, freeze, tray, camera flip, settings, help, game, quarter, layout) are dimmed and switched off so they can't be bumped. Downs, yards, tags, zoom, photo and Last stay live.</p>
     <p><b>Player tags.</b> Enter jersey numbers in Settings. The <b>Tag players</b> block tags the play being recorded (or the last play). Tag your kid's number and the play is starred as a keeper automatically. While watching a play, the number chips at the top tag it too. In the tray, tap a number to see just those plays.</p>
     <p><b>Game.</b> The <b>Game</b> block opens opponent, quarter and score, plus <b>New game</b>. The <b>Quarter</b> block moves to the next quarter with one tap. Plays are numbered per game, grouped by game in the tray, and saved clips show the quarter and score.</p>
     <p><b>Watching a replay.</b> Left side: Live, tray, loop, speed, back to start, frame back/forward, play/pause, zoom. Right side: drawing tools, color, undo, clear, Photo, Save Clip, 9:16. Tap the video to pause/play, drag across it to scrub, pinch to zoom. <b>Steady</b> smooths shaky footage. Drawings stick to the moment you drew them and the replay pauses there briefly.</p>
@@ -866,7 +926,7 @@
   $('brand-logo').src = LOGO; $('fav').href = LOGO; $('touch-icon').href = LOGO; $('splash-logo').src = LOGO;
 
   // ---------- Settings ----------
-  const DEFAULTS = { replayLen: 10, speed: 0.5, facing: 'environment', res: 1080, fps: 60, layout: 'auto', afterPlay: 'live', railY: 50, colsTablet: 2, colsPhone: 3, ctlAlpha: 45, zoomPos: 'auto', players: '', myNum: '', steady: 'off' };
+  const DEFAULTS = { replayLen: 10, speed: 0.5, facing: 'environment', res: 1080, fps: 60, layout: 'auto', afterPlay: 'live', railY: 50, colsTablet: 2, colsPhone: 3, ctlAlpha: 45, zoomPos: 'auto', players: '', myNum: '', steady: 'off', resultPopup: 'on' };
   let settings = Object.assign({}, DEFAULTS);
   try { Object.assign(settings, JSON.parse(localStorage.getItem('sentinels-live-settings') || '{}')); } catch (_) {}
   function saveSettings() { try { localStorage.setItem('sentinels-live-settings', JSON.stringify(settings)); } catch (_) {} }
@@ -926,6 +986,7 @@
     if (m === 'live' && window.__gridRelayout) requestAnimationFrame(window.__gridRelayout);
     if (typeof renderReviewStrip === 'function') { try { renderReviewStrip(); } catch (_) {} }
     if (m !== 'replay') replay.style.transform = '';
+    if (typeof closeResultBig === 'function' && m !== 'live' && m !== 'replay') closeResultBig();
     requestAnimationFrame(positionRails);
     if (m !== 'replay') { replay.pause(); }
     renderModeTag();
@@ -1362,6 +1423,7 @@
     if (r.kind === 'inc') return 'Incomplete';
     if (r.kind === 'td') return 'Touchdown';
     if (r.kind === 'pen') return 'Penalty';
+    if (r.kind === 'nop') return 'No play';
     if (r.kind === 'to') return 'Turnover';
     if (r.kind === 'first') return '1st down' + (r.g ? ' (' + (r.g > 0 ? '+' : '') + r.g + ')' : '');
     const g = r.g || 0;
@@ -1369,7 +1431,7 @@
   }
   function computeNext(pre, r) {
     if (!pre || !pre.down || !r) return null;
-    if (r.kind === 'pen') return Object.assign({}, pre);
+    if (r.kind === 'pen' || r.kind === 'nop') return Object.assign({}, pre);
     if (r.kind === 'to' || r.kind === 'first') return { down: 1, dist: 10, goal: false };
     if (r.kind === 'td') return null;
     const g = r.kind === 'inc' ? 0 : (r.g || 0);
@@ -1387,13 +1449,54 @@
       saveMetaSoon(target); renderTray();
       // Only the most recent play drives the next down & distance.
       if (target === latestPlay() && !playRec && target.dd && target.dd.down) {
-        const next = computeNext(target.dd, r) || (r ? null : null);
-        if (r) { ddTarget = 'next'; setDD(next); hideDDUndo(); }
+        ddTarget = 'next';
+        setDD(r ? computeNext(target.dd, r) : autoNext(target.dd));
+        hideDDUndo();
       }
     }
     renderReviewStrip(); renderModeTag();
+    if (rbpTarget === target) paintResultBig();
     if (window.__gridRefresh) window.__gridRefresh();
   }
+  // ---------- Big result panel ----------
+  // Pops up after End Play (and from the Play result block / replay screen). Big buttons only.
+  let rbpTarget = null;
+  function openResultBig(target) {
+    if (!target) { toast('Record a play first'); return; }
+    rbpTarget = target;
+    hideDDUndo();
+    $('rbp').hidden = false;
+    paintResultBig();
+  }
+  function closeResultBig() { $('rbp').hidden = true; rbpTarget = null; }
+  function paintResultBig() {
+    const tg = rbpTarget; if (!tg) return;
+    const r = tg.result;
+    $('rbp-title').textContent = 'Play ' + tg.n;
+    $('rbp-dd').textContent = ddLabel(tg.dd) || '';
+    $('rbp-val').textContent = r ? resultLabel(r) : 'What happened?';
+    const nx = tg.dd && tg.dd.down ? (r ? computeNext(tg.dd, r) : autoNext(tg.dd)) : null;
+    $('rbp-next').textContent = tg.dd && tg.dd.down ? 'Next: ' + (nx ? ddLabel(nx) : (r && r.kind === 'td' ? 'kickoff' : '—')) : 'Set the down before the next play to get next-down math';
+    document.querySelectorAll('#rbp [data-rk]').forEach((b) => b.classList.toggle('on', !!(r && r.kind === b.dataset.rk)));
+  }
+  function autoNext(pre) { return pre.down >= 4 ? { down: 1, dist: 10, goal: false } : Object.assign({}, pre, { down: pre.down + 1 }); }
+  document.querySelectorAll('#rbp [data-step]').forEach((b) => b.addEventListener('click', () => {
+    const tg = rbpTarget; if (!tg) return;
+    const cur = tg.result && (tg.result.kind === 'gain' || tg.result.kind === 'first') ? (tg.result.g || 0) : 0;
+    setResult(tg, { kind: 'gain', g: Math.max(-30, Math.min(99, cur + Number(b.dataset.step))) });
+    paintResultBig();
+  }));
+  document.querySelectorAll('#rbp [data-rk]').forEach((b) => b.addEventListener('click', () => {
+    const tg = rbpTarget; if (!tg) return;
+    const k = b.dataset.rk;
+    setResult(tg, (tg.result && tg.result.kind === k) ? null : { kind: k, g: tg.result ? (tg.result.g || 0) : 0 });
+    paintResultBig();
+  }));
+  $('rbp-clear').onclick = () => { if (rbpTarget) { setResult(rbpTarget, null); paintResultBig(); } };
+  $('rbp-done').onclick = closeResultBig;
+  $('rbp-next-play').onclick = () => { closeResultBig(); if (mode !== 'live') goLive(); startPlay(); };
+  $('rbp-close').onclick = closeResultBig;
+
   // Builds the result controls into a container (used by the live block and the replay popover).
   function buildResultUI(box, getTarget) {
     box.innerHTML = '<div class="g-result"><div class="gr-top"><button type="button" data-rs="-">−</button><div class="gr-mid"><div class="gr-val">Gain —</div><input type="range" min="-15" max="40" step="1" value="0" aria-label="Yards gained"><div class="gr-next"></div></div><button type="button" data-rs="+">+</button></div>' +
@@ -1438,7 +1541,7 @@
     });
     const rb = document.createElement('button'); rb.type = 'button'; rb.className = 'tagchip res';
     rb.textContent = c.result ? resultLabel(c.result) : 'Result';
-    rb.onclick = () => { const pop = $('res-pop'); pop.hidden = !pop.hidden; if (!pop.hidden) buildResultUI(pop, () => currentClip); };
+    rb.onclick = () => openResultBig(currentClip);
     strip.appendChild(rb);
     if (!$('res-pop').hidden) paintResultUI($('res-pop'), c);
   }
@@ -1546,6 +1649,7 @@
   }
   function startPlay() {
     if (!canRecord || !stream || playRec) return;
+    closeResultBig();
     stopRecorders();
     let seg;
     try { seg = startSegment(); } catch (_) { toast('Could not start recording.'); try { startSegment(); } catch (e) {} return; }
@@ -1576,6 +1680,7 @@
     updateMarkUI();
     toast('Play ' + pr.n + (pr.dd ? ' (' + ddLabel(pr.dd) + ')' : '') + ' saved · ' + fmtShort(secs) + (pr.dd && pr.dd.down ? ' · next ' + ddLabel(curDD) : ''));
     if (openAfter || settings.afterPlay === 'replay') openClip(clip, true);
+    else if (settings.resultPopup !== 'off' && mode === 'live') openResultBig(clip);
     return clip;
   }
   function liveThumb() {
@@ -2860,7 +2965,7 @@
       settings:  { name: 'Settings', desc: 'App settings', w: 1, h: 1, render: () => btn(ICON.gear, () => $('btn-settings').click()) },
       help:      { name: 'Help', desc: 'How it works', w: 1, h: 1, render: () => btn(ICON.help, () => $('btn-help').click()) },
       status:    { name: 'Recording status', desc: 'REC time and frames per second', w: 3, h: 1, resize: { min: 2, max: 6 }, cls: 'g-display', render: () => ({ html: '<div class="gstat"><span class="dot"></span><span class="g-stat-t">REC</span></div>' }) },
-      result:    { name: 'Play result', desc: 'Yards gained, Inc, 1st down, TD, penalty, turnover; sets the next down', w: 4, h: 2, sizes: [[4, 2], [3, 3], [2, 4], [5, 2], [6, 2]], cls: 'g-gold', render: () => ({ html: '<div class="g-res-box" style="width:100%;height:100%"></div>', mount: (el) => buildResultUI(el.querySelector('.g-res-box'), resultTarget) }) },
+      result:    { name: 'Play result', desc: 'Opens the big "what happened" panel for the last play (it also pops up after End Play)', w: 3, h: 1, sizes: [[3, 1], [2, 1], [4, 1], [2, 2], [4, 2]], cls: 'g-gold', render: () => btn('<span class="gl">Result</span><span class="g-res-sum">tap after a play</span>', () => openResultBig(latestPlay())) },
       tags:      { name: 'Tag players', desc: 'Tag jersey numbers on the play (set numbers in Settings)', w: 4, h: 1, resize: { min: 2, max: 12 }, rotate: true, render: (p) => ({ html: '<div class="g-tags' + (p.h > p.w ? ' vert' : '') + '"></div>', mount: (el) => mountTags(el.querySelector('.g-tags')) }) },
       game:      { name: 'Game', desc: 'Opponent, quarter, score, new game', w: 3, h: 1, sizes: [[3, 1], [2, 1], [4, 1], [2, 2]], render: () => btn('<span class="gl g-game-l">Set up game</span>', () => openGame()) },
       quarter:   { name: 'Next quarter', desc: 'One tap moves to the next quarter', w: 1, h: 1, render: () => btn('<span class="gl g-q-l">Q1</span><span class="gs">next</span>', () => nextQuarter()) },
@@ -2928,7 +3033,7 @@
       if (cols >= 12) {
         put('game', 3 + (cols >= 9 ? 0 : 0), 0, 3, 1);
         if (cols >= 14 || portrait) {
-          if (y0 + 4 < rows - 1) put('result', cols - 6, y0 + 3, 4, 2);
+          if (y0 + 4 < rows - 1) put('result', cols - 6, y0 + 3, 4, 2);  // big, easy target; opens the result panel
           if (y0 + 5 < rows - 1) put('tags', cols - 6, y0 + 5, 4, 1);
           put('quarter', 6, 0);
         }
@@ -3038,7 +3143,10 @@
       q('.g-tray-n').forEach((s) => { s.textContent = clips.length + photos.length; });
       q('.g-stat-t').forEach((s) => { s.textContent = recText.textContent.replace(/\s*buffered/i, '') + ' · ' + specText.textContent; });
       q('.g-dd-v').forEach((s) => { s.textContent = ddLabel(ld) || 'Set down'; });
-      q('.g-res-box').forEach((bx) => paintResultUI(bx, resultTarget()));
+      q('.g-res-sum').forEach((s) => { const lp2 = latestPlay(); s.textContent = lp2 ? 'Play ' + lp2.n + ': ' + (lp2.result ? resultLabel(lp2.result) : 'tap to set') : 'after a play'; });
+      // While a play records, switch off and dim what isn't needed.
+      const OFF = ['result', 'replay', 'freeze', 'tray', 'flip', 'settings', 'help', 'game', 'quarter', 'edit'];
+      layer.querySelectorAll('.gc').forEach((el) => el.classList.toggle('g-off', !!playRec && !editing && OFF.includes(el.dataset.c)));
       q('.g-tags').forEach((bx) => paintTags(bx));
       q('.g-game-l').forEach((s) => { s.textContent = gameLabel(game); });
       q('.g-q-l').forEach((s) => { s.textContent = qLabel(game ? game.q : 1); });
