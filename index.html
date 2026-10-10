@@ -192,8 +192,8 @@
   .play-btn.recording .rec-dot { border-radius: 4px; background: var(--scarlet); border-color: var(--scarlet); }
   @keyframes recpulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(224, 20, 56, 0.7); } 50% { box-shadow: 0 0 0 10px rgba(224, 20, 56, 0); } }
   .rb[disabled] { opacity: 0.45; }
-  #btn-replay { flex-direction: column; gap: 2px; height: calc(var(--b) * 1.15); font-size: 13px; text-align: center; line-height: 1.05; }
-  #btn-replay svg { width: 20px; height: 20px; }
+  #btn-replay, #btn-lastplay { flex-direction: column; gap: 2px; height: calc(var(--b) * 1.15); font-size: 13px; text-align: center; line-height: 1.05; }
+  #btn-replay svg, #btn-lastplay svg { width: 20px; height: 20px; }
   #btn-freeze { height: calc(var(--bb) * 1.2); }
   .color-dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #fff; }
   .speed-lbl { font-size: 17px; letter-spacing: 0.02em; }
@@ -373,6 +373,10 @@
     <span class="rec-dot"></span>
     <span><span id="mark-lbl">Start Play</span><small class="sub num" id="mark-sub">Play 1</small></span>
   </button>
+  <button class="rb wide only-live" id="btn-lastplay" disabled title="Watch the most recent play">
+    <svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg>
+    <span>Last Play<small class="sub num" id="lastplay-sub">none yet</small></span>
+  </button>
 </nav>
 
 <div class="color-pop" id="color-pop" hidden>
@@ -485,6 +489,7 @@
   <div class="dlg-body help-list">
     <p><b>1. Always recording.</b> Once the camera is on, it records nonstop in the background. Nothing is uploaded; it all stays on this device.</p>
     <p><b>Record every play.</b> Tap <b>Start Play</b> (big button, bottom right) when the teams line up, and <b>End Play</b> at the whistle. Each play is saved as its own numbered clip on this device. In the tray (grid button), tap ★ on the ones you want to keep, then save them to Photos.</p>
+    <p><b>Last Play</b> (under Start Play) opens the most recent play straight away. Tapping it during a play ends that play and shows it.</p>
     <p><b>2. Or tap Replay after the whistle.</b> It jumps back to just before the snap and plays it in slow motion. The camera keeps recording in the small tile in the corner. Tap that tile, or <b>Live</b>, to go back.</p>
     <p><b>3. Review.</b> Tap the video to pause or play. Drag across it to scrub. Use the arrow buttons to step one frame at a time. Pinch with two fingers to zoom in on a player, and drag with two fingers to move around. Tap the zoom label at the top to reset.</p>
     <p><b>Zoom while filming.</b> Pinch on the live view. On devices that allow it, this zooms the camera itself, so the recording is zoomed too and the label says "Camera". Otherwise only the screen picture zooms and the recording stays wide.</p>
@@ -782,6 +787,19 @@
     b.classList.toggle('recording', !!playRec);
     $('mark-lbl').textContent = playRec ? 'End Play' : 'Start Play';
     $('mark-sub').textContent = playRec ? '0:00' : 'Play ' + nextNumber('play');
+    const lp = latestPlay(), lb = $('btn-lastplay');
+    lb.disabled = !lp && !playRec;
+    $('lastplay-sub').textContent = playRec ? 'ends this play' : lp ? 'Play ' + lp.n + ' · ' + fmtShort(lp.duration || lp.est || 0) : 'none yet';
+  }
+  function latestPlay() {
+    let best = null;
+    clips.forEach((c) => { if (c.kind === 'play' && (!best || c.at > best.at)) best = c; });
+    return best;
+  }
+  async function watchLastPlay() {
+    if (playRec) { await endPlay(true); return; }
+    const lp = latestPlay();
+    if (lp) openClip(lp, true); else toast('No plays recorded yet.');
   }
   function startPlay() {
     if (!canRecord || !stream || playRec) return;
@@ -1677,6 +1695,7 @@
   $('btn-start').onclick = startCamera;
   btnReplay.onclick = instantReplay;
   $('btn-mark').onclick = toggleMark;
+  $('btn-lastplay').onclick = watchLastPlay;
   $('btn-freeze').onclick = () => freezeFrame();
   $('btn-flip').onclick = () => { settings.facing = settings.facing === 'user' ? 'environment' : 'user'; saveSettings(); syncSettingsUI(); restartCamera(); };
   $('btn-live').onclick = goLive; $('pip-hit').onclick = goLive;
