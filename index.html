@@ -61,7 +61,7 @@
 
   /* ---------- Full-screen stage ---------- */
   .stage { position: fixed; inset: 0; background: #000; overflow: hidden; touch-action: none; }
-  body.side-rails:not(.portrait) .stage { left: calc(var(--edge) * 2 + var(--sal) + var(--rail-w)); right: calc(var(--edge) * 2 + var(--sar) + var(--rail-w)); }
+  body.side-rails:not(.portrait):not(.m-live) .stage { left: calc(var(--edge) * 2 + var(--sal) + var(--rail-w)); right: calc(var(--edge) * 2 + var(--sar) + var(--rail-w)); }
   body.side-rails:not(.portrait) .stage.mode-replay #live, body.side-rails:not(.portrait) .stage.mode-still #live,
   body.side-rails:not(.portrait) .pip-hit { left: 8px; }
   body.side-rails:not(.portrait) .pip-label { left: 14px; }
@@ -341,6 +341,80 @@
     font-family: var(--display); font-weight: 600; font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
   }
   .ctl.primary { background: var(--scarlet); border-color: var(--scarlet-bright); }
+  /* ===================== Live-mode customizable grid ===================== */
+  #grid-layer { position: fixed; inset: 0; z-index: 16; pointer-events: none; display: none; }
+  body.m-live #grid-layer { display: block; }
+  body.m-live .rail, body.m-live .hud, body.m-live > .zoombar, body.m-live .scrubbar { display: none !important; }
+  body.editing #grid-layer {
+    pointer-events: auto;
+    background-image:
+      linear-gradient(to right, rgba(255,255,255,0.22) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.22) 1px, transparent 1px);
+    background-size: var(--cell) var(--cell);
+    background-position: var(--gx) var(--gy);
+    background-color: rgba(0,0,0,0.15);
+  }
+  .gc {
+    position: absolute; pointer-events: auto; border-radius: 12px; overflow: hidden;
+    background: rgba(18, 21, 27, var(--ctl-a)); -webkit-backdrop-filter: blur(var(--ctl-blur)); backdrop-filter: blur(var(--ctl-blur));
+    border: 1px solid rgba(255, 255, 255, 0.16); color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.85);
+    font-family: var(--display); font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+    display: grid; place-items: center; text-align: center; touch-action: none; user-select: none; -webkit-user-select: none;
+  }
+  .gc button, .gc .gbtn {
+    all: unset; box-sizing: border-box; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    cursor: pointer; font: inherit; color: inherit; text-align: center; touch-action: manipulation;
+  }
+  .gc button:active { background: rgba(255,255,255,0.12); }
+  .gc button[disabled] { opacity: 0.4; }
+  .gc svg { width: 46%; height: 46%; max-width: 30px; max-height: 30px; }
+  .gc .gl { font-size: clamp(10px, calc(var(--cell) * 0.2), 15px); line-height: 1.05; }
+  .gc .gs { font-family: var(--body); font-weight: 600; font-size: clamp(9px, calc(var(--cell) * 0.16), 12px); letter-spacing: 0; text-transform: none; opacity: 0.85; }
+  .gc .gbig { font-size: clamp(16px, calc(var(--cell) * 0.42), 30px); line-height: 1; }
+  .gc.g-primary { background: rgba(186, 12, 47, var(--ctl-a2)); border-color: var(--scarlet-bright); }
+  .gc.g-gold { color: #FFC72C; border-color: rgba(255, 199, 44, 0.45); }
+  .gc.g-display { pointer-events: none; }
+  body.editing .gc.g-display { pointer-events: auto; }
+  .gc.recording { background: rgba(255,255,255,0.92); color: var(--scarlet); text-shadow: none; animation: recpulse 1.4s infinite; }
+  .gc .rec-dot { width: 30%; max-width: 26px; aspect-ratio: 1; border-radius: 50%; background: #fff; }
+  .gc.recording .rec-dot { border-radius: 4px; background: var(--scarlet); }
+  .g-downs { display: grid; gap: 3px; padding: 3px; place-items: stretch; width: 100%; height: 100%; box-sizing: border-box; }
+  .g-downs button { border-radius: 9px; background: rgba(255,255,255,0.06); color: #FFC72C; font-size: clamp(13px, calc(var(--cell) * 0.3), 20px); text-transform: none; }
+  .g-downs button.active, .gc button.g-on { background: #FFC72C; color: #111; text-shadow: none; }
+  .g-slider { position: relative; width: 100%; height: 100%; touch-action: none; cursor: pointer; }
+  .g-slider .gtrack { position: absolute; border-radius: 99px; background: rgba(255,255,255,0.2); }
+  .g-slider .gfill { position: absolute; border-radius: 99px; background: rgba(255,255,255,0.75); }
+  .g-slider .gknob { position: absolute; width: calc(var(--cell) * 0.5); height: calc(var(--cell) * 0.5); max-width: 30px; max-height: 30px; border-radius: 50%; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.5); transform: translate(-50%, -50%); }
+  .g-slider.gold .gfill { background: #FFC72C; } .g-slider.gold .gknob { background: #FFC72C; }
+  .gc .badge { position: absolute; top: 3px; right: 3px; background: var(--scarlet); color: #fff; border-radius: 99px; font: 600 11px var(--body); min-width: 18px; height: 18px; display: grid; place-items: center; padding: 0 5px; text-shadow: none; }
+  .gc .gstat { font-size: clamp(10px, calc(var(--cell) * 0.2), 14px); display: flex; gap: 6px; align-items: center; justify-content: center; white-space: nowrap; }
+  .gc .gstat .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--scarlet-bright); box-shadow: 0 0 8px var(--scarlet-bright); animation: blink 1.2s infinite; }
+  /* edit mode chrome */
+  body.editing .gc { outline: 2px dashed rgba(255, 199, 44, 0.85); outline-offset: -2px; cursor: grab; }
+  body.editing .gc > * { pointer-events: none; }
+  body.editing .gc.dragging { opacity: 0.85; z-index: 5; outline-color: #fff; }
+  body.editing .gc.bad { outline-color: #FF5470; background: rgba(186, 12, 47, 0.5); }
+  .ge { display: none; position: absolute; width: 26px; height: 26px; border-radius: 50%; font: 700 15px var(--body); line-height: 26px; text-align: center; pointer-events: auto !important; z-index: 3; }
+  body.editing .ge { display: block; }
+  .ge-x { top: 2px; right: 2px; background: #C8102E; color: #fff; }
+  .ge-r { bottom: 2px; right: 2px; background: #FFC72C; color: #111; cursor: nwse-resize; }
+  .ge-s { bottom: 2px; left: 2px; background: #fff; color: #111; }
+  .edit-bar {
+    position: fixed; z-index: 30; top: calc(var(--sat) + 8px); left: 50%; transform: translateX(-50%); display: none; gap: 6px; flex-wrap: wrap; justify-content: center;
+    background: rgba(18, 21, 27, 0.95); border: 1px solid #FFC72C; border-radius: 14px; padding: 8px; max-width: calc(100vw - 24px);
+  }
+  body.editing .edit-bar { display: flex; }
+  .edit-bar .ctl { height: 40px; font-size: 13px; }
+  .edit-bar .eb-key { font: 600 11px var(--body); color: var(--muted); align-self: center; padding: 0 4px; text-transform: none; letter-spacing: 0; }
+  .edit-bar input[type=range] { width: 110px; accent-color: #FFC72C; }
+  .edit-bar label { display: flex; align-items: center; gap: 6px; font: 600 12px var(--body); color: var(--silver); }
+  .cat-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
+  .cat-item { display: flex; align-items: center; gap: 10px; text-align: left; padding: 10px; border-radius: 10px; background: var(--card); border: 1px solid var(--line); }
+  .cat-item b { display: block; font-size: 14px; }
+  .cat-item small { color: var(--muted); font-size: 12px; }
+  .cat-item .sz { margin-left: auto; font: 600 11px var(--body); color: #FFC72C; border: 1px solid rgba(255,199,44,0.5); border-radius: 6px; padding: 2px 6px; }
+  .cat-item.on { opacity: 0.45; }
+
   /* ---------- Tray sheet ---------- */
   .sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 50; display: none; }
   .sheet-backdrop.open { display: block; }
@@ -550,6 +624,18 @@
 </div>
 
 <input type="file" id="import-input" accept="video/*,image/*" multiple hidden>
+<div id="grid-layer" aria-label="Live controls"></div>
+<div class="edit-bar" id="edit-bar">
+  <span class="eb-key" id="eb-key"></span>
+  <button class="ctl primary" id="eb-add">+ Add</button>
+  <label>See-through <input type="range" id="eb-alpha" min="0" max="100" step="5"></label>
+  <button class="ctl" id="eb-export">Export</button>
+  <button class="ctl" id="eb-import">Import file</button>
+  <button class="ctl" id="eb-paste">Paste</button>
+  <button class="ctl" id="eb-reset">Reset</button>
+  <button class="ctl primary" id="eb-done">Done</button>
+</div>
+<input type="file" id="layout-input" accept=".json,application/json,text/plain" hidden>
 <div class="toast" id="toast"></div>
 
 <div class="export-ov" id="export-ov" hidden>
@@ -651,6 +737,15 @@
   </div>
 </dialog>
 
+<!-- Component catalog -->
+<dialog id="dlg-cat">
+  <div class="dlg-head"><h2>Add a control</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
+  <div class="dlg-body">
+    <p class="note">Tap one to drop it in the free space nearest the middle, then drag it where you want. Sizes are in grid squares.</p>
+    <div class="cat-list" id="cat-list"></div>
+  </div>
+</dialog>
+
 <!-- Help -->
 <dialog id="dlg-help">
   <div class="dlg-head"><h2>How It Works</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
@@ -665,6 +760,7 @@
     <p><b>Zoom while filming.</b> Pinch on the live view. On devices that allow it, this zooms the camera itself, so the recording is zoomed too and the label says "Camera". Otherwise only the screen picture zooms and the recording stays wide.</p>
     <p><b>4. Draw.</b> Pick a pen, arrow, circle, or stamp. Touching the video pauses it. Each drawing sticks to the moment you drew it: when the replay plays past that moment, it pauses briefly so the drawing can be seen. Each replay keeps its own drawings. On the live view, tap <b>Freeze</b> first to draw on that moment. Pinching the live view always zooms; it never freezes it.</p>
     <p><b>5. Save.</b> <b>Photo</b> saves the frame with your drawings. <b>Save Clip</b> saves the replay as a video. If you drew on it, the drawings are recorded into the video and it pauses for a beat at each one, like a TV telestrator. Everything lands in the tray (grid button). Tap <b>Save</b> there to put it in Photos or Files.</p>
+    <p><b>Arrange your own controls.</b> On the live view every control is a block on a see-through grid. Tap <b>Layout</b> to edit: drag blocks to move them, ↻ changes shape (or turns a slider), ⤡ stretches sliders, × removes, <b>+ Add</b> opens the catalog of every control. Tap <b>Done</b> to save. The layout is saved separately for phone and iPad, upright and sideways, and each block stays pinned to its nearest corner. <b>Export</b> sends your layouts as a file (also copied) a friend can bring in with <b>Import file</b> or <b>Paste</b>. The see-through slider sets how much video shows through.</p>
     <p><b>Keep your plays safe.</b> Plays live in this browser's storage on this device, not in your Photos, until you save them. Safari can erase a website's stored data if the site isn't opened for about 7 days, and clearing website data in Settings erases it too. Two habits prevent losing anything: (1) open the app from its Home Screen icon (see below), and (2) after every game, open the tray, star your keepers and tap <b>Save keepers to Photos</b>.</p>
     <p><b>Add to Home Screen.</b> In <b>Safari</b>: tap the Share button (square with an up arrow), scroll down, tap <b>Add to Home Screen</b>, then <b>Add</b>. In <b>Chrome</b> on iPhone/iPad: tap the Share button in the address bar, then <b>Add to Home Screen</b>. Open it from the new Sentinels Live icon from then on. It runs full-screen and keeps its storage much more reliably.</p>
     <p><b>Photos in and out.</b> <b>Save</b> (tray) opens the share sheet; choose <b>Save Video</b> or <b>Save Image</b> to put it in Photos. <b>Import from Photos</b> (tray) brings in videos and pictures from your library, including clips shot with the Camera app's stabilization or Slo-Mo, so you can slow them down, draw on them and save them back. <b>9:16</b> (right side, in replay) saves a vertical clip or photo for social media, cropped to what's on screen; zoom in first to frame your player.</p>
@@ -757,6 +853,7 @@
     document.body.classList.remove('m-splash', 'm-live', 'm-replay', 'm-still');
     document.body.classList.add('m-' + m);
     $('color-pop').hidden = true; $('dd-pop').hidden = true; $('vert-pop').hidden = true;
+    if (m === 'live' && window.__gridRelayout) requestAnimationFrame(window.__gridRelayout);
     requestAnimationFrame(positionRails);
     if (m !== 'replay') { replay.pause(); }
     renderModeTag();
@@ -953,9 +1050,11 @@
       recText.textContent = 'Play ' + playRec.n + ' · ' + fmtShort(pt);
       $('mark-sub').textContent = fmtShort(pt);
       if (pt > 300) { endPlay(false); toast('Play ended automatically after 5 minutes.', 2500); }
+      if (window.__gridRefresh) window.__gridRefresh();
       return;
     }
     recText.innerHTML = 'Rec · ' + fmtShort(Math.min(age, 999)) + '<span class="rec-long">&nbsp;buffered</span>';
+    if (window.__gridRefresh) window.__gridRefresh();
     // Overlapping hand-off keeps at least 30 s of footage ready at all times.
     if (segments.length === 1 && age > HANDOFF && !handoffBroken) {
       try { startSegment(); } catch (_) { handoffBroken = true; }
@@ -1024,6 +1123,7 @@
     const f = (ld && ld.goal) ? 1 : Math.min(1, (dist || 0) / 25);
     $('vs-fill').style.height = (f * 100) + '%'; $('vs-thumb').style.bottom = (f * 100) + '%';
     $('vslider').setAttribute('aria-valuenow', ld && !ld.goal ? ld.dist : '');
+    if (window.__gridRefresh) window.__gridRefresh();
     // panel
     if (!$('dd-pop').hidden) {
       const v = ddValue();
@@ -1094,14 +1194,17 @@
     const L = document.querySelector('.rail-left').getBoundingClientRect();
     const R = document.querySelector('.rail-right').getBoundingClientRect();
     const ur = $('dd-undo-r');
-    const mark = $('btn-mark').getBoundingClientRect();
+    const gStart = document.querySelector('#grid-layer [data-c="start"]');
+    const mark = (mode === 'live' && gStart) ? gStart.getBoundingClientRect() : $('btn-mark').getBoundingClientRect();
     if (document.body.classList.contains('portrait')) {
       ur.style.left = 'auto'; ur.style.right = (window.innerWidth - R.right) + 'px'; ur.style.top = Math.max(8, R.top - 74) + 'px';
       return;
     }
     // Right beside the Start/End Play button, where the thumb just was.
     const midY = mark.height ? mark.top + mark.height / 2 : R.top + R.height / 2;
-    ur.style.left = 'auto'; ur.style.right = (window.innerWidth - R.left + 10) + 'px'; ur.style.top = (midY - 32) + 'px';
+    const leftEdge = (mode === 'live' && gStart) ? mark.left : R.left;
+    ur.style.left = 'auto'; ur.style.right = (window.innerWidth - leftEdge + 10) + 'px'; ur.style.top = (midY - 32) + 'px';
+    if (leftEdge < 300) { ur.style.right = 'auto'; ur.style.left = (mark.right + 10) + 'px'; }
   }
   function showDDUndo(nowLbl, backLbl) {
     ['dd-undo-r'].forEach((id) => {
@@ -1137,6 +1240,7 @@
     const lp = latestPlay(), lb = $('btn-lastplay');
     lb.disabled = !lp && !playRec;
     $('lastplay-sub').textContent = playRec ? 'ends play' : lp ? '#' + lp.n + ' · ' + fmtShort(lp.duration || lp.est || 0) : 'none yet';
+    if (window.__gridRefresh) window.__gridRefresh();
   }
   function latestPlay() {
     let best = null;
@@ -1699,6 +1803,7 @@
     $('zs-fill').style.width = (fc * 100) + '%'; $('zs-thumb').style.left = (fc * 100) + '%';
     $('zoom-lbl').textContent = (cur / zr.min).toFixed(1) + '×';
     $('zoom-reset').classList.toggle('zoomed', show);
+    if (window.__gridRefresh) window.__gridRefresh();
   }
   function resetZoom() {
     if (mode === 'live' && zoomCaps) setCamZoom(zoomCaps.min);
@@ -1972,6 +2077,7 @@
   function updateCounts() {
     $('tray-count').textContent = clips.length + photos.length;
     renderTray();
+    if (window.__gridRefresh) window.__gridRefresh();
   }
   function armed(btn, label, action) {
     // Two-tap confirm for anything destructive.
@@ -2297,6 +2403,349 @@
 
   // Stop iOS Safari from zooming the whole page on pinch.
   ['gesturestart', 'gesturechange'].forEach((ev) => document.addEventListener(ev, (e) => e.preventDefault(), { passive: false }));
+  // ===================== Live-mode customizable grid =====================
+  // Every live control is a block on a grid laid over the full-screen video. Blocks are stored per
+  // device (phone / tablet) and orientation, each pinned to its nearest screen corner, so a layout
+  // keeps its feel across slightly different screen sizes. Layouts can be exported and imported.
+  const G = (() => {
+    const layer = $('grid-layer');
+    const ICON = {
+      grid: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 17.5h7M17.5 14v7"/></svg>',
+      tray: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>',
+      flip: '<svg viewBox="0 0 24 24"><path d="M20 7h-3l-2-3H9L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M9 13.5a3 3 0 0 1 5.2-2"/><path d="M15 12.5a3 3 0 0 1-5.2 2"/></svg>',
+      freeze: '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>',
+      replay: '<svg viewBox="0 0 24 24"><path d="M1 4v6h6"/><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/></svg>',
+      play: '<svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg>',
+      gear: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>',
+      help: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>',
+      camera: '<svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>'
+    };
+    const btn = (inner, act, extra) => ({ html: '<button type="button" ' + (extra || '') + '>' + inner + '</button>', act });
+    // Catalog. sizes = shapes the block can switch between; resize = slider-style blocks whose length can be dragged.
+    const CAT = {
+      edit:      { name: 'Layout', desc: 'Opens this editor (always on screen)', w: 1, h: 1, fixed: true, render: () => btn(ICON.grid + '<span class="gs">Layout</span>', () => enterEdit()) },
+      start:     { name: 'Start / End Play', desc: 'Record each play as its own clip', w: 2, h: 2, sizes: [[2, 2], [2, 1], [1, 2], [3, 2], [3, 3]], cls: 'g-primary', render: () => btn('<span class="rec-dot"></span><span class="gl g-mark-l">Start Play</span><span class="gs g-mark-s"></span>', () => toggleMark(), 'data-k="start"') },
+      last:      { name: 'Last Play', desc: 'Watch the most recent play', w: 2, h: 1, sizes: [[2, 1], [1, 1], [2, 2]], render: () => btn(ICON.play + '<span class="gl">Last</span><span class="gs g-last-s"></span>', () => watchLastPlay(), 'data-k="last"') },
+      replay:    { name: 'Instant Replay', desc: 'Look back at the last few seconds', w: 2, h: 1, sizes: [[2, 1], [1, 1], [2, 2]], render: () => btn(ICON.replay + '<span class="gl">Replay</span><span class="gs g-rep-s"></span>', () => instantReplay(), 'data-k="replay"') },
+      downs:     { name: 'Downs 1st–4th', desc: 'Set the down', w: 2, h: 2, sizes: [[2, 2], [4, 1], [1, 4]], render: (p) => ({ html: '<div class="g-downs" style="grid-template-columns:repeat(' + (p.w >= 4 ? 4 : p.w >= 2 ? 2 : 1) + ',1fr)">' + [1, 2, 3, 4].map((d) => '<button type="button" data-down="' + d + '">' + ORD[d] + '</button>').join('') + '</div>', act: null }) },
+      goal:      { name: 'Goal', desc: 'Goal to go', w: 1, h: 1, cls: 'g-gold', render: () => btn('<span class="gl">Goal</span>', () => $('dist-goal').click(), 'data-k="goal"') },
+      ydsSlider: { name: 'Yards slider', desc: 'Slide yards to go (stretch or turn it)', w: 1, h: 3, resize: { min: 2, max: 10 }, rotate: true, cls: 'g-gold', render: () => ({ html: '<div class="g-slider gold" data-sl="yds"><div class="gtrack"></div><div class="gfill"></div><div class="gknob"></div></div>' }) },
+      ydsPlus:   { name: 'Yards +', desc: 'One more yard', w: 1, h: 1, cls: 'g-gold', render: () => btn('<span class="gbig">+</span>', () => $('dist-plus').click()) },
+      ydsMinus:  { name: 'Yards −', desc: 'One less yard', w: 1, h: 1, cls: 'g-gold', render: () => btn('<span class="gbig">−</span>', () => $('dist-minus').click()) },
+      ydsValue:  { name: 'Yards to go', desc: 'Shows the yards', w: 1, h: 1, cls: 'g-gold g-display', render: () => ({ html: '<div class="gbtn"><span class="gbig g-yds-v">10</span><span class="gs">to go</span></div>' }) },
+      zoomSlider:{ name: 'Zoom slider', desc: 'Zoom (stretch or turn it)', w: 5, h: 1, resize: { min: 2, max: 16 }, rotate: true, render: () => ({ html: '<div class="g-slider" data-sl="zoom"><div class="gtrack"></div><div class="gfill"></div><div class="gknob"></div></div>' }) },
+      zoomIn:    { name: 'Zoom +', desc: 'Zoom in a step', w: 1, h: 1, render: () => btn('<span class="gbig">+</span>', () => setZoomLevel(currentZoom() * 1.25)) },
+      zoomOut:   { name: 'Zoom −', desc: 'Zoom out a step', w: 1, h: 1, render: () => btn('<span class="gbig">−</span>', () => setZoomLevel(currentZoom() / 1.25)) },
+      zoomReset: { name: 'Zoom level / reset', desc: 'Shows zoom; tap for 1×', w: 1, h: 1, render: () => btn('<span class="gl g-zoom-l">1.0×</span><span class="gs">reset</span>', () => resetZoom()) },
+      freeze:    { name: 'Freeze', desc: 'Freeze the picture to draw on it', w: 1, h: 1, sizes: [[1, 1], [2, 1]], render: () => btn(ICON.freeze + '<span class="gs">Freeze</span>', () => freezeFrame()) },
+      snap:      { name: 'Photo', desc: 'Save a photo of the live picture', w: 1, h: 1, render: () => btn(ICON.camera + '<span class="gs">Photo</span>', () => savePhoto()) },
+      tray:      { name: 'Clips tray', desc: 'Saved plays, replays, photos', w: 1, h: 1, render: () => btn(ICON.tray + '<span class="badge g-tray-n">0</span>', () => openTray()) },
+      flip:      { name: 'Flip camera', desc: 'Front / back camera', w: 1, h: 1, render: () => btn(ICON.flip, () => $('btn-flip').click()) },
+      settings:  { name: 'Settings', desc: 'App settings', w: 1, h: 1, render: () => btn(ICON.gear, () => $('btn-settings').click()) },
+      help:      { name: 'Help', desc: 'How it works', w: 1, h: 1, render: () => btn(ICON.help, () => $('btn-help').click()) },
+      status:    { name: 'Recording status', desc: 'REC time and frames per second', w: 3, h: 1, resize: { min: 2, max: 6 }, cls: 'g-display', render: () => ({ html: '<div class="gstat"><span class="dot"></span><span class="g-stat-t">REC</span></div>' }) },
+      ddShow:    { name: 'Down & distance display', desc: 'Shows the current down & distance', w: 2, h: 1, resize: { min: 2, max: 5 }, cls: 'g-gold g-display', render: () => ({ html: '<div class="gbtn"><span class="gl g-dd-v">Set down</span></div>' }) }
+    };
+
+    // ---------- geometry ----------
+    let cell = 56, cols = 10, rows = 6, gx = 0, gy = 0;
+    function layoutKey() {
+      const phone = document.body.classList.contains('lay-phone');
+      const portrait = window.innerHeight > window.innerWidth;
+      return (phone ? 'phone' : 'tablet') + '-' + (portrait ? 'portrait' : 'landscape');
+    }
+    function measure() {
+      const cs = getComputedStyle(document.documentElement);
+      const px = (n) => parseFloat(cs.getPropertyValue(n)) || 0;
+      const sat = px('--sat'), sab = px('--sab'), sal = px('--sal'), sar = px('--sar');
+      const W = window.innerWidth - sal - sar - 8, H = window.innerHeight - sat - sab - 8;
+      const phone = document.body.classList.contains('lay-phone');
+      cell = Math.round(Math.max(phone ? 44 : 52, Math.min(phone ? 54 : 66, Math.min(W, H) / (phone ? 7.2 : 11))));
+      cols = Math.max(4, Math.floor(W / cell)); rows = Math.max(4, Math.floor(H / cell));
+      gx = sal + 4 + (W - cols * cell) / 2; gy = sat + 4 + (H - rows * cell) / 2;
+      layer.style.setProperty('--cell', cell + 'px');
+      layer.style.setProperty('--gx', gx + 'px'); layer.style.setProperty('--gy', gy + 'px');
+      document.body.style.setProperty('--cell', cell + 'px');
+    }
+
+    // ---------- storage ----------
+    let store = {};
+    try { store = JSON.parse(localStorage.getItem('sentinels-live-layouts') || '{}') || {}; } catch (_) { store = {}; }
+    function saveStore() { try { localStorage.setItem('sentinels-live-layouts', JSON.stringify(store)); } catch (_) {} }
+    function toAnch(p) {
+      const ax = (p.x + p.w / 2) <= cols / 2 ? 'l' : 'r', ay = (p.y + p.h / 2) <= rows / 2 ? 't' : 'b';
+      return { c: p.c, w: p.w, h: p.h, a: ax + ay, dx: ax === 'l' ? p.x : cols - p.x - p.w, dy: ay === 't' ? p.y : rows - p.y - p.h };
+    }
+    function fromAnch(s) {
+      const w = Math.min(s.w, cols), h = Math.min(s.h, rows);
+      let x = s.a[0] === 'l' ? s.dx : cols - w - s.dx, y = s.a[1] === 't' ? s.dy : rows - h - s.dy;
+      x = Math.max(0, Math.min(cols - w, x)); y = Math.max(0, Math.min(rows - h, y));
+      return { c: s.c, w, h, x, y };
+    }
+    // Default layout: thumb columns on both sides (middle of the screen sideways on an iPad, the
+    // whole side on a phone, the bottom when upright), status along the top, zoom along the bottom.
+    function defaults() {
+      const key = layoutKey(), portrait = key.endsWith('portrait'), tablet = key.startsWith('tablet');
+      const out = [], put = (c, x, y, w, h) => out.push({ c, x, y, w: w || CAT[c].w, h: h || CAT[c].h });
+      const stack = 6;
+      let y0 = portrait ? rows - 1 - stack : tablet ? Math.max(1, Math.round(rows / 2 - stack / 2)) : 1;
+      y0 = Math.max(1, Math.min(rows - stack - (portrait ? 1 : 0), y0));
+      const R = cols - 2;
+      put('edit', 0, 0); put('settings', 1, 0);
+      if (cols >= 9) put('help', 2, 0);
+      const sw = cols >= 12 ? 4 : 3;
+      put('status', cols - sw, 0, sw, 1);
+      if (cols >= 9) put('ddShow', cols - sw - 2, 0, 2, 1);
+      put('tray', 0, y0); put('flip', 1, y0);
+      put('downs', 0, y0 + 1, 2, 2);
+      put('goal', 0, y0 + 3); put('freeze', 1, y0 + 3);
+      put('zoomOut', 0, y0 + 4); put('zoomIn', 1, y0 + 4);
+      put('zoomReset', 0, y0 + 5); put('snap', 1, y0 + 5);
+      put('ydsSlider', R, y0, 1, 3); put('ydsPlus', R + 1, y0); put('ydsValue', R + 1, y0 + 1); put('ydsMinus', R + 1, y0 + 2);
+      put('start', R, y0 + 3, 2, 2);
+      put('replay', R, y0 + 5, 1, 1); put('last', R + 1, y0 + 5, 1, 1);
+      if (cols - 4 >= 2) put('zoomSlider', 2, rows - 1, Math.min(cols - 4, 10), 1);
+      return out;
+    }
+    let items = [];
+    function load() {
+      measure();
+      const key = layoutKey();
+      const saved = store[key];
+      items = saved && saved.length ? saved.filter((s) => CAT[s.c]).map(fromAnch) : defaults();
+      if (!items.some((p) => p.c === 'edit')) items.unshift({ c: 'edit', x: 0, y: 0, w: 1, h: 1 });
+    }
+    function persist() { store[layoutKey()] = items.map(toAnch); saveStore(); }
+
+    // ---------- render ----------
+    function place(el, p) {
+      el.style.left = (gx + p.x * cell + 2) + 'px'; el.style.top = (gy + p.y * cell + 2) + 'px';
+      el.style.width = (p.w * cell - 4) + 'px'; el.style.height = (p.h * cell - 4) + 'px';
+    }
+    function render() {
+      layer.innerHTML = '';
+      items.forEach((p, i) => {
+        const def = CAT[p.c];
+        const el = document.createElement('div');
+        el.className = 'gc ' + (def.cls || '');
+        el.dataset.i = i; el.dataset.c = p.c;
+        const r = def.render(p);
+        el.innerHTML = r.html +
+          (def.fixed ? '' : '<span class="ge ge-x" data-e="x" aria-label="Remove">×</span>') +
+          (def.resize ? '<span class="ge ge-r" data-e="r" aria-label="Stretch">⤡</span>' : '') +
+          ((def.sizes || def.rotate) ? '<span class="ge ge-s" data-e="s" aria-label="Change shape">↻</span>' : '');
+        const b = el.querySelector(':scope > button');
+        if (b && r.act) b.addEventListener('click', (e) => { if (editing) return; r.act(); });
+        el.querySelectorAll('[data-down]').forEach((d) => d.addEventListener('click', () => { if (!editing) document.querySelector('[data-rdown="' + d.dataset.down + '"]').click(); }));
+        const sl = el.querySelector('[data-sl]'); if (sl) wireSlider(sl, p);
+        place(el, p);
+        layer.appendChild(el);
+      });
+      refresh();
+    }
+    function sliderGeom(sl) {
+      const vertical = sl.clientHeight > sl.clientWidth;
+      const pad = cell * 0.32;
+      const tr = sl.querySelector('.gtrack'), fi = sl.querySelector('.gfill');
+      if (vertical) { tr.style.cssText = fi.style.cssText = 'left:50%;width:8px;margin-left:-4px;top:' + pad + 'px;bottom:' + pad + 'px'; }
+      else { tr.style.cssText = fi.style.cssText = 'top:50%;height:8px;margin-top:-4px;left:' + pad + 'px;right:' + pad + 'px'; }
+      return { vertical, pad };
+    }
+    function setSlider(sl, f) {
+      const { vertical, pad } = sliderGeom(sl);
+      f = Math.max(0, Math.min(1, f));
+      const fi = sl.querySelector('.gfill'), kn = sl.querySelector('.gknob');
+      if (vertical) {
+        const len = sl.clientHeight - 2 * pad;
+        fi.style.top = (pad + len * (1 - f)) + 'px'; fi.style.bottom = pad + 'px';
+        kn.style.left = '50%'; kn.style.top = (pad + len * (1 - f)) + 'px';
+      } else {
+        const len = sl.clientWidth - 2 * pad;
+        fi.style.left = pad + 'px'; fi.style.right = (pad + len * (1 - f)) + 'px';
+        kn.style.top = '50%'; kn.style.left = (pad + len * f) + 'px';
+      }
+    }
+    function wireSlider(sl, p) {
+      let drag = false;
+      const valueAt = (e) => {
+        const r = sl.getBoundingClientRect(), { vertical, pad } = sliderGeom(sl);
+        return vertical ? (r.bottom - pad - e.clientY) / (r.height - 2 * pad) : (e.clientX - r.left - pad) / (r.width - 2 * pad);
+      };
+      const apply = (e) => {
+        const f = Math.max(0, Math.min(1, valueAt(e)));
+        if (sl.dataset.sl === 'yds') liveDDEdit({ dist: Math.round(f * 25), goal: false });
+        else { const zr = zoomRange(); setZoomLevel(zr.min * Math.pow(zr.max / zr.min, f)); }
+      };
+      sl.addEventListener('pointerdown', (e) => { if (editing) return; drag = true; sl.setPointerCapture(e.pointerId); apply(e); e.stopPropagation(); });
+      sl.addEventListener('pointermove', (e) => { if (drag) apply(e); });
+      const end = (e) => { drag = false; try { sl.releasePointerCapture(e.pointerId); } catch (_) {} };
+      sl.addEventListener('pointerup', end); sl.addEventListener('pointercancel', end);
+    }
+    // Pull current app state into the blocks.
+    function refresh() {
+      if (!layer.childElementCount) return;
+      const q = (s) => layer.querySelectorAll(s);
+      const lp = latestPlay();
+      q('[data-c="start"]').forEach((el) => {
+        el.classList.toggle('recording', !!playRec);
+        el.querySelector('.g-mark-l').textContent = playRec ? 'End Play' : 'Start Play';
+        el.querySelector('.g-mark-s').textContent = playRec ? $('mark-sub').textContent : 'Play ' + nextNumber('play');
+        el.querySelector('button').disabled = !canRecord || !stream;
+      });
+      q('.g-last-s').forEach((s) => { s.textContent = $('lastplay-sub').textContent; s.closest('button').disabled = !lp && !playRec; });
+      q('.g-rep-s').forEach((s) => { s.textContent = replaySub.textContent; s.closest('button').disabled = btnReplay.disabled; });
+      const ld = playRec ? playRec.dd : curDD;
+      q('[data-down]').forEach((b) => b.classList.toggle('active', !!(ld && ld.down === Number(b.dataset.down))));
+      q('[data-c="goal"] button').forEach((b) => b.classList.toggle('g-on', !!(ld && ld.goal)));
+      q('.g-yds-v').forEach((s) => { s.textContent = $('dist-val').textContent; });
+      const dist = ld ? (ld.goal ? 25 : ld.dist) : 10;
+      q('[data-sl="yds"]').forEach((sl) => setSlider(sl, dist / 25));
+      const zr = zoomRange(), cz = currentZoom();
+      q('[data-sl="zoom"]').forEach((sl) => setSlider(sl, zr.max > zr.min ? Math.log(cz / zr.min) / Math.log(zr.max / zr.min) : 0));
+      q('.g-zoom-l').forEach((s) => { s.textContent = (cz / zr.min).toFixed(1) + '×'; });
+      q('.g-tray-n').forEach((s) => { s.textContent = clips.length + photos.length; });
+      q('.g-stat-t').forEach((s) => { s.textContent = recText.textContent.replace(/\s*buffered/i, '') + ' · ' + specText.textContent; });
+      q('.g-dd-v').forEach((s) => { s.textContent = ddLabel(ld) || 'Set down'; });
+    }
+
+    // ---------- edit mode ----------
+    let editing = false;
+    function enterEdit() { editing = true; document.body.classList.add('editing'); render(); }
+    function exitEdit() { editing = false; document.body.classList.remove('editing'); persist(); render(); toast('Layout saved for ' + layoutKey().replace('-', ' ')); }
+    function overlaps(p, skip) {
+      if (p.x < 0 || p.y < 0 || p.x + p.w > cols || p.y + p.h > rows) return true;
+      return items.some((o, j) => j !== skip && p.x < o.x + o.w && o.x < p.x + p.w && p.y < o.y + o.h && o.y < p.y + p.h);
+    }
+    function freeSpot(w, h) {
+      const cx = cols / 2, cy = rows / 2; let best = null, bd = 1e9;
+      for (let y = 0; y + h <= rows; y++) for (let x = 0; x + w <= cols; x++) {
+        if (!overlaps({ x, y, w, h }, -1)) { const d = Math.abs(x + w / 2 - cx) + Math.abs(y + h / 2 - cy); if (d < bd) { bd = d; best = { x, y }; } }
+      }
+      return best;
+    }
+    let drag = null;
+    layer.addEventListener('pointerdown', (e) => {
+      if (!editing) return;
+      const el = e.target.closest('.gc'); if (!el) return;
+      const i = Number(el.dataset.i), p = items[i], def = CAT[p.c];
+      const handle = e.target.dataset ? e.target.dataset.e : null;
+      if (handle === 'x') { items.splice(i, 1); render(); return; }
+      if (handle === 's') {
+        let n;
+        if (def.sizes) {
+          const k = def.sizes.findIndex((s) => s[0] === p.w && s[1] === p.h);
+          const s = def.sizes[(k + 1) % def.sizes.length]; n = Object.assign({}, p, { w: s[0], h: s[1] });
+        } else n = Object.assign({}, p, { w: p.h, h: p.w });
+        if (overlaps(n, i)) { const sp = (() => { const keep = items.splice(i, 1)[0]; const f = freeSpot(n.w, n.h); items.splice(i, 0, keep); return f; })(); if (sp) { n.x = sp.x; n.y = sp.y; } else { toast('No room for that shape here'); return; } }
+        items[i] = n; render(); return;
+      }
+      e.preventDefault();
+      drag = { i, el, mode: handle === 'r' ? 'resize' : 'move', sx: e.clientX, sy: e.clientY, p0: Object.assign({}, p), cand: Object.assign({}, p) };
+      el.classList.add('dragging');
+      layer.setPointerCapture(e.pointerId);
+    });
+    layer.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      const dxc = Math.round((e.clientX - drag.sx) / cell), dyc = Math.round((e.clientY - drag.sy) / cell);
+      const p0 = drag.p0, def = CAT[p0.c];
+      let n = Object.assign({}, p0);
+      if (drag.mode === 'move') { n.x = p0.x + dxc; n.y = p0.y + dyc; }
+      else {
+        const long = p0.w >= p0.h ? 'w' : 'h';
+        const v = Math.max(def.resize.min, Math.min(def.resize.max, p0[long] + (long === 'w' ? dxc : dyc)));
+        n[long] = v;
+      }
+      n.x = Math.max(0, Math.min(cols - n.w, n.x)); n.y = Math.max(0, Math.min(rows - n.h, n.y));
+      drag.cand = n;
+      place(drag.el, n);
+      drag.el.classList.toggle('bad', overlaps(n, drag.i));
+    });
+    const endDrag = () => {
+      if (!drag) return;
+      const n = drag.cand;
+      if (!overlaps(n, drag.i)) items[drag.i] = n;
+      drag = null; render();
+    };
+    layer.addEventListener('pointerup', endDrag); layer.addEventListener('pointercancel', endDrag);
+
+    function openCatalog() {
+      const list = $('cat-list'); list.innerHTML = '';
+      Object.keys(CAT).forEach((c) => {
+        const d = CAT[c], on = items.some((p) => p.c === c);
+        const b = document.createElement('button'); b.type = 'button';
+        b.className = 'cat-item' + (on ? ' on' : '');
+        b.innerHTML = '<span><b></b><small></small></span><span class="sz">' + d.w + '×' + d.h + '</span>';
+        b.querySelector('b').textContent = d.name + (on ? ' (on screen)' : '');
+        b.querySelector('small').textContent = d.desc;
+        b.onclick = () => {
+          if (on) { toast(d.name + ' is already on screen'); return; }
+          const sp = freeSpot(d.w, d.h) || freeSpot(1, 1);
+          if (!sp) { toast('No free space. Remove or shrink something first.'); return; }
+          const w = freeSpot(d.w, d.h) ? d.w : 1, h = freeSpot(d.w, d.h) ? d.h : 1;
+          items.push({ c, x: sp.x, y: sp.y, w, h });
+          $('dlg-cat').close(); render();
+        };
+        list.appendChild(b);
+      });
+      $('dlg-cat').showModal();
+    }
+    // ---------- export / import ----------
+    function exportJSON() {
+      persist();
+      return JSON.stringify({ app: 'sentinels-live-layout', version: 1, exported: new Date().toISOString(), layouts: store }, null, 1);
+    }
+    function importJSON(text) {
+      const data = JSON.parse(text);
+      if (!data || data.app !== 'sentinels-live-layout' || typeof data.layouts !== 'object') throw new Error('Not a Sentinels Live layout file');
+      Object.keys(data.layouts).forEach((k) => {
+        if (!/^(phone|tablet)-(portrait|landscape)$/.test(k) || !Array.isArray(data.layouts[k])) return;
+        store[k] = data.layouts[k].filter((s) => s && CAT[s.c] && /^[lr][tb]$/.test(s.a)).map((s) => ({ c: s.c, w: Math.max(1, s.w | 0), h: Math.max(1, s.h | 0), a: s.a, dx: Math.max(0, s.dx | 0), dy: Math.max(0, s.dy | 0) }));
+      });
+      saveStore(); load(); render();
+    }
+    $('eb-add').onclick = openCatalog;
+    $('eb-done').onclick = exitEdit;
+    $('eb-reset').onclick = () => armed($('eb-reset'), 'Tap again to reset', () => { delete store[layoutKey()]; saveStore(); items = defaults(); render(); });
+    $('eb-export').onclick = async () => {
+      const text = exportJSON();
+      const blob = new Blob([text], { type: 'application/json' });
+      const ok = await shareBlob(blob, 'Sentinels-Live-layout.json');
+      try { await navigator.clipboard.writeText(text); toast('Layout exported (also copied)'); } catch (_) { if (ok !== false) toast('Layout exported'); }
+    };
+    $('eb-import').onclick = () => $('layout-input').click();
+    $('layout-input').addEventListener('change', async (e) => {
+      const f = e.target.files && e.target.files[0]; e.target.value = '';
+      if (!f) return;
+      try { importJSON(await f.text()); toast('Layout imported'); } catch (err) { toast('Could not import: ' + err.message, 3500); }
+    });
+    $('eb-paste').onclick = () => {
+      const t = window.prompt('Paste a layout here:');
+      if (!t) return;
+      try { importJSON(t); toast('Layout imported'); } catch (err) { toast('Could not import: ' + err.message, 3500); }
+    };
+    $('eb-alpha').addEventListener('input', (e) => { settings.ctlAlpha = Number(e.target.value); saveSettings(); syncSettingsUI(); });
+    $('eb-key').textContent = '';
+
+    let lastKey = '';
+    function relayout() {
+      const key = layoutKey();
+      if (editing && key !== lastKey) { persistFor(lastKey); }
+      measure();
+      if (key !== lastKey) { lastKey = key; load(); }
+      else items = items.map((p) => ({ c: p.c, w: Math.min(p.w, cols), h: Math.min(p.h, rows), x: Math.max(0, Math.min(cols - Math.min(p.w, cols), p.x)), y: Math.max(0, Math.min(rows - Math.min(p.h, rows), p.y)) }));
+      $('eb-key').textContent = key.replace('-', ' · ');
+      $('eb-alpha').value = settings.ctlAlpha;
+      render();
+    }
+    function persistFor(key) { if (key) { store[key] = items.map(toAnch); saveStore(); } }
+    window.addEventListener('resize', () => requestAnimationFrame(relayout));
+    window.addEventListener('orientationchange', () => setTimeout(relayout, 300));
+    return { relayout, refresh, enterEdit, exitEdit, exportJSON, importJSON, get items() { return items; }, get dims() { return { cell, cols, rows }; }, get editing() { return editing; } };
+  })();
+  window.__gridRefresh = () => { try { G.refresh(); } catch (_) {} };
+
+  window.__gridRelayout = () => { try { G.relayout(); } catch (e) { console.error(e); } };
+
   updateCounts();
   try {
     const installed = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
@@ -2306,6 +2755,7 @@
   renderDD();
   loadStored();
   // Test hook for automated checks (harmless in normal use)
+  window.__sentinelsGrid = () => G;
   window.__sentinels = { get state() { return { mode, plays: clips.filter((c) => c.kind === 'play').length, recordingPlay: !!playRec, clips: clips.length, photos: photos.length, segments: segments.length, items: items.length, zoom: view.s, dur: clipDuration(), t: replay.currentTime, rate: replay.playbackRate, windowStart }; } };
 })();
 </script>
