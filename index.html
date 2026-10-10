@@ -415,6 +415,41 @@
   .cat-item .sz { margin-left: auto; font: 600 11px var(--body); color: #FFC72C; border: 1px solid rgba(255,199,44,0.5); border-radius: 6px; padding: 2px 6px; }
   .cat-item.on { opacity: 0.45; }
 
+  .set-h { font-family: var(--display); font-size: 15px; letter-spacing: 0.1em; text-transform: uppercase; color: #FFC72C; border-bottom: 1px solid var(--line); padding-bottom: 4px; margin-top: 4px; }
+  .txt { height: 42px; border-radius: 9px; background: var(--card); border: 1px solid var(--line-bright); color: #fff; padding: 0 12px; font-size: 16px; width: 100%; user-select: text; -webkit-user-select: text; }
+  .score-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .score-row b { min-width: 92px; }
+  .score-n { font-family: var(--display); font-size: 26px; min-width: 40px; text-align: center; }
+  #g-q button.active { background: var(--scarlet); border-color: var(--scarlet-bright); }
+  .review-strip {
+    position: fixed; z-index: 21; top: calc(var(--hud) + var(--sat) + 6px); left: 50%; transform: translateX(-50%); display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
+    max-width: 60vw; padding: 5px; border-radius: 12px; background: rgba(18, 21, 27, var(--ctl-a)); border: 1px solid rgba(255,255,255,0.12);
+  }
+  body.portrait .review-strip { max-width: calc(100vw - 20px); top: calc(var(--hud) + var(--sat) + 4px); }
+  .tagchip { height: 36px; min-width: 44px; padding: 0 10px; border-radius: 9px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); font-family: var(--display); font-weight: 700; font-size: 15px; color: #fff; }
+  .tagchip.on { background: #00C2FF; color: #00131a; border-color: #00C2FF; }
+  .tagchip.res { color: #FFC72C; border-color: rgba(255,199,44,0.5); }
+  .res-pop { position: fixed; z-index: 26; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(420px, calc(100vw - 24px)); height: 200px; border-radius: 14px; border: 1px solid #FFC72C; background: rgba(18,21,27,0.97); padding: 8px; }
+  .g-result { width: 100%; height: 100%; display: flex; flex-direction: column; gap: 4px; padding: 4px; box-sizing: border-box; }
+  .gr-top { flex: 1; display: flex; gap: 4px; align-items: stretch; min-height: 0; }
+  .gr-top button { flex: 0 0 auto; width: calc(var(--cell, 54px) * 0.8); border-radius: 9px; background: rgba(255,255,255,0.08); font-size: 22px; color: #FFC72C; }
+  .gr-mid { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: stretch; gap: 2px; min-width: 0; }
+  .gr-val { font-family: var(--display); font-weight: 700; color: #FFC72C; font-size: clamp(13px, calc(var(--cell, 54px) * 0.3), 20px); text-align: center; line-height: 1; }
+  .gr-mid input[type=range] { width: 100%; accent-color: #FFC72C; margin: 0; height: 26px; }
+  .gr-btns { flex: 1.2; display: grid; grid-template-columns: repeat(auto-fit, minmax(54px, 1fr)); gap: 4px; min-height: 0; }
+  .gr-btns button { border-radius: 9px; background: rgba(255,255,255,0.08); font-size: clamp(10px, calc(var(--cell, 54px) * 0.2), 14px); text-transform: uppercase; letter-spacing: 0.03em; color: #fff; }
+  .gr-btns button.on { background: #FFC72C; color: #111; text-shadow: none; }
+  .gr-next { font-family: var(--body); font-size: 11px; color: var(--silver); text-align: center; text-transform: none; letter-spacing: 0; }
+  .g-tags { width: 100%; height: 100%; display: flex; flex-wrap: nowrap; gap: 4px; padding: 4px; box-sizing: border-box; align-content: center; justify-content: center; }
+  .g-tags.vert { flex-direction: column; }
+  .g-tags button { flex: 1 1 0; min-width: 0; min-height: 0; border-radius: 9px; background: rgba(255,255,255,0.08); font-size: clamp(13px, calc(var(--cell) * 0.28), 19px); }
+  .g-tags button.on { background: #00C2FF; color: #00131a; text-shadow: none; }
+  .g-tags .gs { width: 100%; }
+  .f-tags { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+  .tray-group { grid-column: 1 / -1; font-family: var(--display); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--silver); font-size: 14px; border-bottom: 1px solid var(--line); padding: 6px 0 4px; }
+  .tray-sub { padding: 0 8px; font-size: 11px; color: #9ad9ff; min-height: 14px; }
+  #btn-steady.on { border-color: #00C2FF; color: #00C2FF; }
+
   /* ---------- Tray sheet ---------- */
   .sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 50; display: none; }
   .sheet-backdrop.open { display: block; }
@@ -514,6 +549,7 @@
   <button class="rb" id="btn-tray" title="Saved replays and photos" aria-label="Saved replays and photos"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span class="badge num" id="tray-count">0</span></button>
   <button class="rb only-live" id="btn-flip" title="Switch camera" aria-label="Switch camera"><svg viewBox="0 0 24 24"><path d="M20 7h-3l-2-3H9L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M9 13.5a3 3 0 0 1 5.2-2"/><path d="M15 12.5a3 3 0 0 1-5.2 2"/></svg></button>
   <button class="rb on only-replay" id="btn-loop" title="Loop the play" aria-label="Loop"><svg viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></button>
+  <button class="rb only-replay" id="btn-steady" title="Steady: smooth out hand shake" aria-label="Steady"><svg viewBox="0 0 24 24"><path d="M2 12c3-4 5-4 8 0s5 4 8 0 3-2 4-1"/><path d="M2 18h20" opacity=".5"/></svg></button>
   <button class="rb only-replay" id="btn-speed" title="Speed (1 2 3)" aria-label="Playback speed"><span class="speed-lbl" id="speed-lbl">½×</span></button>
   <button class="rb only-replay" id="btn-restart" title="Back to start of the play (R)" aria-label="Back to start of the play"><svg viewBox="0 0 24 24"><path d="M19 20L9 12l10-8v16z"/><path d="M5 19V5"/></svg></button>
   <button class="rb only-replay" id="btn-prev" title="Back 1 frame (←)" aria-label="Back one frame"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
@@ -625,6 +661,8 @@
 
 <input type="file" id="import-input" accept="video/*,image/*" multiple hidden>
 <div id="grid-layer" aria-label="Live controls"></div>
+<div class="review-strip" id="review-strip" hidden></div>
+<div class="res-pop" id="res-pop" hidden></div>
 <div class="edit-bar" id="edit-bar">
   <span class="eb-key" id="eb-key"></span>
   <button class="ctl primary" id="eb-add">+ Add</button>
@@ -672,7 +710,9 @@
     <div class="tray-bar">
       <button class="chip active" id="f-all">All</button>
       <button class="chip" id="f-keep">★ Keepers</button>
+      <span id="f-tags" class="f-tags"></span>
       <span class="spacer" style="flex:1"></span>
+      <button class="chip" id="btn-reel">Highlight reel</button>
       <button class="chip" id="btn-import">Import from Photos</button>
       <button class="chip" id="btn-save-keepers">Save keepers to Photos</button>
       <button class="chip danger" id="btn-purge">Delete non-keepers</button>
@@ -691,49 +731,82 @@
 <dialog id="dlg-settings">
   <div class="dlg-head"><h2>Settings</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
   <div class="dlg-body">
-    <div class="field"><span>Replay length</span>
-      <div class="seg" data-setting="replayLen"><button data-v="5">5 s</button><button data-v="10">10 s</button><button data-v="15">15 s</button><button data-v="20">20 s</button><button data-v="30">30 s</button></div>
-      <p class="note">How far back the Replay button jumps. You can always drag back further, up to the last replay you took.</p>
+    <h3 class="set-h">Live screen</h3>
+    <p class="note">To move, add or remove live controls, tap the <b>Layout</b> button on the live screen.</p>
+    <div class="field"><span>Control see-through</span>
+      <input type="range" id="ctl-alpha" min="0" max="100" step="5" aria-label="How solid the controls are">
+      <p class="note">Left = see-through (more video shows), right = solid. Applies to every screen.</p>
     </div>
+    <div class="field"><span>Grid and button size</span>
+      <div class="seg" data-setting="layout"><button data-v="auto">Auto</button><button data-v="tablet">Large (iPad)</button><button data-v="phone">Compact (phone)</button></div>
+      <p class="note">Auto picks by screen size. Each size keeps its own saved layouts.</p>
+    </div>
+
+    <h3 class="set-h">Plays</h3>
     <div class="field"><span>After End Play</span>
       <div class="seg" data-setting="afterPlay"><button data-v="live">Stay on live</button><button data-v="replay">Show the replay</button></div>
+    </div>
+    <div class="field"><span>Jersey numbers to tag</span>
+      <input type="text" id="set-players" class="txt" placeholder="e.g. 22, 7, 15" autocomplete="off">
+      <p class="note">These become the buttons on the <b>Tag players</b> control and the filters in the tray.</p>
+    </div>
+    <div class="field"><span>Your kid's number</span>
+      <input type="text" id="set-mynum" class="txt" placeholder="e.g. 22" autocomplete="off" inputmode="numeric">
+      <p class="note">Any play tagged with this number is starred as a keeper automatically.</p>
+    </div>
+
+    <h3 class="set-h">Replays</h3>
+    <div class="field"><span>Replay length</span>
+      <div class="seg" data-setting="replayLen"><button data-v="5">5 s</button><button data-v="10">10 s</button><button data-v="15">15 s</button><button data-v="20">20 s</button><button data-v="30">30 s</button></div>
+      <p class="note">How far back the Instant Replay button jumps. Recorded plays always show from their start.</p>
     </div>
     <div class="field"><span>Replay starts at</span>
       <div class="seg" data-setting="speed"><button data-v="0.25">¼× speed</button><button data-v="0.5">½× speed</button><button data-v="1">Full speed</button></div>
     </div>
-    <div class="field"><span>Where the side controls sit</span>
+    <div class="field"><span>Steady (stabilize replays)</span>
+      <div class="seg" data-setting="steady"><button data-v="off">Off</button><button data-v="on">On</button></div>
+      <p class="note">Smooths hand shake when watching replays and in saved clips. Trims a little off the edges. The live picture isn't changed. You can also flip it with the Steady button on the replay screen.</p>
+    </div>
+    <div class="field"><span>Replay screen · side controls height</span>
       <div class="seg" data-setting="railY"><button data-v="0">Bottom</button><button data-v="25">Low</button><button data-v="50">Middle</button><button data-v="75">High</button></div>
       <input type="range" id="rail-y" min="0" max="100" step="1" aria-label="Fine-tune control height">
-      <p class="note">Drag to move both side columns up or down so they sit under your thumbs. Applies when the device is held sideways.</p>
     </div>
-    <div class="field"><span>Columns of controls on each side · iPad</span>
-      <div class="seg" data-setting="colsTablet"><button data-v="2">2 columns</button><button data-v="3">3 columns</button></div>
+    <div class="field"><span>Replay screen · columns per side</span>
+      <div class="seg" data-setting="colsTablet"><button data-v="2">iPad: 2</button><button data-v="3">iPad: 3</button></div>
+      <div class="seg" data-setting="colsPhone"><button data-v="2">Phone: 2</button><button data-v="3">Phone: 3</button></div>
     </div>
-    <div class="field"><span>Columns of controls on each side · Phone</span>
-      <div class="seg" data-setting="colsPhone"><button data-v="2">2 columns</button><button data-v="3">3 columns</button></div>
+    <div class="field"><span>Replay screen · zoom slider</span>
+      <div class="seg" data-setting="zoomPos"><button data-v="auto">Auto</button><button data-v="rail">Left column</button><button data-v="bottom">Bottom of screen</button></div>
     </div>
-    <div class="field"><span>Zoom slider</span>
-      <div class="seg" data-setting="zoomPos"><button data-v="auto">Auto</button><button data-v="rail">Bottom of left thumb column</button><button data-v="bottom">Bottom of screen</button></div>
-      <p class="note">Auto puts it in the left thumb column on an iPad (thumbs can't reach the middle of a big screen) and along the bottom on a phone.</p>
-    </div>
-    <div class="field"><span>Control see-through</span>
-      <input type="range" id="ctl-alpha" min="0" max="100" step="5" aria-label="How solid the controls are">
-      <p class="note">Left = see-through (more video shows), right = solid.</p>
-    </div>
-    <div class="field"><span>Control size</span>
-      <div class="seg" data-setting="layout"><button data-v="auto">Auto</button><button data-v="tablet">iPad (large)</button><button data-v="phone">Phone (compact)</button></div>
-    </div>
+
+    <h3 class="set-h">Camera</h3>
     <div class="field"><span>Camera</span>
       <div class="seg" data-setting="facing"><button data-v="environment">Back</button><button data-v="user">Front (selfie)</button></div>
     </div>
     <div class="field"><span>Resolution</span>
       <div class="seg" data-setting="res"><button data-v="720">720p</button><button data-v="1080">1080p</button><button data-v="2160">4K</button></div>
+      <p class="note">1080p is recommended. 4K can drop some devices to a few frames per second; if that happens the app steps down to 1080p on its own (never in the middle of a play).</p>
     </div>
     <div class="field"><span>Frame rate</span>
       <div class="seg" data-setting="fps"><button data-v="30">30 fps</button><button data-v="60">60 fps</button></div>
-      <p class="note">60 fps makes slow motion smoother. Web pages can't use the iPhone's 120/240 fps Slo-Mo mode, and some devices give 30 fps no matter what you pick. The camera reports what you actually got:</p>
+      <p class="note">60 fps makes slow motion smoother. Web pages can't use the iPhone's 120/240 fps Slo-Mo; for that, film with the Camera app and use Import from Photos. What the camera is actually giving:</p>
       <div class="actual num" id="actual">Camera not started</div>
     </div>
+  </div>
+</dialog>
+
+<!-- Game -->
+<dialog id="dlg-game">
+  <div class="dlg-head"><h2>Game</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
+  <div class="dlg-body">
+    <div class="field"><span>Opponent</span><input type="text" id="g-opp" class="txt" placeholder="e.g. Riverton" autocomplete="off"></div>
+    <div class="field"><span>Quarter</span><div class="seg" id="g-q"><button data-q="1">Q1</button><button data-q="2">Q2</button><button data-q="3">Q3</button><button data-q="4">Q4</button><button data-q="5">OT</button></div></div>
+    <div class="field"><span>Score</span>
+      <div class="score-row"><b>Sentinels</b><button class="ctl" data-sc="us" data-d="-1">−</button><span class="score-n" id="g-us">0</span><button class="ctl" data-sc="us" data-d="1">+</button><button class="ctl" data-sc="us" data-d="6">+6</button><button class="ctl" data-sc="us" data-d="3">+3</button></div>
+      <div class="score-row"><b id="g-opp-l">Opponent</b><button class="ctl" data-sc="them" data-d="-1">−</button><span class="score-n" id="g-them">0</span><button class="ctl" data-sc="them" data-d="1">+</button><button class="ctl" data-sc="them" data-d="6">+6</button><button class="ctl" data-sc="them" data-d="3">+3</button></div>
+    </div>
+    <div class="row-btns"><button class="ctl primary" id="g-done">Done</button><button class="ctl" id="g-new">New game</button></div>
+    <p class="note">New game starts play numbers back at 1 and keeps the old game's plays in the tray, grouped under their own heading.</p>
   </div>
 </dialog>
 
@@ -750,22 +823,19 @@
 <dialog id="dlg-help">
   <div class="dlg-head"><h2>How It Works</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
   <div class="dlg-body help-list">
-    <p><b>1. Always recording.</b> Once the camera is on, it records nonstop in the background. Nothing is uploaded; it all stays on this device.</p>
-    <p><b>Record every play.</b> Tap <b>Start Play</b> (big button, bottom right) when the teams line up, and <b>End Play</b> at the whistle. Each play is saved as its own numbered clip on this device. In the tray (grid button), tap ★ on the ones you want to keep, then save them to Photos.</p>
-    <p><b>Down &amp; distance.</b> On the live view, tap the down (1st–4th, or Goal for goal-to-go) with your left thumb and slide the yards with your right thumb (+ / − for fine steps). Tapping 1st resets to 10 yards. When you end a play, the down moves on by one automatically (4th goes back to 1st &amp; 10). A gold <b>Undo</b> button shows next to Start Play for 3 seconds if it shouldn't have (timeout, penalty). On a phone, or to edit a play you're watching, tap the gold chip in the top strip. The next play you start gets that label. While watching a play, the chip edits that play. The label goes in the clip's file name, and <b>Save Clip</b> writes it onto the video itself in a gold box.</p>
-    <p><b>Last</b> (under Start Play, next to Replay) opens the most recent play straight away. Tapping it during a play ends that play and shows it.</p>
-    <p><b>2. Or tap Replay after the whistle.</b> It jumps back to just before the snap and plays it in slow motion. The camera keeps recording in the small tile in the corner. Tap that tile, or <b>Live</b>, to go back.</p>
-    <p><b>3. Review.</b> Tap the video to pause or play. Drag across it to scrub. Use the arrow buttons to step one frame at a time. Pinch with two fingers to zoom in on a player, and drag with two fingers to move around. Tap the zoom label at the top to reset.</p>
-    <p><b>Zoom slider.</b> On an iPad it sits at the bottom of the left thumb column; on a phone it runs along the bottom. The button showing the level (e.g. 2.0×) resets to 1×. Change where it goes in Settings → Zoom slider.</p>
-    <p><b>Zoom while filming.</b> Pinch on the live view. On devices that allow it, this zooms the camera itself, so the recording is zoomed too and the label says "Camera". Otherwise only the screen picture zooms and the recording stays wide.</p>
-    <p><b>4. Draw.</b> Pick a pen, arrow, circle, or stamp. Touching the video pauses it. Each drawing sticks to the moment you drew it: when the replay plays past that moment, it pauses briefly so the drawing can be seen. Each replay keeps its own drawings. On the live view, tap <b>Freeze</b> first to draw on that moment. Pinching the live view always zooms; it never freezes it.</p>
-    <p><b>5. Save.</b> <b>Photo</b> saves the frame with your drawings. <b>Save Clip</b> saves the replay as a video. If you drew on it, the drawings are recorded into the video and it pauses for a beat at each one, like a TV telestrator. Everything lands in the tray (grid button). Tap <b>Save</b> there to put it in Photos or Files.</p>
-    <p><b>Arrange your own controls.</b> On the live view every control is a block on a see-through grid. Tap <b>Layout</b> to edit: drag blocks to move them, ↻ changes shape (or turns a slider), ⤡ stretches sliders, × removes, <b>+ Add</b> opens the catalog of every control. Tap <b>Done</b> to save. The layout is saved separately for phone and iPad, upright and sideways, and each block stays pinned to its nearest corner. <b>Export</b> sends your layouts as a file (also copied) a friend can bring in with <b>Import file</b> or <b>Paste</b>. The see-through slider sets how much video shows through.</p>
-    <p><b>Keep your plays safe.</b> Plays live in this browser's storage on this device, not in your Photos, until you save them. Safari can erase a website's stored data if the site isn't opened for about 7 days, and clearing website data in Settings erases it too. Two habits prevent losing anything: (1) open the app from its Home Screen icon (see below), and (2) after every game, open the tray, star your keepers and tap <b>Save keepers to Photos</b>.</p>
-    <p><b>Add to Home Screen.</b> In <b>Safari</b>: tap the Share button (square with an up arrow), scroll down, tap <b>Add to Home Screen</b>, then <b>Add</b>. In <b>Chrome</b> on iPhone/iPad: tap the Share button in the address bar, then <b>Add to Home Screen</b>. Open it from the new Sentinels Live icon from then on. It runs full-screen and keeps its storage much more reliably.</p>
-    <p><b>Photos in and out.</b> <b>Save</b> (tray) opens the share sheet; choose <b>Save Video</b> or <b>Save Image</b> to put it in Photos. <b>Import from Photos</b> (tray) brings in videos and pictures from your library, including clips shot with the Camera app's stabilization or Slo-Mo, so you can slow them down, draw on them and save them back. <b>9:16</b> (right side, in replay) saves a vertical clip or photo for social media, cropped to what's on screen; zoom in first to frame your player.</p>
-    <p><b>Tips.</b> Hold the iPad sideways. Keep the screen on; the page asks the device not to sleep while the camera is running.</p>
-    <p><b>Keyboard.</b> <span class="kbd">Space</span> replay / play-pause · <span class="kbd">←</span><span class="kbd">→</span> frame · <span class="kbd">1</span><span class="kbd">2</span><span class="kbd">3</span> speed · <span class="kbd">Esc</span> live · <span class="kbd">F</span> freeze · <span class="kbd">P A L O B X 0 S V</span> tools · <span class="kbd">C</span> clear</p>
+    <p><b>Getting started.</b> Tap Start Camera. The video fills the screen (the whole picture always shows; black bars only where the shapes don't match). The camera records nonstop in the background, and nothing is uploaded.</p>
+    <p><b>Your live controls.</b> Every control is a see-through block on a grid over the video. Tap <b>Layout</b> to arrange them: drag to move, <b>↻</b> changes shape or turns a slider, <b>⤡</b> stretches sliders, <b>×</b> removes, <b>+ Add</b> opens the catalog of every control (new controls show up there). Tap <b>Done</b> to save. There's a separate layout for phone and iPad, upright and sideways, and each block stays pinned to its nearest corner. <b>Export</b> shares your layouts as a file (also copied); a friend uses <b>Import file</b> or <b>Paste</b>. The see-through slider is in the edit bar and in Settings.</p>
+    <p><b>Record every play.</b> <b>Start Play</b> when the teams line up, <b>End Play</b> at the whistle. Each play is saved as its own numbered clip in the current game. <b>Last</b> opens the most recent play; tapping it during a play ends and shows that play. <b>Replay</b> looks back at the last few seconds even if you didn't start a play.</p>
+    <p><b>Down &amp; distance.</b> Tap the down on the <b>Downs</b> block (1st resets to 10 yards), or <b>Goal</b>. Set yards with the <b>Yards slider</b> or <b>Yards + / −</b>. The next play you start gets that label. When a play ends the down moves on by one (4th goes to 1st &amp; 10), and a gold <b>Undo</b> shows for 3 seconds for timeouts.</p>
+    <p><b>Play result.</b> After End Play, use the <b>Play result</b> block: slide or step the yards gained (negative for a loss), or tap Incomplete, 1st down, TD, Penalty or Turnover. The next down &amp; distance is worked out for you (1st &amp; 10 plus 4 yards becomes 2nd &amp; 6; gaining the distance resets to 1st &amp; 10; a penalty replays the down). The result is added to the play's label. While watching a play you can change it with <b>Result</b> at the top of the screen.</p>
+    <p><b>Player tags.</b> Enter jersey numbers in Settings. The <b>Tag players</b> block tags the play being recorded (or the last play). Tag your kid's number and the play is starred as a keeper automatically. While watching a play, the number chips at the top tag it too. In the tray, tap a number to see just those plays.</p>
+    <p><b>Game.</b> The <b>Game</b> block opens opponent, quarter and score, plus <b>New game</b>. The <b>Quarter</b> block moves to the next quarter with one tap. Plays are numbered per game, grouped by game in the tray, and saved clips show the quarter and score.</p>
+    <p><b>Watching a replay.</b> Left side: Live, tray, loop, speed, back to start, frame back/forward, play/pause, zoom. Right side: drawing tools, color, undo, clear, Photo, Save Clip, 9:16. Tap the video to pause/play, drag across it to scrub, pinch to zoom. <b>Steady</b> smooths shaky footage. Drawings stick to the moment you drew them and the replay pauses there briefly.</p>
+    <p><b>Saving.</b> <b>Photo</b> saves the frame with drawings. <b>Save Clip</b> saves the replay as video with drawings, down &amp; distance, quarter and score written on. <b>9:16</b> makes a vertical clip or photo for social media, cropped to what's on screen. In the tray: <b>★</b> marks keepers, <b>Save</b> opens the share sheet (choose Save Video / Save Image), <b>Save keepers to Photos</b> does them all, <b>Highlight reel</b> stitches the plays you're looking at into one video with a title card before each, and <b>Import from Photos</b> brings in videos and pictures to mark up.</p>
+    <p><b>Keep your plays safe.</b> Plays stay in this browser's storage on this device, not in Photos, until you save them. Safari can erase a website's stored data if it isn't opened for about 7 days, and clearing website data erases it too. Open the app from its Home Screen icon, and after every game star your keepers and tap <b>Save keepers to Photos</b>.</p>
+    <p><b>Add to Home Screen.</b> Safari: Share button (square with up arrow) → <b>Add to Home Screen</b> → Add. Chrome on iPhone/iPad: Share in the address bar → <b>Add to Home Screen</b>. Then always open it from the Sentinels Live icon. It runs full-screen and keeps its storage more reliably.</p>
+    <p><b>Steadier video.</b> Use 1080p, zoom less while filming (zoom in on the replay instead), brace the device, or use a tripod clamp. Web pages can't use Apple's camera stabilization; Steady helps on replays.</p>
+    <p><b>Keyboard.</b> <span class="kbd">Enter</span> start/end play · <span class="kbd">Space</span> replay / play-pause · <span class="kbd">←</span><span class="kbd">→</span> frame · <span class="kbd">1</span><span class="kbd">2</span><span class="kbd">3</span> speed · <span class="kbd">Esc</span> live · <span class="kbd">F</span> freeze · <span class="kbd">C</span> clear drawings</p>
   </div>
 </dialog>
 
@@ -796,7 +866,7 @@
   $('brand-logo').src = LOGO; $('fav').href = LOGO; $('touch-icon').href = LOGO; $('splash-logo').src = LOGO;
 
   // ---------- Settings ----------
-  const DEFAULTS = { replayLen: 10, speed: 0.5, facing: 'environment', res: 1080, fps: 60, layout: 'auto', afterPlay: 'live', railY: 50, colsTablet: 2, colsPhone: 3, ctlAlpha: 45, zoomPos: 'auto' };
+  const DEFAULTS = { replayLen: 10, speed: 0.5, facing: 'environment', res: 1080, fps: 60, layout: 'auto', afterPlay: 'live', railY: 50, colsTablet: 2, colsPhone: 3, ctlAlpha: 45, zoomPos: 'auto', players: '', myNum: '', steady: 'off' };
   let settings = Object.assign({}, DEFAULTS);
   try { Object.assign(settings, JSON.parse(localStorage.getItem('sentinels-live-settings') || '{}')); } catch (_) {}
   function saveSettings() { try { localStorage.setItem('sentinels-live-settings', JSON.stringify(settings)); } catch (_) {} }
@@ -854,6 +924,8 @@
     document.body.classList.add('m-' + m);
     $('color-pop').hidden = true; $('dd-pop').hidden = true; $('vert-pop').hidden = true;
     if (m === 'live' && window.__gridRelayout) requestAnimationFrame(window.__gridRelayout);
+    if (typeof renderReviewStrip === 'function') { try { renderReviewStrip(); } catch (_) {} }
+    if (m !== 'replay') replay.style.transform = '';
     requestAnimationFrame(positionRails);
     if (m !== 'replay') { replay.pause(); }
     renderModeTag();
@@ -1228,8 +1300,228 @@
   function nextNumber(kind) {
     const today = dayKey(new Date());
     let n = 0;
-    clips.forEach((c) => { if (c.kind === kind && dayKey(c.at) === today) n = Math.max(n, c.n); });
+    if (kind === 'play' && game) clips.forEach((c) => { if (c.kind === 'play' && c.gameId === game.id) n = Math.max(n, c.n); });
+    else clips.forEach((c) => { if (c.kind === kind && dayKey(c.at) === today) n = Math.max(n, c.n); });
     return n + 1;
+  }
+
+  // ---------- Game: opponent, quarter, score ----------
+  let game = null;
+  try { game = JSON.parse(localStorage.getItem('sentinels-live-game') || 'null'); } catch (_) {}
+  function saveGame() { try { localStorage.setItem('sentinels-live-game', JSON.stringify(game)); } catch (_) {} }
+  function ensureGame() { if (!game) { game = { id: uid(), opp: '', q: 1, us: 0, them: 0, at: Date.now() }; saveGame(); } return game; }
+  function qLabel(q) { return q >= 5 ? 'OT' : 'Q' + (q || 1); }
+  function oppShort(o) { return (o || 'OPP').replace(/[^A-Za-z0-9 ]/g, '').trim().slice(0, 3).toUpperCase() || 'OPP'; }
+  function gameLabel(g) { if (!g) return 'Set up game'; return (g.opp ? 'vs ' + g.opp + ' · ' : '') + qLabel(g.q) + ' · ' + g.us + '–' + g.them; }
+  function scoreText(c) { if (c.us == null) return ''; return 'SEN ' + c.us + ' · ' + oppShort(c.opp) + ' ' + c.them + ' · ' + qLabel(c.q); }
+  function openGame() {
+    ensureGame();
+    $('g-opp').value = game.opp || '';
+    renderGameDlg();
+    $('dlg-game').showModal();
+  }
+  function renderGameDlg() {
+    $('g-us').textContent = game.us; $('g-them').textContent = game.them;
+    $('g-opp-l').textContent = game.opp || 'Opponent';
+    document.querySelectorAll('#g-q button').forEach((b) => b.classList.toggle('active', Number(b.dataset.q) === game.q));
+  }
+  function gameChanged() { saveGame(); renderGameDlg(); updateMarkUI(); if (window.__gridRefresh) window.__gridRefresh(); }
+  $('g-opp').addEventListener('input', (e) => { ensureGame(); game.opp = e.target.value.slice(0, 30); gameChanged(); });
+  document.querySelectorAll('#g-q button').forEach((b) => b.onclick = () => { ensureGame(); game.q = Number(b.dataset.q); gameChanged(); });
+  document.querySelectorAll('[data-sc]').forEach((b) => b.onclick = () => { ensureGame(); const k = b.dataset.sc; game[k] = Math.max(0, game[k] + Number(b.dataset.d)); gameChanged(); });
+  $('g-done').onclick = () => $('dlg-game').close();
+  $('g-new').onclick = () => armed($('g-new'), 'Tap again for a new game', () => {
+    game = { id: uid(), opp: '', q: 1, us: 0, them: 0, at: Date.now() }; $('g-opp').value = ''; gameChanged(); toast('New game started');
+  });
+  function nextQuarter() { ensureGame(); game.q = game.q >= 5 ? 1 : game.q + 1; gameChanged(); toast(qLabel(game.q)); }
+
+  // ---------- Player tags ----------
+  function playerList() {
+    const nums = String(settings.players || '').split(/[\s,;\/]+/).map((s) => s.replace(/[^0-9]/g, '')).filter(Boolean);
+    const mine = String(settings.myNum || '').replace(/[^0-9]/g, '');
+    if (mine && !nums.includes(mine)) nums.unshift(mine);
+    return Array.from(new Set(nums)).slice(0, 16);
+  }
+  function tagTarget() { return playRec || latestPlay(); }
+  function toggleTag(target, num) {
+    if (!target) { toast('Record a play first'); return; }
+    target.tags = target.tags || [];
+    const i = target.tags.indexOf(num);
+    if (i >= 0) target.tags.splice(i, 1); else target.tags.push(num);
+    const mine = String(settings.myNum || '').replace(/[^0-9]/g, '');
+    if (i < 0 && mine && num === mine && !target.starred) { target.starred = true; toast('#' + num + ' tagged · kept ★'); }
+    else toast((i >= 0 ? 'Untagged #' : 'Tagged #') + num + (target === playRec ? ' (this play)' : ' on Play ' + target.n));
+    if (target !== playRec) { saveMetaSoon(target); renderTray(); }
+    renderReviewStrip();
+    if (window.__gridRefresh) window.__gridRefresh();
+  }
+
+  // ---------- Play result -> next down & distance ----------
+  function resultLabel(r) {
+    if (!r) return '';
+    if (r.kind === 'inc') return 'Incomplete';
+    if (r.kind === 'td') return 'Touchdown';
+    if (r.kind === 'pen') return 'Penalty';
+    if (r.kind === 'to') return 'Turnover';
+    if (r.kind === 'first') return '1st down' + (r.g ? ' (' + (r.g > 0 ? '+' : '') + r.g + ')' : '');
+    const g = r.g || 0;
+    return (g > 0 ? '+' : '') + g + ' yd' + (Math.abs(g) === 1 ? '' : 's') + (r.firstDown ? ', 1st down' : '');
+  }
+  function computeNext(pre, r) {
+    if (!pre || !pre.down || !r) return null;
+    if (r.kind === 'pen') return Object.assign({}, pre);
+    if (r.kind === 'to' || r.kind === 'first') return { down: 1, dist: 10, goal: false };
+    if (r.kind === 'td') return null;
+    const g = r.kind === 'inc' ? 0 : (r.g || 0);
+    if (!pre.goal && g >= pre.dist) return { down: 1, dist: 10, goal: false };
+    if (pre.down >= 4) return { down: 1, dist: 10, goal: false };
+    if (pre.goal) return { down: pre.down + 1, dist: pre.dist, goal: true };
+    return { down: pre.down + 1, dist: Math.max(1, Math.min(30, pre.dist - g)), goal: false };
+  }
+  function resultTarget() { return playRec || latestPlay(); }
+  function setResult(target, r) {
+    if (!target) { toast('Record a play first'); return; }
+    if (r && r.kind === 'gain' && target.dd && target.dd.down && !target.dd.goal) r.firstDown = (r.g || 0) >= target.dd.dist;
+    target.result = r;
+    if (target !== playRec) {
+      saveMetaSoon(target); renderTray();
+      // Only the most recent play drives the next down & distance.
+      if (target === latestPlay() && !playRec && target.dd && target.dd.down) {
+        const next = computeNext(target.dd, r) || (r ? null : null);
+        if (r) { ddTarget = 'next'; setDD(next); hideDDUndo(); }
+      }
+    }
+    renderReviewStrip(); renderModeTag();
+    if (window.__gridRefresh) window.__gridRefresh();
+  }
+  // Builds the result controls into a container (used by the live block and the replay popover).
+  function buildResultUI(box, getTarget) {
+    box.innerHTML = '<div class="g-result"><div class="gr-top"><button type="button" data-rs="-">−</button><div class="gr-mid"><div class="gr-val">Gain —</div><input type="range" min="-15" max="40" step="1" value="0" aria-label="Yards gained"><div class="gr-next"></div></div><button type="button" data-rs="+">+</button></div>' +
+      '<div class="gr-btns"><button type="button" data-rk="inc">Inc</button><button type="button" data-rk="first">1st dn</button><button type="button" data-rk="td">TD</button><button type="button" data-rk="pen">Pen</button><button type="button" data-rk="to">TO</button><button type="button" data-rk="clear">Clear</button></div></div>';
+    const step = (d) => { const tg = getTarget(); if (!tg) { toast('Record a play first'); return; } const g = (tg.result && tg.result.kind === 'gain' ? tg.result.g : 0) + d; setResult(tg, { kind: 'gain', g: Math.max(-15, Math.min(40, g)) }); };
+    box.querySelector('[data-rs="-"]').addEventListener('click', () => { if (!G_editing()) step(-1); });
+    box.querySelector('[data-rs="+"]').addEventListener('click', () => { if (!G_editing()) step(1); });
+    const rng = box.querySelector('input[type=range]');
+    rng.addEventListener('input', () => { const tg = getTarget(); if (tg) setResult(tg, { kind: 'gain', g: Number(rng.value) }); });
+    rng.addEventListener('pointerdown', (e) => e.stopPropagation());
+    box.querySelectorAll('[data-rk]').forEach((b) => b.addEventListener('click', () => {
+      if (G_editing()) return;
+      const tg = getTarget(); if (!tg) { toast('Record a play first'); return; }
+      const k = b.dataset.rk;
+      if (k === 'clear') { setResult(tg, null); return; }
+      if (k === 'td' && game) { /* score is up to you: tap Game to add points */ }
+      setResult(tg, (tg.result && tg.result.kind === k) ? null : { kind: k, g: tg.result ? tg.result.g || 0 : 0 });
+    }));
+    paintResultUI(box, getTarget());
+  }
+  function paintResultUI(box, tg) {
+    const r = tg && tg.result;
+    const v = box.querySelector('.gr-val'), n = box.querySelector('.gr-next'), rng = box.querySelector('input[type=range]');
+    if (!v) return;
+    v.textContent = r ? resultLabel(r) : (tg ? 'Result · Play ' + tg.n : 'Result');
+    if (r && (r.kind === 'gain' || r.kind === 'first')) { if (document.activeElement !== rng) rng.value = r.g || 0; } else if (document.activeElement !== rng) rng.value = 0;
+    box.querySelectorAll('[data-rk]').forEach((b) => b.classList.toggle('on', !!(r && r.kind === b.dataset.rk)));
+    const nx = tg && tg.dd && r ? computeNext(tg.dd, r) : null;
+    n.textContent = tg && tg.dd && tg.dd.down ? (ddLabel(tg.dd) + (r ? ' → ' + (nx ? ddLabel(nx) : (r.kind === 'td' ? 'score!' : '—')) : '')) : (tg ? 'Play ' + tg.n : '');
+  }
+  function G_editing() { try { return !!(window.__sentinelsGrid && window.__sentinelsGrid().editing); } catch (_) { return false; } }
+
+  // ---------- Replay screen strip: tags + result for the play being watched ----------
+  function renderReviewStrip() {
+    const strip = $('review-strip');
+    const c = currentClip;
+    if (mode !== 'replay' || !c || c.kind !== 'play') { strip.hidden = true; $('res-pop').hidden = true; return; }
+    strip.hidden = false; strip.innerHTML = '';
+    playerList().forEach((num) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'tagchip' + ((c.tags || []).includes(num) ? ' on' : '');
+      b.textContent = '#' + num; b.onclick = () => toggleTag(c, num); strip.appendChild(b);
+    });
+    const rb = document.createElement('button'); rb.type = 'button'; rb.className = 'tagchip res';
+    rb.textContent = c.result ? resultLabel(c.result) : 'Result';
+    rb.onclick = () => { const pop = $('res-pop'); pop.hidden = !pop.hidden; if (!pop.hidden) buildResultUI(pop, () => currentClip); };
+    strip.appendChild(rb);
+    if (!$('res-pop').hidden) paintResultUI($('res-pop'), c);
+  }
+
+  // ---------- Steady (replay stabilization) ----------
+  // Tracks how the whole picture shifts frame to frame on a small grayscale copy, smooths that
+  // path, and shifts each frame to cancel the jitter (slightly zoomed in to hide the edges).
+  function makeStab() {
+    const SW = 96, SH = 54;
+    const cv = document.createElement('canvas'); cv.width = SW; cv.height = SH;
+    const g = cv.getContext('2d', { willReadFrequently: true });
+    let prev = null, rx = 0, ry = 0, sx = 0, sy = 0, lastT = -1, out = { dx: 0, dy: 0 };
+    function gray() { const d = g.getImageData(0, 0, SW, SH).data; const a = new Float32Array(SW * SH); for (let i = 0, j = 0; i < a.length; i++, j += 4) a[i] = d[j] * 0.3 + d[j + 1] * 0.59 + d[j + 2] * 0.11; return a; }
+    return {
+      reset() { prev = null; rx = ry = sx = sy = 0; lastT = -1; out = { dx: 0, dy: 0 }; },
+      step(v) {
+        if (!v.videoWidth || v.currentTime === lastT) return out;
+        lastT = v.currentTime;
+        try { g.drawImage(v, 0, 0, SW, SH); } catch (_) { return out; }
+        const cur = gray();
+        if (prev) {
+          const R = 5, M = 7; let best = Infinity, bx = 0, by = 0;
+          for (let dy = -R; dy <= R; dy++) for (let dx = -R; dx <= R; dx++) {
+            let s = 0;
+            for (let y = M; y < SH - M; y += 2) { const o = y * SW, po = (y + dy) * SW + dx; for (let x = M; x < SW - M; x += 2) s += Math.abs(cur[o + x] - prev[po + x]); }
+            if (s < best) { best = s; bx = dx; by = dy; }
+          }
+          rx += bx; ry += by;
+        }
+        prev = cur;
+        sx += (rx - sx) * 0.12; sy += (ry - sy) * 0.12;
+        const lim = SW * 0.06;
+        const ox = Math.max(-lim, Math.min(lim, rx - sx)), oy = Math.max(-lim, Math.min(lim, ry - sy));
+        out = { dx: ox * v.videoWidth / SW, dy: oy * v.videoHeight / SH };
+        return out;
+      }
+    };
+  }
+  const STAB_ZOOM = 1.08;
+  const viewStab = makeStab();
+  function steadyOn() { return settings.steady === 'on'; }
+  function applySteadyUI() { $('btn-steady').classList.toggle('on', steadyOn()); if (!steadyOn()) replay.style.transform = ''; }
+  function steadyLoop() {
+    if (mode === 'replay' && steadyOn() && replay.videoWidth) {
+      const off = viewStab.step(replay);
+      const k = (parseFloat(ink.style.width) || replay.clientWidth) / replay.videoWidth;
+      replay.style.transform = 'translate(' + (off.dx * k).toFixed(1) + 'px,' + (off.dy * k).toFixed(1) + 'px) scale(' + STAB_ZOOM + ')';
+    }
+    if (replay.requestVideoFrameCallback) replay.requestVideoFrameCallback(steadyLoop); else requestAnimationFrame(steadyLoop);
+  }
+  if (replay.requestVideoFrameCallback) replay.requestVideoFrameCallback(steadyLoop); else requestAnimationFrame(steadyLoop);
+  replay.addEventListener('seeking', () => viewStab.reset());
+  $('btn-steady').onclick = () => { settings.steady = steadyOn() ? 'off' : 'on'; saveSettings(); syncSettingsUI(); applySteadyUI(); viewStab.reset(); toast(steadyOn() ? 'Steady on' : 'Steady off'); };
+  // Draw one video frame, steadied if Steady is on (source window shifted against the shake).
+  function drawSteadyFrame(x, src, vw, vh, W, H, stab, crop) {
+    const off = (stab && steadyOn()) ? stab.step(src) : { dx: 0, dy: 0 };
+    const z = (stab && steadyOn()) ? STAB_ZOOM : 1;
+    if (crop) {
+      const sw = crop.sw / z, sh = crop.sh / z;
+      const sx = Math.max(0, Math.min(vw - sw, crop.sx + (crop.sw - sw) / 2 - off.dx)), sy = Math.max(0, Math.min(vh - sh, crop.sy + (crop.sh - sh) / 2 - off.dy));
+      x.drawImage(src, sx, sy, sw, sh, 0, 0, W, H);
+    } else {
+      const sw = vw / z, sh = vh / z;
+      x.drawImage(src, (vw - sw) / 2 - off.dx, (vh - sh) / 2 - off.dy, sw, sh, 0, 0, W, H);
+    }
+  }
+  function drawScore(x, W, H, text) {
+    if (!text) return;
+    const s = W / 1280, pad = 18 * s;
+    x.save();
+    x.font = '700 ' + Math.round(22 * s) + 'px Oswald, Impact, "Arial Narrow", sans-serif';
+    const tw = x.measureText(text).width, bw = tw + 28 * s, bh = 44 * s;
+    x.fillStyle = 'rgba(9, 11, 14, 0.88)'; x.strokeStyle = '#ffffff'; x.lineWidth = 2 * s;
+    x.beginPath(); if (x.roundRect) x.roundRect(W - pad - bw, pad, bw, bh, 8 * s); else x.rect(W - pad - bw, pad, bw, bh);
+    x.fill(); x.stroke();
+    x.fillStyle = '#fff'; x.textBaseline = 'middle'; x.fillText(text, W - pad - bw + 14 * s, pad + bh / 2 + 1 * s);
+    x.restore();
+  }
+  function longLabel(c) {
+    const parts = [clipLabel(c).toUpperCase()];
+    if (c.kind === 'play' && c.result) parts.push(resultLabel(c.result).toUpperCase());
+    if (c.kind === 'play' && c.tags && c.tags.length) parts.push(c.tags.map((t) => '#' + t).join(' '));
+    return parts.join(' · ');
   }
   function updateMarkUI() {
     const b = $('btn-mark');
@@ -1257,7 +1549,9 @@
     stopRecorders();
     let seg;
     try { seg = startSegment(); } catch (_) { toast('Could not start recording.'); try { startSegment(); } catch (e) {} return; }
-    playRec = { seg, n: nextNumber('play'), start: now(), thumb: liveThumb(), dd: curDD ? Object.assign({}, curDD) : null };
+    ensureGame();
+    playRec = { seg, n: nextNumber('play'), start: now(), thumb: liveThumb(), dd: curDD ? Object.assign({}, curDD) : null, tags: [], result: null, starred: false,
+      gameId: game.id, opp: game.opp, q: game.q, us: game.us, them: game.them };
     renderDD();
     updateMarkUI();
     toast('Recording play ' + playRec.n + (playRec.dd ? ' · ' + ddLabel(playRec.dd) : ''));
@@ -1273,8 +1567,10 @@
     if (!segments.length) { try { startSegment(); } catch (_) {} }
     const secs = (now() - pr.start) / 1000;
     if (!blob.size) { toast('Nothing was recorded for that play.'); return null; }
-    const clip = addClip(blob, secs, actualFps(), 'play', { n: pr.n, thumb: pr.thumb || '', dd: pr.dd || null });
-    autoAdvanceDown(pr.dd);
+    const clip = addClip(blob, secs, actualFps(), 'play', { n: pr.n, thumb: pr.thumb || '', dd: pr.dd || null, tags: pr.tags || [], result: pr.result || null, starred: !!pr.starred,
+      gameId: pr.gameId, opp: pr.opp, q: pr.q, us: pr.us, them: pr.them });
+    if (pr.result && pr.dd && pr.dd.down) { ddTarget = 'next'; setDD(computeNext(pr.dd, pr.result)); }
+    else autoAdvanceDown(pr.dd);
     renderDD();
     lastPlay = clip; lastPlayEnd = now();
     updateMarkUI();
@@ -1331,7 +1627,8 @@
   function metaOf(o) {
     const m = { id: o.id, kind: o.kind, n: o.n, at: o.at.getTime(), type: o.type, thumb: o.thumb || '', starred: !!o.starred };
     if (o.kind === 'photo') { m.label = o.label; }
-    else { m.est = o.est; m.duration = o.duration || 0; m.fps = o.fps; m.items = o.items || []; m.of = o.of || ''; m.dd = o.dd || null; m.playN = o.playN || 0; m.vertical = !!o.vertical; }
+    else { m.est = o.est; m.duration = o.duration || 0; m.fps = o.fps; m.items = o.items || []; m.of = o.of || ''; m.dd = o.dd || null; m.playN = o.playN || 0; m.vertical = !!o.vertical;
+      m.tags = o.tags || []; m.result = o.result || null; m.gameId = o.gameId || ''; m.opp = o.opp || ''; m.q = o.q || 0; m.us = o.us; m.them = o.them; }
     if (o.kind === 'photo') m.vertical = !!o.vertical;
     return m;
   }
@@ -1377,6 +1674,7 @@
     if (c.kind === 'play') return 'Play ' + c.n + (ddLabel(c.dd) ? ' · ' + ddLabel(c.dd) : '');
     if (c.kind === 'markup') return (c.of || 'Clip') + ' ✎';
     if (c.kind === 'import') return 'Import ' + c.n;
+    if (c.kind === 'reel') return 'Highlight reel ' + c.n;
     return 'Replay ' + c.n;
   }
   function addClip(blob, est, fps, kind, extra) {
@@ -1441,6 +1739,7 @@
     updateScrub();
     if (autoplay) { try { await replay.play(); } catch (_) {} }
     if (clip.duration && clip.stored) saveMetaSoon(clip);
+    viewStab.reset(); renderReviewStrip();
     toast(clipLabel(clip) + ' · ' + speedLabel(replay.playbackRate));
   }
 
@@ -1615,7 +1914,7 @@
     vertical = vertical === true;
     if (mode !== 'replay' || !currentClip || exporting) return;
     const timed = items.filter((it) => it.t != null);
-    if (!vertical && !timed.length && !(currentClip.dd && currentClip.dd.down)) {
+    if (!vertical && !timed.length && !(currentClip.dd && currentClip.dd.down) && !steadyOn() && currentClip.us == null && !currentClip.result) {
       // No drawings and no down & distance: hand the original clip straight to the share sheet.
       shareClip(currentClip);
       return;
@@ -1636,18 +1935,24 @@
     const c = document.createElement('canvas'); c.width = W; c.height = H;
     const x = c.getContext('2d');
     const k = W / (parseFloat(ink.style.width) || W);
-    const label = clipLabel(currentClip).toUpperCase() + (rate < 1 ? ' · ' + speedLabel(rate).toUpperCase() : '');
+    const label = longLabel(currentClip).replace(' · ' + ddLabel(currentClip.dd).toUpperCase(), '') + (rate < 1 ? ' · ' + speedLabel(rate).toUpperCase() : '');
     const ddText = ddLabel(currentClip.dd).toUpperCase();
     const holds = Array.from(new Set(timed.map((i) => Math.round(i.t * 1000) / 1000))).filter((h) => h >= start).sort((a, b) => a - b);
 
     replay.pause();
     replay.currentTime = start;
     await waitFor(replay, 'seeked', 2000);
+    const exStab = makeStab();
+    const scoreTxt = scoreText(currentClip);
     const paint = () => {
-      if (crop) drawCropped(x, replay, vw, vh, crop, W, H, visibleItems());
-      else { x.drawImage(replay, 0, 0, W, H); visibleItems().forEach((it) => drawItem(it, x, W, H, k)); }
+      if (crop) {
+        const kk = vw / (parseFloat(ink.style.width) || vw);
+        drawSteadyFrame(x, replay, vw, vh, W, H, exStab, crop);
+        x.save(); x.scale(W / crop.sw, H / crop.sh); x.translate(-crop.sx, -crop.sy); visibleItems().forEach((it) => drawItem(it, x, vw, vh, kk)); x.restore();
+      } else { drawSteadyFrame(x, replay, vw, vh, W, H, exStab, null); visibleItems().forEach((it) => drawItem(it, x, W, H, k)); }
       drawBadge(x, W, H, label);
       if (ddText) drawDD(x, W, H, ddText);
+      if (scoreTxt && !crop) drawScore(x, W, H, scoreTxt);
     };
     paint();
 
@@ -2064,6 +2369,7 @@
   function extFor(type) { return /mp4/.test(type) ? 'mp4' : /webm/.test(type) ? 'webm' : 'mov'; }
   function fileName(o) {
     if (o.kind === 'photo') return 'Sentinels_Photo_' + stampName(o.at) + '.jpg';
+    if (o.kind === 'reel') return 'Sentinels_Highlights_' + stampName(o.at) + '.' + extFor(o.type || (o.blob && o.blob.type) || '');
     const base = (o.kind === 'markup' && o.playN) ? 'Play_' + o.playN + (o.dd && o.dd.down ? '_' + ddFile(o.dd) : '') + '_edited' : o.kind === 'play' ? 'Play_' + o.n + (o.dd && o.dd.down ? '_' + ddFile(o.dd) : '') : clipLabel(o).replace(/[^A-Za-z0-9]+/g, '_').replace(/_+$/, '');
     return 'Sentinels_' + base + (o.vertical ? '_vertical' : '') + '_' + stampName(o.at) + '.' + extFor(o.type || (o.blob && o.blob.type) || '');
   }
@@ -2102,6 +2408,11 @@
     if (c.thumb) th.style.backgroundImage = 'url(' + c.thumb + ')';
     th.querySelector('.dur').textContent = fmtShort(c.duration || c.est || 0);
     el.querySelector('.tray-meta').textContent = clipLabel(c) + ' · ' + (today ? '' : c.at.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ') + c.at.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    if (c.kind === 'play') {
+      const sub = document.createElement('div'); sub.className = 'tray-sub';
+      sub.textContent = [c.q ? qLabel(c.q) : '', c.result ? resultLabel(c.result) : '', (c.tags || []).map((t) => '#' + t).join(' ')].filter(Boolean).join(' · ');
+      el.querySelector('.tray-meta').after(sub);
+    }
     const star = el.querySelector('[data-a=star]'); star.classList.toggle('on', !!c.starred);
     star.onclick = () => { c.starred = !c.starred; saveMetaSoon(c); if (!c.stored) persist(c); renderTray(); };
     th.onclick = () => openClip(c, true);
@@ -2111,6 +2422,12 @@
     del.onclick = () => armed(del, 'Delete?', () => deleteItem(c));
     return el;
   }
+  function trayShownPlays() {
+    const plays = clips.filter((c) => c.kind === 'play');
+    if (trayFilter === 'keep') return plays.filter((c) => c.starred);
+    if (trayFilter.startsWith('tag:')) { const n = trayFilter.slice(4); return plays.filter((c) => (c.tags || []).includes(n)); }
+    return plays;
+  }
   function renderTray() {
     const plays = clips.filter((c) => c.kind === 'play');
     const others = clips.filter((c) => c.kind !== 'play');
@@ -2119,9 +2436,27 @@
     $('f-all').classList.toggle('active', trayFilter === 'all'); $('f-keep').classList.toggle('active', trayFilter === 'keep');
     const pWrapPlays = $('tray-plays'), cWrap = $('tray-clips'), pWrap = $('tray-photos');
     pWrapPlays.innerHTML = ''; cWrap.innerHTML = ''; pWrap.innerHTML = '';
-    const shown = trayFilter === 'keep' ? keepers : plays;
-    if (!shown.length) pWrapPlays.innerHTML = '<p class="empty">' + (trayFilter === 'keep' ? 'No keepers yet. Tap ★ on a play to keep it.' : 'No plays yet. Tap Start Play when the teams line up and End Play at the whistle.') + '</p>';
-    shown.slice().reverse().forEach((c) => pWrapPlays.appendChild(clipCard(c)));
+    const shown = trayShownPlays();
+    // tag filter chips
+    const ft = $('f-tags'); ft.innerHTML = '';
+    playerList().forEach((num) => {
+      const cnt = plays.filter((c) => (c.tags || []).includes(num)).length;
+      const b = document.createElement('button'); b.className = 'chip' + (trayFilter === 'tag:' + num ? ' active' : '');
+      b.textContent = '#' + num + ' ' + cnt; b.onclick = () => { trayFilter = trayFilter === 'tag:' + num ? 'all' : 'tag:' + num; renderTray(); };
+      ft.appendChild(b);
+    });
+    $('btn-reel').textContent = 'Highlight reel (' + shown.length + ')';
+    $('btn-reel').hidden = !shown.length;
+    if (!shown.length) pWrapPlays.innerHTML = '<p class="empty">' + (trayFilter === 'keep' ? 'No keepers yet. Tap ★ on a play to keep it.' : trayFilter.startsWith('tag:') ? 'No plays tagged ' + trayFilter.slice(4).replace(/^/, '#') + ' yet.' : 'No plays yet. Tap Start Play when the teams line up and End Play at the whistle.') + '</p>';
+    // group by game (newest first)
+    const groups = new Map();
+    shown.slice().reverse().forEach((c) => { const key = c.gameId || ('day-' + dayKey(c.at)); if (!groups.has(key)) groups.set(key, []); groups.get(key).push(c); });
+    groups.forEach((list) => {
+      const c0 = list[0], h = document.createElement('div'); h.className = 'tray-group';
+      h.textContent = (c0.opp ? 'vs ' + c0.opp : (c0.gameId ? 'Game' : 'Plays')) + ' · ' + c0.at.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }) + ' · ' + list.length + ' play' + (list.length === 1 ? '' : 's');
+      pWrapPlays.appendChild(h);
+      list.forEach((c) => pWrapPlays.appendChild(clipCard(c)));
+    });
     if (!others.length) cWrap.innerHTML = '<p class="empty">None yet. Tap Replay on the live view to look back at the last few seconds.</p>';
     others.slice().reverse().forEach((c) => cWrap.appendChild(clipCard(c)));
     if (!photos.length) pWrap.innerHTML = '<p class="empty">No photos yet. Pause a replay or freeze the live view, draw if you like, then tap the camera button.</p>';
@@ -2205,6 +2540,83 @@
     const loose = clips.filter((c) => c.kind === 'play' && !c.starred);
     armed($('btn-purge'), 'Tap again to delete ' + loose.length + ' plays', () => { loose.forEach((c) => deleteItem(c)); toast('Deleted ' + loose.length + ' plays'); });
   };
+  // ---------- Highlight reel: the plays being shown, stitched into one video with title cards ----------
+  let reelCancel = false;
+  async function makeReel(list) {
+    if (exporting) return;
+    if (!list.length) { toast('No plays to put in a reel.'); return; }
+    if (!HTMLCanvasElement.prototype.captureStream || !window.MediaRecorder) { toast('This browser can\'t build video files.'); return; }
+    closeTray();
+    exporting = true; reelCancel = false; exportCancel = false;
+    const ov = $('export-ov'); ov.hidden = false; $('export-bar').style.width = '0%';
+    const ovTitle = ov.querySelector('.display'); const oldTitle = ovTitle.textContent; ovTitle.textContent = 'Building highlight reel';
+    const W = 1280, H = 720, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+    const v = document.createElement('video'); v.muted = true; v.playsInline = true; v.setAttribute('playsinline', '');
+    v.style.cssText = 'position:fixed;left:0;top:0;width:2px;height:2px;opacity:0;pointer-events:none'; document.body.appendChild(v);
+    const cs = c.captureStream(30);
+    const opts = { videoBitsPerSecond: 6e6 }; if (mime) opts.mimeType = mime;
+    let mr; try { mr = new MediaRecorder(cs, opts); } catch (_) { mr = new MediaRecorder(cs); }
+    const chunks = []; mr.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
+    const stopped = new Promise((res) => { mr.onstop = res; });
+    x.fillStyle = '#090B0E'; x.fillRect(0, 0, W, H);
+    mr.start();
+    const frameLoop = (until, painter) => new Promise((res) => { const f = () => { if (exportCancel) return res(); painter(); if (until()) return res(); requestAnimationFrame(f); }; requestAnimationFrame(f); });
+    let total = 0;
+    for (let i = 0; i < list.length && !exportCancel; i++) {
+      const clip = list[i];
+      if (!(await ensureBlob(clip))) continue;
+      // Title card
+      const t0 = performance.now();
+      await frameLoop(() => performance.now() - t0 > 1600, () => {
+        x.fillStyle = '#090B0E'; x.fillRect(0, 0, W, H);
+        x.fillStyle = '#BA0C2F'; x.fillRect(0, H - 10, W, 10);
+        if (logoImg.complete && logoImg.naturalWidth) { const lh = 160, lw = lh * logoImg.naturalWidth / logoImg.naturalHeight; x.drawImage(logoImg, W / 2 - lw / 2, 110, lw, lh); }
+        x.textAlign = 'center'; x.fillStyle = '#fff';
+        x.font = '700 64px Oswald, Impact, sans-serif'; x.fillText(clipLabel(clip).toUpperCase(), W / 2, 360);
+        x.font = '600 34px Oswald, Impact, sans-serif'; x.fillStyle = '#FFC72C';
+        const sub = [clip.q ? qLabel(clip.q) : '', clip.result ? resultLabel(clip.result) : '', (clip.tags || []).map((t) => '#' + t).join(' ')].filter(Boolean).join('  ·  ');
+        if (sub) x.fillText(sub, W / 2, 420);
+        x.fillStyle = '#9A9DA0'; x.font = '500 26px Oswald, Impact, sans-serif';
+        x.fillText((clip.opp ? 'vs ' + clip.opp + ' · ' : '') + clip.at.toLocaleDateString(), W / 2, 470);
+        x.textAlign = 'start';
+      });
+      // The play
+      v.src = clip.url; v.load();
+      await waitFor(v, 'loadedmetadata', 4000);
+      v.currentTime = 0; await waitFor(v, 'seeked', 1500);
+      const st = makeStab(); const items_ = clip.items || [];
+      const dd = ddLabel(clip.dd).toUpperCase(), sc = scoreText(clip), lb = longLabel(clip).replace(' · ' + dd, '');
+      const k = W / (parseFloat(ink.style.width) || W);
+      v.play().catch(() => {});
+      await frameLoop(() => v.ended || (v.duration && v.currentTime >= v.duration - 0.05), () => {
+        x.fillStyle = '#000'; x.fillRect(0, 0, W, H);
+        const vw = v.videoWidth || W, vh = v.videoHeight || H, sc2 = Math.min(W / vw, H / vh), dw = vw * sc2, dh = vh * sc2;
+        x.save(); x.translate((W - dw) / 2, (H - dh) / 2);
+        const tmpW = dw, tmpH = dh;
+        drawSteadyFrame(x, v, vw, vh, tmpW, tmpH, st, null);
+        items_.filter((it) => it.t == null || it.t <= v.currentTime + 0.03).forEach((it) => drawItem(it, x, tmpW, tmpH, k * dw / W));
+        x.restore();
+        drawBadge(x, W, H, lb); if (dd) drawDD(x, W, H, dd); if (sc) drawScore(x, W, H, sc);
+      });
+      v.pause();
+      if (clip !== currentClip) releaseBlob(clip);
+      total++;
+      $('export-bar').style.width = Math.round((i + 1) / list.length * 100) + '%';
+    }
+    try { mr.stop(); } catch (_) {}
+    await stopped; cs.getTracks().forEach((tr) => tr.stop()); v.remove();
+    ov.hidden = true; ovTitle.textContent = oldTitle; exporting = false;
+    if (exportCancel) { toast('Reel canceled'); return; }
+    const blob = new Blob(chunks, { type: mr.mimeType || mime || 'video/mp4' });
+    if (!blob.size || !total) { toast('Could not build the reel.'); return; }
+    const reel = addClip(blob, 0, 30, 'reel', { thumb: c.toDataURL('image/jpeg', 0.6) });
+    openMedia({ blob: reel.blob, url: reel.url, name: fileName(reel), title: 'Highlight reel ready (' + total + ' plays)', video: true });
+  }
+  $('btn-reel').onclick = () => {
+    const list = trayShownPlays().slice().sort((a, b) => a.at - b.at);
+    makeReel(list);
+  };
+
   // Saving many videos: load them first, then a fresh tap hands them all to the share sheet.
   let keeperFiles = null;
   $('btn-save-keepers').onclick = async () => {
@@ -2299,6 +2711,8 @@
   }
   if (window.ResizeObserver) { const ro = new ResizeObserver(positionRails); rails.forEach((r) => ro.observe(r)); }
   window.addEventListener('resize', positionRails);
+  $('set-players').addEventListener('input', (e) => { settings.players = e.target.value.slice(0, 80); saveSettings(); renderTray(); renderReviewStrip(); if (window.__gridRelayout) window.__gridRelayout(); });
+  $('set-mynum').addEventListener('input', (e) => { settings.myNum = e.target.value.replace(/[^0-9]/g, '').slice(0, 3); saveSettings(); renderTray(); renderReviewStrip(); if (window.__gridRelayout) window.__gridRelayout(); });
   $('rail-y').addEventListener('input', (e) => { settings.railY = Number(e.target.value); saveSettings(); syncSettingsUI(); });
   $('ctl-alpha').addEventListener('input', (e) => { settings.ctlAlpha = Number(e.target.value); saveSettings(); syncSettingsUI(); });
 
@@ -2311,6 +2725,8 @@
     replaySub.textContent = settings.replayLen + 's · ' + (settings.speed === 1 ? '1×' : speedLabel(settings.speed).replace(' slow', ''));
     const ry = $('rail-y'); if (ry && Number(ry.value) !== settings.railY) ry.value = settings.railY;
     const ca = $('ctl-alpha'); if (ca && Number(ca.value) !== settings.ctlAlpha) ca.value = settings.ctlAlpha;
+    const sp = $('set-players'); if (sp && document.activeElement !== sp) sp.value = settings.players || '';
+    const sm = $('set-mynum'); if (sm && document.activeElement !== sm) sm.value = settings.myNum || '';
     applyLayout();
     if (typeof positionRails === 'function' && rails) positionRails();
   }
@@ -2444,6 +2860,10 @@
       settings:  { name: 'Settings', desc: 'App settings', w: 1, h: 1, render: () => btn(ICON.gear, () => $('btn-settings').click()) },
       help:      { name: 'Help', desc: 'How it works', w: 1, h: 1, render: () => btn(ICON.help, () => $('btn-help').click()) },
       status:    { name: 'Recording status', desc: 'REC time and frames per second', w: 3, h: 1, resize: { min: 2, max: 6 }, cls: 'g-display', render: () => ({ html: '<div class="gstat"><span class="dot"></span><span class="g-stat-t">REC</span></div>' }) },
+      result:    { name: 'Play result', desc: 'Yards gained, Inc, 1st down, TD, penalty, turnover; sets the next down', w: 4, h: 2, sizes: [[4, 2], [3, 3], [2, 4], [5, 2], [6, 2]], cls: 'g-gold', render: () => ({ html: '<div class="g-res-box" style="width:100%;height:100%"></div>', mount: (el) => buildResultUI(el.querySelector('.g-res-box'), resultTarget) }) },
+      tags:      { name: 'Tag players', desc: 'Tag jersey numbers on the play (set numbers in Settings)', w: 4, h: 1, resize: { min: 2, max: 12 }, rotate: true, render: (p) => ({ html: '<div class="g-tags' + (p.h > p.w ? ' vert' : '') + '"></div>', mount: (el) => mountTags(el.querySelector('.g-tags')) }) },
+      game:      { name: 'Game', desc: 'Opponent, quarter, score, new game', w: 3, h: 1, sizes: [[3, 1], [2, 1], [4, 1], [2, 2]], render: () => btn('<span class="gl g-game-l">Set up game</span>', () => openGame()) },
+      quarter:   { name: 'Next quarter', desc: 'One tap moves to the next quarter', w: 1, h: 1, render: () => btn('<span class="gl g-q-l">Q1</span><span class="gs">next</span>', () => nextQuarter()) },
       ddShow:    { name: 'Down & distance display', desc: 'Shows the current down & distance', w: 2, h: 1, resize: { min: 2, max: 5 }, cls: 'g-gold g-display', render: () => ({ html: '<div class="gbtn"><span class="gl g-dd-v">Set down</span></div>' }) }
     };
 
@@ -2505,7 +2925,18 @@
       put('start', R, y0 + 3, 2, 2);
       put('replay', R, y0 + 5, 1, 1); put('last', R + 1, y0 + 5, 1, 1);
       if (cols - 4 >= 2) put('zoomSlider', 2, rows - 1, Math.min(cols - 4, 10), 1);
-      return out;
+      if (cols >= 12) {
+        put('game', 3 + (cols >= 9 ? 0 : 0), 0, 3, 1);
+        if (cols >= 14 || portrait) {
+          if (y0 + 4 < rows - 1) put('result', cols - 6, y0 + 3, 4, 2);
+          if (y0 + 5 < rows - 1) put('tags', cols - 6, y0 + 5, 4, 1);
+          put('quarter', 6, 0);
+        }
+      }
+      // drop anything that collides (very small grids)
+      const ok = [];
+      out.forEach((p) => { if (p.x >= 0 && p.y >= 0 && p.x + p.w <= cols && p.y + p.h <= rows && !ok.some((o) => p.x < o.x + o.w && o.x < p.x + p.w && p.y < o.y + o.h && o.y < p.y + p.h)) ok.push(p); });
+      return ok;
     }
     let items = [];
     function load() {
@@ -2538,6 +2969,7 @@
         if (b && r.act) b.addEventListener('click', (e) => { if (editing) return; r.act(); });
         el.querySelectorAll('[data-down]').forEach((d) => d.addEventListener('click', () => { if (!editing) document.querySelector('[data-rdown="' + d.dataset.down + '"]').click(); }));
         const sl = el.querySelector('[data-sl]'); if (sl) wireSlider(sl, p);
+        if (r.mount) { place(el, p); layer.appendChild(el); r.mount(el); return; }
         place(el, p);
         layer.appendChild(el);
       });
@@ -2606,8 +3038,23 @@
       q('.g-tray-n').forEach((s) => { s.textContent = clips.length + photos.length; });
       q('.g-stat-t').forEach((s) => { s.textContent = recText.textContent.replace(/\s*buffered/i, '') + ' · ' + specText.textContent; });
       q('.g-dd-v').forEach((s) => { s.textContent = ddLabel(ld) || 'Set down'; });
+      q('.g-res-box').forEach((bx) => paintResultUI(bx, resultTarget()));
+      q('.g-tags').forEach((bx) => paintTags(bx));
+      q('.g-game-l').forEach((s) => { s.textContent = gameLabel(game); });
+      q('.g-q-l').forEach((s) => { s.textContent = qLabel(game ? game.q : 1); });
     }
 
+    function mountTags(box) {
+      const nums = playerList();
+      if (!nums.length) { box.innerHTML = '<button type="button"><span class="gs">Add jersey numbers in Settings</span></button>'; box.querySelector('button').onclick = () => { if (!editing) $('btn-settings').click(); }; return; }
+      box.innerHTML = nums.map((n) => '<button type="button" data-tag="' + n + '">#' + n + '</button>').join('');
+      box.querySelectorAll('[data-tag]').forEach((b) => b.addEventListener('click', () => { if (!editing) toggleTag(tagTarget(), b.dataset.tag); }));
+      paintTags(box);
+    }
+    function paintTags(box) {
+      const tg = tagTarget(), on = (tg && tg.tags) || [];
+      box.querySelectorAll('[data-tag]').forEach((b) => b.classList.toggle('on', on.includes(b.dataset.tag)));
+    }
     // ---------- edit mode ----------
     let editing = false;
     function enterEdit() { editing = true; document.body.classList.add('editing'); render(); }
@@ -2745,6 +3192,7 @@
   window.__gridRefresh = () => { try { G.refresh(); } catch (_) {} };
 
   window.__gridRelayout = () => { try { G.relayout(); } catch (e) { console.error(e); } };
+  applySteadyUI();
 
   updateCounts();
   try {
@@ -2756,6 +3204,7 @@
   loadStored();
   // Test hook for automated checks (harmless in normal use)
   window.__sentinelsGrid = () => G;
+  window.__sentinelsData = () => ({ clips: clips.map((c) => ({ kind: c.kind, n: c.n, dd: c.dd, tags: c.tags, result: c.result, q: c.q, opp: c.opp, us: c.us, them: c.them, starred: c.starred })), curDD, game, steady: settings.steady });
   window.__sentinels = { get state() { return { mode, plays: clips.filter((c) => c.kind === 'play').length, recordingPlay: !!playRec, clips: clips.length, photos: photos.length, segments: segments.length, items: items.length, zoom: view.s, dur: clipDuration(), t: replay.currentTime, rate: replay.playbackRate, windowStart }; } };
 })();
 </script>
