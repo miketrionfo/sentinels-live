@@ -186,9 +186,15 @@
   .rb .badge { position: absolute; top: -5px; right: -5px; background: var(--scarlet); color: #fff; border-radius: 99px; font-size: 11px; min-width: 19px; height: 19px; display: grid; place-items: center; padding: 0 5px; font-family: var(--body); letter-spacing: 0; }
   .rb .sub { display: block; font-family: var(--body); font-size: 11px; font-weight: 600; letter-spacing: 0.01em; text-transform: none; opacity: 0.85; }
   .rb.wide.big:not(#btn-play) { flex-direction: column; gap: 3px; font-size: 13px; overflow: hidden; text-align: center; line-height: 1.1; }
-  .replay-btn { height: calc(var(--bb) * 1.45) !important; font-size: 16px !important; letter-spacing: 0.1em; box-shadow: 0 6px 24px var(--scarlet-glow); }
+  .play-btn { height: calc(var(--bb) * 1.45) !important; font-size: 16px !important; letter-spacing: 0.08em; box-shadow: 0 6px 24px var(--scarlet-glow); }
+  .play-btn .rec-dot { width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 3px solid rgba(255,255,255,0.5); }
+  .play-btn.recording { background: #fff !important; color: var(--scarlet) !important; border-color: #fff !important; animation: recpulse 1.4s infinite; }
+  .play-btn.recording .rec-dot { border-radius: 4px; background: var(--scarlet); border-color: var(--scarlet); }
+  @keyframes recpulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(224, 20, 56, 0.7); } 50% { box-shadow: 0 0 0 10px rgba(224, 20, 56, 0); } }
+  .rb[disabled] { opacity: 0.45; }
+  #btn-replay { flex-direction: column; gap: 2px; height: calc(var(--b) * 1.15); font-size: 13px; text-align: center; line-height: 1.05; }
+  #btn-replay svg { width: 20px; height: 20px; }
   #btn-freeze { height: calc(var(--bb) * 1.2); }
-  .replay-btn[disabled] { opacity: 0.45; }
   .color-dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #fff; }
   .speed-lbl { font-size: 17px; letter-spacing: 0.02em; }
 
@@ -247,7 +253,7 @@
   .sheet-head h2 { font-family: var(--display); font-size: 20px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
   .sheet-body { overflow-y: auto; padding: 0 16px 16px; display: grid; gap: 14px; }
   .sheet-body h3 { font-family: var(--display); font-size: 13px; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; font-weight: 600; }
-  .tray-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .tray-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
   .tray-item { background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
   .tray-thumb { aspect-ratio: 16 / 9; background: #000 center / cover no-repeat; position: relative; width: 100%; }
   .tray-thumb .dur { position: absolute; right: 6px; bottom: 6px; background: rgba(0,0,0,0.75); font-size: 11px; padding: 1px 6px; border-radius: 4px; font-variant-numeric: tabular-nums; }
@@ -256,6 +262,16 @@
   .tray-actions button { flex: 1; height: 34px; border-radius: 7px; background: var(--surface); border: 1px solid var(--line); font-size: 12px; font-weight: 600; }
   .tray-actions button.del { flex: 0 0 34px; color: #FF8A9B; }
   .empty { color: var(--muted); font-size: 13px; line-height: 1.5; }
+  .tray-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .chip { height: 34px; padding: 0 12px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); font-weight: 600; font-size: 13px; }
+  .chip.active { background: var(--scarlet); border-color: var(--scarlet-bright); }
+  .chip.danger { color: #FF8A9B; }
+  .chip.armed { background: #5A0E1D; border-color: #FF8A9B; color: #fff; }
+  .tray-actions button.star { flex: 0 0 38px; font-size: 18px; color: var(--muted); }
+  .tray-actions button.star.on { color: #FFC72C; border-color: #FFC72C; }
+  .tray-actions button.armed { background: #5A0E1D; color: #fff; flex: 1; }
+  .tray-item.keeper { border-color: #FFC72C; }
+  .storage-line { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
 
   /* ---------- Dialogs ---------- */
   dialog {
@@ -271,6 +287,7 @@
   .seg { display: flex; flex-wrap: wrap; gap: 6px; }
   .seg button { height: 40px; padding: 0 14px; border-radius: 9px; background: var(--card); border: 1px solid var(--line); font-weight: 600; }
   .seg button.active { background: var(--scarlet); border-color: var(--scarlet-bright); }
+  #rail-y { width: 100%; accent-color: var(--scarlet-bright); height: 32px; }
   .note { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
   .actual { font-size: 13px; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px; font-variant-numeric: tabular-nums; }
   .help-list { display: grid; gap: 10px; line-height: 1.45; font-size: 14px; }
@@ -348,9 +365,13 @@
   <button class="rb only-review" id="btn-clear" title="Clear drawings (C)" aria-label="Clear drawings"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg></button>
   <button class="rb only-review" id="btn-photo" title="Save photo of this frame with drawings" aria-label="Save photo"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></button>
   <button class="rb only-replay" id="btn-saveclip" title="Save this replay as a video (with your drawings, if any)" aria-label="Save clip"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 4v16M17 4v16M2 9h5M2 15h5M17 9h5M17 15h5"/></svg></button>
-  <button class="rb wide big primary replay-btn only-live" id="btn-replay" disabled>
+  <button class="rb wide only-live" id="btn-replay" disabled title="Instant replay of the last few seconds (Space)">
     <svg viewBox="0 0 24 24"><path d="M1 4v6h6"/><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/></svg>
     <span>Replay<small class="sub" id="replay-sub">10 s · ½×</small></span>
+  </button>
+  <button class="rb wide big primary play-btn only-live" id="btn-mark" disabled title="Start / end recording a play (Enter)">
+    <span class="rec-dot"></span>
+    <span><span id="mark-lbl">Start Play</span><small class="sub num" id="mark-sub">Play 1</small></span>
   </button>
 </nav>
 
@@ -404,11 +425,21 @@
     <button class="icon-btn" id="btn-tray-close" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
   </div>
   <div class="sheet-body">
-    <h3>Replays</h3>
+    <h3>Plays</h3>
+    <div class="tray-bar">
+      <button class="chip active" id="f-all">All</button>
+      <button class="chip" id="f-keep">★ Keepers</button>
+      <span class="spacer" style="flex:1"></span>
+      <button class="chip" id="btn-save-keepers">Save keepers to Photos</button>
+      <button class="chip danger" id="btn-purge">Delete non-keepers</button>
+    </div>
+    <div class="tray-grid" id="tray-plays"></div>
+    <h3>Instant replays</h3>
     <div class="tray-grid" id="tray-clips"></div>
     <h3>Photos</h3>
     <div class="tray-grid" id="tray-photos"></div>
-    <p class="note">Clips and photos live in this browser tab only. They are gone when you close or reload it. Tap <b>Save</b> to put one in your Photos or Files. Only the newest <span id="clip-cap">8</span> replays are kept.</p>
+    <p class="note">Plays, replays and photos are stored on this device in the browser, so they survive a reload. Tap ★ on the plays you want to keep, then <b>Save</b> (or <b>Save keepers to Photos</b>) to copy them into your Photos app. Deleting the browser's website data erases them. Only the newest <span id="clip-cap">8</span> unstarred instant replays are kept.</p>
+    <p class="storage-line" id="storage-line"></p>
   </div>
 </section>
 
@@ -420,8 +451,16 @@
       <div class="seg" data-setting="replayLen"><button data-v="5">5 s</button><button data-v="10">10 s</button><button data-v="15">15 s</button><button data-v="20">20 s</button><button data-v="30">30 s</button></div>
       <p class="note">How far back the Replay button jumps. You can always drag back further, up to the last replay you took.</p>
     </div>
+    <div class="field"><span>After End Play</span>
+      <div class="seg" data-setting="afterPlay"><button data-v="live">Stay on live</button><button data-v="replay">Show the replay</button></div>
+    </div>
     <div class="field"><span>Replay starts at</span>
       <div class="seg" data-setting="speed"><button data-v="0.25">¼× speed</button><button data-v="0.5">½× speed</button><button data-v="1">Full speed</button></div>
+    </div>
+    <div class="field"><span>Where the side controls sit</span>
+      <div class="seg" data-setting="railY"><button data-v="0">Bottom</button><button data-v="25">Low</button><button data-v="50">Middle</button><button data-v="75">High</button></div>
+      <input type="range" id="rail-y" min="0" max="100" step="1" aria-label="Fine-tune control height">
+      <p class="note">Drag to move both side columns up or down so they sit under your thumbs. Applies when the device is held sideways.</p>
     </div>
     <div class="field"><span>Control size</span>
       <div class="seg" data-setting="layout"><button data-v="auto">Auto</button><button data-v="tablet">iPad (large)</button><button data-v="phone">Phone (compact)</button></div>
@@ -445,10 +484,11 @@
   <div class="dlg-head"><h2>How It Works</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
   <div class="dlg-body help-list">
     <p><b>1. Always recording.</b> Once the camera is on, it records nonstop in the background. Nothing is uploaded; it all stays on this device.</p>
-    <p><b>2. Tap Replay after the whistle.</b> It jumps back to just before the snap and plays it in slow motion. The camera keeps recording in the small tile in the corner. Tap that tile, or <b>Live</b>, to go back.</p>
+    <p><b>Record every play.</b> Tap <b>Start Play</b> (big button, bottom right) when the teams line up, and <b>End Play</b> at the whistle. Each play is saved as its own numbered clip on this device. In the tray (grid button), tap ★ on the ones you want to keep, then save them to Photos.</p>
+    <p><b>2. Or tap Replay after the whistle.</b> It jumps back to just before the snap and plays it in slow motion. The camera keeps recording in the small tile in the corner. Tap that tile, or <b>Live</b>, to go back.</p>
     <p><b>3. Review.</b> Tap the video to pause or play. Drag across it to scrub. Use the arrow buttons to step one frame at a time. Pinch with two fingers to zoom in on a player, and drag with two fingers to move around. Tap the zoom label at the top to reset.</p>
     <p><b>Zoom while filming.</b> Pinch on the live view. On devices that allow it, this zooms the camera itself, so the recording is zoomed too and the label says "Camera". Otherwise only the screen picture zooms and the recording stays wide.</p>
-    <p><b>4. Draw.</b> Pick a pen, arrow, circle, or stamp. Touching the video pauses it. Each drawing sticks to the moment you drew it: when the replay plays past that moment, it pauses briefly so the drawing can be seen. Each replay keeps its own drawings. On the live view, picking a tool and touching the screen freezes that moment.</p>
+    <p><b>4. Draw.</b> Pick a pen, arrow, circle, or stamp. Touching the video pauses it. Each drawing sticks to the moment you drew it: when the replay plays past that moment, it pauses briefly so the drawing can be seen. Each replay keeps its own drawings. On the live view, tap <b>Freeze</b> first to draw on that moment. Pinching the live view always zooms; it never freezes it.</p>
     <p><b>5. Save.</b> <b>Photo</b> saves the frame with your drawings. <b>Save Clip</b> saves the replay as a video. If you drew on it, the drawings are recorded into the video and it pauses for a beat at each one, like a TV telestrator. Everything lands in the tray (grid button). Tap <b>Save</b> there to put it in Photos or Files.</p>
     <p><b>Tips.</b> Hold the iPad sideways. For a full-screen app, use Share → Add to Home Screen. Keep the screen on; the page asks the device not to sleep while the camera is running.</p>
     <p><b>Keyboard.</b> <span class="kbd">Space</span> replay / play-pause · <span class="kbd">←</span><span class="kbd">→</span> frame · <span class="kbd">1</span><span class="kbd">2</span><span class="kbd">3</span> speed · <span class="kbd">Esc</span> live · <span class="kbd">F</span> freeze · <span class="kbd">P A L O B X 0 S V</span> tools · <span class="kbd">C</span> clear</p>
@@ -482,7 +522,7 @@
   $('brand-logo').src = LOGO; $('fav').href = LOGO; $('touch-icon').href = LOGO; $('splash-logo').src = LOGO;
 
   // ---------- Settings ----------
-  const DEFAULTS = { replayLen: 10, speed: 0.5, facing: 'environment', res: 1080, fps: 60, layout: 'auto' };
+  const DEFAULTS = { replayLen: 10, speed: 0.5, facing: 'environment', res: 1080, fps: 60, layout: 'auto', afterPlay: 'live', railY: 50 };
   let settings = Object.assign({}, DEFAULTS);
   try { Object.assign(settings, JSON.parse(localStorage.getItem('sentinels-live-settings') || '{}')); } catch (_) {}
   function saveSettings() { try { localStorage.setItem('sentinels-live-settings', JSON.stringify(settings)); } catch (_) {} }
@@ -504,7 +544,9 @@
   let windowStart = 0;            // replay window start (s)
   let loopOn = true;
   let wakeLock = null;
-  let clipSeq = 0, photoSeq = 0;
+  let playRec = null;             // the play being recorded right now
+  let lastPlay = null, lastPlayEnd = 0;
+  let trayFilter = 'all';
   const frozen = document.createElement('canvas'); // native-res frozen frame for still mode
 
   // Drawing
@@ -535,13 +577,14 @@
     document.body.classList.remove('m-splash', 'm-live', 'm-replay', 'm-still');
     document.body.classList.add('m-' + m);
     $('color-pop').hidden = true;
+    requestAnimationFrame(positionRails);
     if (m !== 'replay') { replay.pause(); }
     renderModeTag();
     requestAnimationFrame(fitInk);
   }
   function renderModeTag() {
     let html = '';
-    if (mode === 'replay' && currentClip) html = '<span class="tag-main">Replay ' + currentClip.n + '</span><span>' + speedLabel(replay.playbackRate) + '</span>';
+    if (mode === 'replay' && currentClip) html = '<span class="tag-main">' + clipLabel(currentClip) + '</span><span>' + speedLabel(replay.playbackRate) + '</span>';
     else if (mode === 'still') html = '<span class="tag-main">Frozen</span>';
     modeTag.innerHTML = html;
   }
@@ -554,7 +597,7 @@
     for (const t of list) { try { if (MediaRecorder.isTypeSupported(t)) return t; } catch (_) {} }
     return '';
   }
-  function bitrate() { return settings.res >= 2160 ? 20e6 : settings.res >= 1080 ? 8e6 : 4e6; }
+  function bitrate() { return settings.res >= 2160 ? 14e6 : settings.res >= 1080 ? 6e6 : 3e6; }
 
   function showSplashError(msg) {
     const e = $('splash-err'); e.innerHTML = msg; e.hidden = false;
@@ -596,6 +639,7 @@
     canRecord = mime !== null;
     if (canRecord) { startSegment(); btnReplay.disabled = false; }
     else { btnReplay.disabled = true; toast('This browser can\'t record video. Live view only.', 3500); }
+    playRec = null; updateMarkUI();
     requestWakeLock();
     $('splash').hidden = true;
     setMode('live');
@@ -630,7 +674,7 @@
   }
 
   function stopCamera() {
-    stopRecorders();
+    stopCameraRecorders();
     if (stream) stream.getTracks().forEach((t) => t.stop());
     stream = null; live.srcObject = null;
   }
@@ -671,6 +715,7 @@
     segments = segments.filter((s) => s !== seg);
   }
   function stopRecorders() { segments.slice().forEach(discardSegment); segments = []; }
+  function stopCameraRecorders() { if (playRec) { playRec = null; } stopRecorders(); }
   function finishSegment(seg) {
     return new Promise((resolve) => {
       seg.mr.onstop = () => resolve(new Blob(seg.chunks, { type: seg.mr.mimeType || mime || 'video/mp4' }));
@@ -687,6 +732,13 @@
     const oldest = segments[0];
     const age = (now() - oldest.start) / 1000;
     recPill.classList.add('rec');
+    if (playRec) {
+      const pt = (now() - playRec.start) / 1000;
+      recText.textContent = 'Play ' + playRec.n + ' · ' + fmtShort(pt);
+      $('mark-sub').textContent = fmtShort(pt);
+      if (pt > 300) { endPlay(false); toast('Play ended automatically after 5 minutes.', 2500); }
+      return;
+    }
     recText.innerHTML = 'Rec · ' + fmtShort(Math.min(age, 999)) + '<span class="rec-long">&nbsp;buffered</span>';
     // Overlapping hand-off keeps at least 30 s of footage ready at all times.
     if (segments.length === 1 && age > HANDOFF && !handoffBroken) {
@@ -698,9 +750,11 @@
 
   async function instantReplay() {
     if (!canRecord || !segments.length) return;
+    if (playRec) { await endPlay(true); return; }
+    if (lastPlay && clips.includes(lastPlay) && now() - lastPlayEnd < 20000) { openClip(lastPlay, true); return; }
     const seg = segments[0];
     const age = (now() - seg.start) / 1000;
-    if (age < 1.5) { if (clips.length) openClip(clips[clips.length - 1], true); else toast('Recording just started. Try again in a second.'); return; }
+    if (age < 1.5) { const last = clips[clips.length - 1]; if (last) openClip(last, true); else toast('Recording just started. Try again in a second.'); return; }
     btnReplay.disabled = true;
     segments.slice(1).forEach(discardSegment);
     segments = [];
@@ -710,17 +764,159 @@
     if (!segments.length) { try { startSegment(); } catch (_) {} }
     btnReplay.disabled = false;
     if (!blob.size) { toast('Nothing was recorded. Try again.'); return; }
-    const clip = addClip(blob, age, seg.fps);
+    const clip = addClip(blob, age, seg.fps, 'replay');
     openClip(clip, true);
   }
 
-  function addClip(blob, est, fps) {
-    const clip = { id: ++clipSeq, n: clipSeq, blob, url: URL.createObjectURL(blob), est, duration: 0, fps: fps || 30, at: new Date(), thumb: '' };
+  // ---------- Play-by-play recording ----------
+  function dayKey(d) { return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+  function nextNumber(kind) {
+    const today = dayKey(new Date());
+    let n = 0;
+    clips.forEach((c) => { if (c.kind === kind && dayKey(c.at) === today) n = Math.max(n, c.n); });
+    return n + 1;
+  }
+  function updateMarkUI() {
+    const b = $('btn-mark');
+    b.disabled = !canRecord || !stream;
+    b.classList.toggle('recording', !!playRec);
+    $('mark-lbl').textContent = playRec ? 'End Play' : 'Start Play';
+    $('mark-sub').textContent = playRec ? '0:00' : 'Play ' + nextNumber('play');
+  }
+  function startPlay() {
+    if (!canRecord || !stream || playRec) return;
+    stopRecorders();
+    let seg;
+    try { seg = startSegment(); } catch (_) { toast('Could not start recording.'); try { startSegment(); } catch (e) {} return; }
+    playRec = { seg, n: nextNumber('play'), start: now(), thumb: liveThumb() };
+    updateMarkUI();
+    toast('Recording play ' + playRec.n);
+  }
+  async function endPlay(openAfter) {
+    if (!playRec) return null;
+    const pr = playRec; playRec = null;
+    segments = segments.filter((s) => s !== pr.seg);
+    const done = finishSegment(pr.seg);
+    try { startSegment(); } catch (_) {}
+    updateMarkUI();
+    const blob = await done;
+    if (!segments.length) { try { startSegment(); } catch (_) {} }
+    const secs = (now() - pr.start) / 1000;
+    if (!blob.size) { toast('Nothing was recorded for that play.'); return null; }
+    const clip = addClip(blob, secs, pr.seg.fps, 'play', { n: pr.n, thumb: pr.thumb || '' });
+    lastPlay = clip; lastPlayEnd = now();
+    updateMarkUI();
+    toast('Play ' + pr.n + ' saved · ' + fmtShort(secs));
+    if (openAfter || settings.afterPlay === 'replay') openClip(clip, true);
+    return clip;
+  }
+  function liveThumb() {
+    try {
+      if (!live.videoWidth) return '';
+      const c = document.createElement('canvas'); c.width = 320; c.height = Math.round(320 * live.videoHeight / live.videoWidth);
+      c.getContext('2d').drawImage(live, 0, 0, c.width, c.height);
+      return c.toDataURL('image/jpeg', 0.7);
+    } catch (_) { return ''; }
+  }
+  function toggleMark() { if (playRec) endPlay(false); else startPlay(); }
+
+  // ---------- On-device storage (IndexedDB) ----------
+  // Clips and photos are written to the browser's storage on this device so a
+  // whole game of plays fits without holding every video in memory, and survives a reload.
+  const Store = (() => {
+    let dbp = null;
+    function open() {
+      if (!dbp) dbp = new Promise((res, rej) => {
+        if (!window.indexedDB) return rej(new Error('no indexedDB'));
+        const r = indexedDB.open('sentinels-live', 1);
+        r.onupgradeneeded = () => { const db = r.result; db.createObjectStore('meta', { keyPath: 'id' }); db.createObjectStore('blobs'); };
+        r.onsuccess = () => res(r.result);
+        r.onerror = () => rej(r.error);
+      });
+      return dbp;
+    }
+    async function run(stores, mode, fn) {
+      const db = await open();
+      return new Promise((res, rej) => {
+        const tx = db.transaction(stores, mode);
+        let out;
+        const ret = fn(tx);
+        if (ret && ret.onsuccess !== undefined) ret.onsuccess = () => { out = ret.result; };
+        tx.oncomplete = () => res(out);
+        tx.onerror = () => rej(tx.error);
+        tx.onabort = () => rej(tx.error || new Error('aborted'));
+      });
+    }
+    return {
+      putAll: (meta, blob) => run(['meta', 'blobs'], 'readwrite', (tx) => { tx.objectStore('meta').put(meta); if (blob) tx.objectStore('blobs').put(blob, meta.id); }),
+      putMeta: (meta) => run(['meta'], 'readwrite', (tx) => { tx.objectStore('meta').put(meta); }),
+      getBlob: (id) => run(['blobs'], 'readonly', (tx) => tx.objectStore('blobs').get(id)),
+      allMeta: () => run(['meta'], 'readonly', (tx) => tx.objectStore('meta').getAll()),
+      del: (id) => run(['meta', 'blobs'], 'readwrite', (tx) => { tx.objectStore('meta').delete(id); tx.objectStore('blobs').delete(id); })
+    };
+  })();
+  let askedPersist = false;
+  function metaOf(o) {
+    const m = { id: o.id, kind: o.kind, n: o.n, at: o.at.getTime(), type: o.type, thumb: o.thumb || '', starred: !!o.starred };
+    if (o.kind === 'photo') { m.label = o.label; }
+    else { m.est = o.est; m.duration = o.duration || 0; m.fps = o.fps; m.items = o.items || []; m.of = o.of || ''; }
+    return m;
+  }
+  function persist(o) {
+    if (!askedPersist && navigator.storage && navigator.storage.persist) { askedPersist = true; navigator.storage.persist().catch(() => {}); }
+    Store.putAll(metaOf(o), o.blob).then(() => {
+      o.stored = true;
+      if (o.kind !== 'photo' && o !== currentClip) releaseBlob(o);
+    }).catch(() => { toast('Could not store on this device. Save important clips now.', 3500); });
+  }
+  const metaTimers = {};
+  function saveMetaSoon(o) {
+    if (!o || !o.stored) return;
+    clearTimeout(metaTimers[o.id]);
+    metaTimers[o.id] = setTimeout(() => { Store.putMeta(metaOf(o)).catch(() => {}); }, 700);
+  }
+  function markDirty() { if (mode === 'replay' && currentClip) saveMetaSoon(currentClip); }
+  function releaseBlob(o) {
+    if (!o || !o.stored) return;
+    if (o.url) URL.revokeObjectURL(o.url);
+    o.url = null; o.blob = null;
+  }
+  async function ensureBlob(o) {
+    if (o.blob) { if (!o.url) o.url = URL.createObjectURL(o.blob); return true; }
+    try { o.blob = await Store.getBlob(o.id); } catch (_) { o.blob = null; }
+    if (!o.blob) { toast('That file is missing from storage.'); return false; }
+    o.url = URL.createObjectURL(o.blob);
+    return true;
+  }
+  async function loadStored() {
+    let metas = [];
+    try { metas = await Store.allMeta(); } catch (_) { return; }
+    metas.sort((a, b) => a.at - b.at);
+    metas.forEach((m) => {
+      const o = Object.assign({}, m, { at: new Date(m.at), blob: null, url: null, stored: true });
+      if (m.kind === 'photo') photos.push(o); else clips.push(o);
+    });
+    updateCounts(); updateMarkUI();
+  }
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+  function clipLabel(c) {
+    if (c.kind === 'play') return 'Play ' + c.n;
+    if (c.kind === 'markup') return (c.of || 'Clip') + ' ✎';
+    return 'Replay ' + c.n;
+  }
+  function addClip(blob, est, fps, kind, extra) {
+    kind = kind || 'replay';
+    const clip = Object.assign({ id: uid(), kind, n: kind === 'markup' ? 0 : nextNumber(kind), blob, url: URL.createObjectURL(blob), type: blob.type, est, duration: 0, fps: fps || 30, at: new Date(), thumb: '', starred: false, items: [] }, extra || {});
     clips.push(clip);
-    if (clips.length > CLIP_CAP) {
-      const old = clips.shift();
-      URL.revokeObjectURL(old.url);
-      toast('Oldest replay dropped. Save the ones you want to keep.', 2500);
+    persist(clip);
+    // Keep only the newest few unstarred instant replays; plays are never dropped automatically.
+    const loose = clips.filter((c) => c.kind === 'replay' && !c.starred);
+    if (loose.length > CLIP_CAP) {
+      const old = loose[0];
+      clips = clips.filter((c) => c !== old);
+      if (old.url) URL.revokeObjectURL(old.url);
+      Store.del(old.id).catch(() => {});
     }
     updateCounts();
     return clip;
@@ -750,6 +946,8 @@
   async function openClip(clip, autoplay) {
     closeTray();
     if (exporting) return;
+    if (!(await ensureBlob(clip))) return;
+    if (currentClip && currentClip !== clip) { saveMetaSoon(currentClip); releaseBlob(currentClip); }
     currentClip = clip;
     clip.items = clip.items || [];
     items = clip.items; redo = []; current = null; spot = null;
@@ -760,7 +958,7 @@
     await waitFor(replay, 'loadedmetadata', 4000);
     await ensureDuration(clip);
     const dur = clipDuration();
-    windowStart = Math.max(0, dur - settings.replayLen);
+    windowStart = clip.kind === 'replay' ? Math.max(0, dur - settings.replayLen) : 0;
     replay.currentTime = windowStart;
     await waitFor(replay, 'seeked', 1500);
     setSpeed(settings.speed);
@@ -768,7 +966,8 @@
     if (!clip.thumb) makeThumb(clip);
     updateScrub();
     if (autoplay) { try { await replay.play(); } catch (_) {} }
-    toast('Replay ' + clip.n + ' · ' + speedLabel(replay.playbackRate));
+    if (clip.duration && clip.stored) saveMetaSoon(clip);
+    toast(clipLabel(clip) + ' · ' + speedLabel(replay.playbackRate));
   }
 
   function makeThumb(clip) {
@@ -778,6 +977,7 @@
       c.width = w; c.height = h;
       c.getContext('2d').drawImage(replay, 0, 0, w, h);
       clip.thumb = c.toDataURL('image/jpeg', 0.7);
+      saveMetaSoon(clip);
       renderTray();
     } catch (_) {}
   }
@@ -886,7 +1086,7 @@
     const timed = items.filter((it) => it.t != null);
     if (!timed.length) {
       // No drawings: hand the original clip straight to the share sheet.
-      shareBlob(currentClip.blob, 'Sentinels_Replay_' + currentClip.n + '_' + stampName(currentClip.at) + '.' + extFor(currentClip.blob.type));
+      shareClip(currentClip);
       return;
     }
     const canvasOk = !!HTMLCanvasElement.prototype.captureStream && !!window.MediaRecorder;
@@ -904,7 +1104,7 @@
     const c = document.createElement('canvas'); c.width = W; c.height = H;
     const x = c.getContext('2d');
     const k = W / (parseFloat(ink.style.width) || W);
-    const label = 'REPLAY ' + currentClip.n + (rate < 1 ? ' · ' + speedLabel(rate).toUpperCase() : '');
+    const label = clipLabel(currentClip).toUpperCase() + (rate < 1 ? ' · ' + speedLabel(rate).toUpperCase() : '');
     const holds = Array.from(new Set(timed.map((i) => Math.round(i.t * 1000) / 1000))).filter((h) => h >= start).sort((a, b) => a - b);
 
     replay.pause();
@@ -953,10 +1153,9 @@
     if (exportCancel || !finished) { toast('Export canceled'); return; }
     const blob = new Blob(chunks, { type: mr.mimeType || mime || 'video/mp4' });
     if (!blob.size) { toast('Export failed. Try saving photos instead.', 3000); return; }
-    const clip = addClip(blob, (end - start) / rate + holds.length * HOLD_MS / 1000, currentClip.fps);
-    clip.marked = true; clip.n = currentClip.n + ' ✎'; clip.thumb = c.toDataURL('image/jpeg', 0.6);
+    const clip = addClip(blob, (end - start) / rate + holds.length * HOLD_MS / 1000, currentClip.fps, 'markup', { of: clipLabel(currentClip), thumb: c.toDataURL('image/jpeg', 0.6) });
     renderTray();
-    openMedia({ video: clip });
+    openMedia({ blob: clip.blob, url: clip.url, name: fileName(clip), title: 'Marked-up clip ready', video: true });
   }
 
   // ---------- Freeze (still mode) ----------
@@ -1122,13 +1321,13 @@
       if (mode === 'replay') { jog = { x: e.clientX, t: replay.currentTime, moved: false, wasPaused: replay.paused }; ink.setPointerCapture(e.pointerId); }
       return;
     }
-    // Drawing on the live view freezes that moment first.
-    if (mode === 'live') { if (!freezeFrame()) return; }
+    // Touches on the live view never freeze it (pinch zooms instead); use the Freeze button to draw.
+    if (mode === 'live') return;
     if (mode === 'replay' && !replay.paused) replay.pause();
     ink.setPointerCapture(e.pointerId);
     if (tool === 'spotlight') { spot = p; drawing = true; redraw(); return; }
     if (tool === 'stamp_x' || tool === 'stamp_o') {
-      items.push({ type: tool, color, size, pos: p, t: stampT() }); redo = []; redraw(); return;
+      items.push({ type: tool, color, size, pos: p, t: stampT() }); redo = []; redraw(); markDirty(); return;
     }
     drawing = true;
     current = tool === 'pen' ? { type: 'pen', color, size, points: [p] } : { type: tool, color, size, start: p, end: p };
@@ -1164,7 +1363,7 @@
       current.t = stampT();
       const tiny = current.type === 'pen' ? current.points.length < 2 : false;
       if (tiny) current.points.push({ x: current.points[0].x + 0.001, y: current.points[0].y });
-      items.push(current); redo = []; current = null;
+      items.push(current); redo = []; current = null; markDirty();
     }
     redraw();
   }
@@ -1234,7 +1433,7 @@
   }
   function clearInk(silent) {
     if (!items.length && !spot && silent) { redraw(); return; }
-    items.length = 0; redo = []; current = null; spot = null; redraw();
+    items.length = 0; redo = []; current = null; spot = null; redraw(); markDirty();
     if (!silent) toast('Drawings cleared');
   }
 
@@ -1251,14 +1450,14 @@
     const k = W / (parseFloat(ink.style.width) || W);
     drawSpot(x, W, H, k);
     visibleItems().forEach((it) => drawItem(it, x, W, H, k));
-    const stamp = mode === 'replay' ? 'REPLAY ' + currentClip.n + ' · ' + fmt(replay.currentTime) : clockStr(new Date());
+    const stamp = mode === 'replay' ? clipLabel(currentClip).toUpperCase() + ' · ' + fmt(replay.currentTime) : clockStr(new Date());
     drawBadge(x, W, H, stamp);
     c.toBlob((blob) => {
       if (!blob) { toast('Could not save the photo.'); return; }
       const thumbC = document.createElement('canvas'); thumbC.width = 320; thumbC.height = Math.round(320 * H / W);
       thumbC.getContext('2d').drawImage(c, 0, 0, thumbC.width, thumbC.height);
-      photos.push({ id: ++photoSeq, blob, url: URL.createObjectURL(blob), thumb: thumbC.toDataURL('image/jpeg', 0.7), at: new Date(), label: stamp });
-      if (photos.length > PHOTO_CAP) { const o = photos.shift(); URL.revokeObjectURL(o.url); }
+      const ph = { id: uid(), kind: 'photo', n: 0, type: blob.type, blob, url: URL.createObjectURL(blob), thumb: thumbC.toDataURL('image/jpeg', 0.7), at: new Date(), label: stamp, starred: false };
+      photos.push(ph); persist(ph);
       updateCounts();
       flash();
       toast('Photo saved to tray');
@@ -1275,9 +1474,12 @@
       const file = new File([blob], name, { type: blob.type });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({ files: [file], title: name });
-        return;
+        return true;
       }
-    } catch (e) { if (e && e.name === 'AbortError') return; }
+    } catch (e) {
+      if (e && e.name === 'AbortError') return true;
+      if (e && e.name === 'NotAllowedError') return false; // the tap "expired" while loading; caller offers a fresh button
+    }
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob); a.download = name;
     document.body.appendChild(a); a.click(); a.remove();
@@ -1285,63 +1487,124 @@
   }
   function stampName(d) { return d.toISOString().slice(0, 19).replace(/[:T]/g, '-'); }
   function extFor(type) { return /mp4/.test(type) ? 'mp4' : /webm/.test(type) ? 'webm' : 'mov'; }
+  function fileName(o) {
+    if (o.kind === 'photo') return 'Sentinels_Photo_' + stampName(o.at) + '.jpg';
+    return 'Sentinels_' + clipLabel(o).replace(/[^A-Za-z0-9]+/g, '_').replace(/_+$/, '') + '_' + stampName(o.at) + '.' + extFor(o.type || (o.blob && o.blob.type) || '');
+  }
+  async function shareClip(o) {
+    if (!(await ensureBlob(o))) return;
+    const ok = await shareBlob(o.blob, fileName(o));
+    if (ok === false) openMedia({ blob: o.blob, url: o.url, name: fileName(o), title: clipLabel(o), video: o.kind !== 'photo' });
+  }
 
   // ---------- Tray ----------
   function updateCounts() {
-    const n = clips.length + photos.length;
-    $('tray-count').textContent = n;
+    $('tray-count').textContent = clips.length + photos.length;
     renderTray();
   }
+  function armed(btn, label, action) {
+    // Two-tap confirm for anything destructive.
+    if (btn.dataset.armed) { action(); return; }
+    btn.dataset.armed = '1'; const old = btn.textContent; btn.textContent = label; btn.classList.add('armed');
+    setTimeout(() => { if (btn.isConnected) { delete btn.dataset.armed; btn.textContent = old; btn.classList.remove('armed'); } }, 3000);
+  }
+  function deleteItem(o) {
+    if (o.kind === 'photo') photos = photos.filter((x) => x !== o); else clips = clips.filter((x) => x !== o);
+    if (o.url) URL.revokeObjectURL(o.url);
+    Store.del(o.id).catch(() => {});
+    if (currentClip === o) { currentClip = null; goLive(); }
+    updateCounts(); updateMarkUI();
+  }
+  function clipCard(c) {
+    const el = document.createElement('div'); el.className = 'tray-item' + (c.starred ? ' keeper' : '');
+    const today = dayKey(c.at) === dayKey(new Date());
+    el.innerHTML = '<button class="tray-thumb"><span class="dur"></span></button><div class="tray-meta"></div>' +
+      '<div class="tray-actions"><button class="star" data-a="star" aria-label="Keep">★</button><button data-a="open">Watch</button><button data-a="save">Save</button><button class="del" data-a="del" aria-label="Delete">✕</button></div>';
+    const th = el.querySelector('.tray-thumb');
+    th.setAttribute('aria-label', 'Watch ' + clipLabel(c));
+    if (c.thumb) th.style.backgroundImage = 'url(' + c.thumb + ')';
+    th.querySelector('.dur').textContent = fmtShort(c.duration || c.est || 0);
+    el.querySelector('.tray-meta').textContent = clipLabel(c) + ' · ' + (today ? '' : c.at.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ') + c.at.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    const star = el.querySelector('[data-a=star]'); star.classList.toggle('on', !!c.starred);
+    star.onclick = () => { c.starred = !c.starred; saveMetaSoon(c); if (!c.stored) persist(c); renderTray(); };
+    th.onclick = () => openClip(c, true);
+    el.querySelector('[data-a=open]').onclick = () => openClip(c, true);
+    el.querySelector('[data-a=save]').onclick = () => shareClip(c);
+    const del = el.querySelector('[data-a=del]');
+    del.onclick = () => armed(del, 'Delete?', () => deleteItem(c));
+    return el;
+  }
   function renderTray() {
-    const cWrap = $('tray-clips'), pWrap = $('tray-photos');
-    cWrap.innerHTML = ''; pWrap.innerHTML = '';
-    if (!clips.length) cWrap.innerHTML = '<p class="empty">No replays yet. Tap Replay on the live view after a play.</p>';
-    clips.slice().reverse().forEach((c) => {
-      const el = document.createElement('div'); el.className = 'tray-item';
-      el.innerHTML = '<button class="tray-thumb" aria-label="Open replay ' + c.n + '"><span class="dur"></span></button>' +
-        '<div class="tray-meta">Replay ' + c.n + ' · ' + clockStr(c.at) + '</div>' +
-        '<div class="tray-actions"><button data-a="open">Watch</button><button data-a="save">Save</button><button class="del" data-a="del" aria-label="Delete">✕</button></div>';
-      const th = el.querySelector('.tray-thumb');
-      if (c.thumb) th.style.backgroundImage = 'url(' + c.thumb + ')';
-      th.querySelector('.dur').textContent = fmtShort(c.duration || c.est);
-      th.onclick = () => openClip(c, true);
-      el.querySelector('[data-a=open]').onclick = () => openClip(c, true);
-      el.querySelector('[data-a=save]').onclick = () => shareBlob(c.blob, 'Sentinels_Replay_' + c.n + '_' + stampName(c.at) + '.' + extFor(c.blob.type));
-      el.querySelector('[data-a=del]').onclick = () => {
-        clips = clips.filter((x) => x !== c); URL.revokeObjectURL(c.url);
-        if (currentClip === c) { currentClip = null; goLive(); }
-        updateCounts();
-      };
-      cWrap.appendChild(el);
-    });
-    if (!photos.length) pWrap.innerHTML = '<p class="empty">No photos yet. Pause a replay or freeze the live view, draw if you like, then tap Photo.</p>';
+    const plays = clips.filter((c) => c.kind === 'play');
+    const others = clips.filter((c) => c.kind !== 'play');
+    const keepers = plays.filter((c) => c.starred);
+    $('f-all').textContent = 'All ' + plays.length; $('f-keep').textContent = '★ Keepers ' + keepers.length;
+    $('f-all').classList.toggle('active', trayFilter === 'all'); $('f-keep').classList.toggle('active', trayFilter === 'keep');
+    const pWrapPlays = $('tray-plays'), cWrap = $('tray-clips'), pWrap = $('tray-photos');
+    pWrapPlays.innerHTML = ''; cWrap.innerHTML = ''; pWrap.innerHTML = '';
+    const shown = trayFilter === 'keep' ? keepers : plays;
+    if (!shown.length) pWrapPlays.innerHTML = '<p class="empty">' + (trayFilter === 'keep' ? 'No keepers yet. Tap ★ on a play to keep it.' : 'No plays yet. Tap Start Play when the teams line up and End Play at the whistle.') + '</p>';
+    shown.slice().reverse().forEach((c) => pWrapPlays.appendChild(clipCard(c)));
+    if (!others.length) cWrap.innerHTML = '<p class="empty">None yet. Tap Replay on the live view to look back at the last few seconds.</p>';
+    others.slice().reverse().forEach((c) => cWrap.appendChild(clipCard(c)));
+    if (!photos.length) pWrap.innerHTML = '<p class="empty">No photos yet. Pause a replay or freeze the live view, draw if you like, then tap the camera button.</p>';
     photos.slice().reverse().forEach((p) => {
       const el = document.createElement('div'); el.className = 'tray-item';
       el.innerHTML = '<button class="tray-thumb" aria-label="View photo"></button><div class="tray-meta"></div>' +
         '<div class="tray-actions"><button data-a="save">Save</button><button class="del" data-a="del" aria-label="Delete">✕</button></div>';
       const th = el.querySelector('.tray-thumb'); th.style.backgroundImage = 'url(' + p.thumb + ')';
       el.querySelector('.tray-meta').textContent = p.label;
-      th.onclick = () => openPhoto(p);
-      el.querySelector('[data-a=save]').onclick = () => shareBlob(p.blob, 'Sentinels_Photo_' + stampName(p.at) + '.jpg');
-      el.querySelector('[data-a=del]').onclick = () => { photos = photos.filter((x) => x !== p); URL.revokeObjectURL(p.url); updateCounts(); };
+      th.onclick = async () => { if (await ensureBlob(p)) openMedia({ blob: p.blob, url: p.url, name: fileName(p), title: 'Photo', video: false }); };
+      el.querySelector('[data-a=save]').onclick = () => shareClip(p);
+      const del = el.querySelector('[data-a=del]');
+      del.onclick = () => armed(del, 'Delete?', () => deleteItem(p));
       pWrap.appendChild(el);
     });
+    const purge = $('btn-purge'); const loose = plays.length - keepers.length;
+    purge.hidden = loose === 0;
+    $('btn-save-keepers').hidden = keepers.length === 0;
+    if (!$('btn-save-keepers').dataset.ready) $('btn-save-keepers').textContent = 'Save ' + keepers.length + ' keeper' + (keepers.length === 1 ? '' : 's') + ' to Photos';
+    if (navigator.storage && navigator.storage.estimate) {
+      navigator.storage.estimate().then((e) => {
+        const mb = (x) => x > 1e9 ? (x / 1e9).toFixed(1) + ' GB' : Math.round(x / 1e6) + ' MB';
+        $('storage-line').textContent = 'Using ' + mb(e.usage || 0) + ' of storage on this device' + (e.quota ? ' (about ' + mb(Math.max(0, e.quota - e.usage)) + ' free for this app)' : '') + '.';
+      }).catch(() => {});
+    }
   }
+  $('f-all').onclick = () => { trayFilter = 'all'; renderTray(); };
+  $('f-keep').onclick = () => { trayFilter = 'keep'; renderTray(); };
+  $('btn-purge').onclick = () => {
+    const loose = clips.filter((c) => c.kind === 'play' && !c.starred);
+    armed($('btn-purge'), 'Tap again to delete ' + loose.length + ' plays', () => { loose.forEach((c) => deleteItem(c)); toast('Deleted ' + loose.length + ' plays'); });
+  };
+  // Saving many videos: load them first, then a fresh tap hands them all to the share sheet.
+  let keeperFiles = null;
+  $('btn-save-keepers').onclick = async () => {
+    const b = $('btn-save-keepers');
+    if (keeperFiles) {
+      const files = keeperFiles; keeperFiles = null; delete b.dataset.ready;
+      try {
+        if (navigator.canShare && navigator.canShare({ files })) { await navigator.share({ files }); renderTray(); return; }
+      } catch (e) { if (e && e.name === 'AbortError') { renderTray(); return; } }
+      for (const f of files) await shareBlob(f, f.name);
+      renderTray(); return;
+    }
+    const keepers = clips.filter((c) => c.kind === 'play' && c.starred);
+    b.textContent = 'Loading ' + keepers.length + '…';
+    const files = [];
+    for (const c of keepers) { if (await ensureBlob(c)) files.push(new File([c.blob], fileName(c), { type: c.blob.type })); if (c !== currentClip) releaseBlob(c); }
+    keeperFiles = files; b.dataset.ready = '1';
+    b.textContent = 'Tap to save ' + files.length + ' videos';
+  };
   let openItem = null;
   function openMedia(o) {
     const img = $('photo-view'), vid = $('media-video');
-    if (o.video) {
-      openItem = { blob: o.video.blob, name: 'Sentinels_Replay_' + String(o.video.n).replace(/\D+/g, '') + '_markup_' + stampName(o.video.at) + '.' + extFor(o.video.blob.type) };
-      $('media-title').textContent = 'Marked-up clip ready';
-      img.hidden = true; vid.hidden = false; vid.src = o.video.url; vid.play().catch(() => {});
-    } else {
-      openItem = { blob: o.photo.blob, name: 'Sentinels_Photo_' + stampName(o.photo.at) + '.jpg' };
-      $('media-title').textContent = 'Photo';
-      vid.hidden = true; vid.pause(); vid.removeAttribute('src'); img.hidden = false; img.src = o.photo.url;
-    }
+    openItem = { blob: o.blob, name: o.name };
+    $('media-title').textContent = o.title || 'Saved';
+    if (o.video) { img.hidden = true; vid.hidden = false; vid.src = o.url; vid.play().catch(() => {}); }
+    else { vid.hidden = true; vid.pause(); vid.removeAttribute('src'); img.hidden = false; img.src = o.url; }
     $('dlg-photo').showModal();
   }
-  function openPhoto(p) { openMedia({ photo: p }); }
   $('dlg-photo').addEventListener('close', () => { $('media-video').pause(); });
   $('photo-share').onclick = () => { if (openItem) shareBlob(openItem.blob, openItem.name); };
   function openTray() { renderTray(); $('tray').classList.add('open'); $('sheet-backdrop').classList.add('open'); }
@@ -1351,6 +1614,7 @@
   function goLive() {
     if (mode === 'splash' || exporting) return;
     cancelHold();
+    if (currentClip) saveMetaSoon(currentClip);
     items = []; redo = []; current = null; spot = null;
     setMode('live');
   }
@@ -1364,6 +1628,28 @@
   }
   window.addEventListener('resize', () => { applyLayout(); requestAnimationFrame(fitInk); });
 
+  // Side columns sit where the holder's thumbs are: settings.railY 0 = bottom, 50 = middle, 100 = top.
+  const rails = Array.from(document.querySelectorAll('.rail'));
+  function positionRails() {
+    const portrait = document.body.classList.contains('portrait');
+    const cs = getComputedStyle(document.body);
+    const px = (v) => parseFloat(v) || 0;
+    const hud = px(cs.getPropertyValue('--hud')), edge = px(cs.getPropertyValue('--edge'));
+    const sat = px(getComputedStyle(document.documentElement).getPropertyValue('--sat'));
+    const sab = px(getComputedStyle(document.documentElement).getPropertyValue('--sab'));
+    const top0 = hud + sat + edge, bottom0 = window.innerHeight - sab - edge;
+    const center = bottom0 - (settings.railY / 100) * (bottom0 - top0);
+    rails.forEach((r) => {
+      if (portrait) { r.style.top = ''; r.style.bottom = ''; return; }
+      const h = Math.min(r.scrollHeight, bottom0 - top0);
+      const top = Math.max(top0, Math.min(bottom0 - h, center - h / 2));
+      r.style.top = top + 'px'; r.style.bottom = 'auto';
+    });
+  }
+  if (window.ResizeObserver) { const ro = new ResizeObserver(positionRails); rails.forEach((r) => ro.observe(r)); }
+  window.addEventListener('resize', positionRails);
+  $('rail-y').addEventListener('input', (e) => { settings.railY = Number(e.target.value); saveSettings(); syncSettingsUI(); });
+
   // ---------- Settings UI ----------
   function syncSettingsUI() {
     document.querySelectorAll('[data-setting]').forEach((g) => {
@@ -1371,7 +1657,9 @@
       g.querySelectorAll('button').forEach((b) => b.classList.toggle('active', String(settings[key]) === b.dataset.v));
     });
     replaySub.textContent = settings.replayLen + ' s · ' + (settings.speed === 1 ? '1×' : speedLabel(settings.speed).replace(' slow', ''));
+    const ry = $('rail-y'); if (ry && Number(ry.value) !== settings.railY) ry.value = settings.railY;
     applyLayout();
+    if (typeof positionRails === 'function' && rails) positionRails();
   }
   document.querySelectorAll('[data-setting]').forEach((g) => {
     g.addEventListener('click', (e) => {
@@ -1388,6 +1676,7 @@
   // ---------- Wire up controls ----------
   $('btn-start').onclick = startCamera;
   btnReplay.onclick = instantReplay;
+  $('btn-mark').onclick = toggleMark;
   $('btn-freeze').onclick = () => freezeFrame();
   $('btn-flip').onclick = () => { settings.facing = settings.facing === 'user' ? 'environment' : 'user'; saveSettings(); syncSettingsUI(); restartCamera(); };
   $('btn-live').onclick = goLive; $('pip-hit').onclick = goLive;
@@ -1397,7 +1686,14 @@
   $('btn-restart').onclick = () => { replay.currentTime = windowStart; replay.play().catch(() => {}); };
   $('btn-loop').onclick = () => { loopOn = !loopOn; $('btn-loop').classList.toggle('on', loopOn); toast(loopOn ? 'Loop on' : 'Loop off'); };
   $('btn-speed').onclick = () => { const r = replay.playbackRate; setSpeed(r === 0.25 ? 0.5 : r === 0.5 ? 1 : 0.25); toast(speedLabel(replay.playbackRate)); };
-  $('btn-color').onclick = () => { $('color-pop').hidden = !$('color-pop').hidden; };
+  $('btn-color').onclick = () => {
+    const pop = $('color-pop'); pop.hidden = !pop.hidden;
+    if (!pop.hidden && !document.body.classList.contains('portrait')) {
+      const r = $('btn-color').getBoundingClientRect();
+      pop.style.bottom = 'auto';
+      pop.style.top = Math.max(8, Math.min(window.innerHeight - pop.offsetHeight - 8, r.top + r.height / 2 - pop.offsetHeight / 2)) + 'px';
+    } else { pop.style.top = ''; pop.style.bottom = ''; }
+  };
   $('btn-photo').onclick = savePhoto;
   $('btn-saveclip').onclick = saveClip;
   $('export-cancel').onclick = () => { exportCancel = true; };
@@ -1417,8 +1713,8 @@
   document.querySelectorAll('.size').forEach((s) => s.onclick = () => {
     document.querySelectorAll('.size').forEach((x) => x.classList.remove('active')); s.classList.add('active'); size = parseInt(s.dataset.size, 10);
   });
-  $('btn-undo').onclick = () => { if (items.length) { redo.push(items.pop()); redraw(); } };
-  const doRedo = () => { if (redo.length) { items.push(redo.pop()); redraw(); } };
+  $('btn-undo').onclick = () => { if (items.length) { redo.push(items.pop()); redraw(); markDirty(); } };
+  const doRedo = () => { if (redo.length) { items.push(redo.pop()); redraw(); markDirty(); } };
   $('btn-clear').onclick = () => clearInk(false);
 
   // Keyboard (iPad with keyboard, laptops). Letter shortcuts ignore Ctrl/Cmd/Alt.
@@ -1430,6 +1726,7 @@
     if (mod || e.altKey) return;
     const tools = { v: 'pointer', p: 'pen', a: 'arrow', l: 'line', o: 'circle', b: 'rect', x: 'stamp_x', '0': 'stamp_o', s: 'spotlight' };
     if (k === ' ') { e.preventDefault(); if (mode === 'live') instantReplay(); else togglePlay(); }
+    else if (k === 'Enter') { e.preventDefault(); if (mode === 'live') toggleMark(); }
     else if (k === 'ArrowLeft') { e.preventDefault(); stepFrame(-1); }
     else if (k === 'ArrowRight') { e.preventDefault(); stepFrame(1); }
     else if (k === 'Escape') { if ($('tray').classList.contains('open')) closeTray(); else goLive(); }
@@ -1444,8 +1741,9 @@
   ['gesturestart', 'gesturechange'].forEach((ev) => document.addEventListener(ev, (e) => e.preventDefault(), { passive: false }));
   updateCounts();
   setMode('splash');
+  loadStored();
   // Test hook for automated checks (harmless in normal use)
-  window.__sentinels = { get state() { return { mode, clips: clips.length, photos: photos.length, segments: segments.length, items: items.length, zoom: view.s, dur: clipDuration(), t: replay.currentTime, rate: replay.playbackRate, windowStart }; } };
+  window.__sentinels = { get state() { return { mode, plays: clips.filter((c) => c.kind === 'play').length, recordingPlay: !!playRec, clips: clips.length, photos: photos.length, segments: segments.length, items: items.length, zoom: view.s, dur: clipDuration(), t: replay.currentTime, rate: replay.playbackRate, windowStart }; } };
 })();
 </script>
 </body>
