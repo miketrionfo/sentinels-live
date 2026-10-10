@@ -167,8 +167,8 @@
   .rail::-webkit-scrollbar { display: none; }
   .rail-left { left: calc(var(--edge) + var(--sal)); }
   .rail-right { right: calc(var(--edge) + var(--sar)); }
-  body.portrait .rail { max-height: calc(44dvh - 64px - var(--sab)); }
-  body.portrait:not(.m-replay) .rail { max-height: calc(44dvh - 14px - var(--sab)); }
+  body.portrait .rail { max-height: calc(44dvh - 22px - var(--b) * 2 - var(--gap) - var(--sab)); }
+  body.portrait:not(.m-replay) .rail { max-height: calc(44dvh - 18px - var(--b) - var(--sab)); }
   body.m-splash .rail, body.m-splash .scrubbar { display: none; }
   .rb {
     width: var(--b); height: var(--b); border-radius: 12px; display: grid; place-items: center; position: relative;
@@ -239,15 +239,29 @@
   .dist-val { display: grid; place-items: center; align-content: center; font-family: var(--display); font-weight: 700; color: #FFC72C; font-size: 26px; line-height: 1; }
   .dist-val small { font-family: var(--body); font-size: 10px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 2px; }
   .dist-goal { font-size: 13px; color: #FFC72C; }
+  body.cols3 .dist-block { grid-template-columns: 1fr var(--b) var(--b); grid-template-rows: repeat(2, var(--b)); }
+  body.cols3 .dist-block .vslider { grid-row: 1 / 3; }
+  body.lay-phone.portrait .mode-tag { display: none; }
+  body.lay-phone.portrait .dd-chip { margin-left: auto; }
   .dist-goal.active { background: #FFC72C; color: #111; border-color: #FFC72C; }
-  body.lay-phone .dist-block { display: none !important; }
-  .zoom-block { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr var(--b); grid-template-rows: repeat(3, var(--b)); gap: var(--gap); }
-  .zslider { grid-row: 1 / 4; border-color: rgba(255, 255, 255, 0.25) !important; }
-  .zslider .vs-fill { background: rgba(255, 255, 255, 0.18); }
-  .zslider .vs-thumb { background: #fff; box-shadow: 0 0 8px rgba(255,255,255,0.6); }
-  #zoom-in, #zoom-out { font-size: 26px; }
-  .zoom-lbl { font-size: 14px; letter-spacing: 0.02em; text-transform: none; }
-  #zoom-reset.zoomed { border-color: #fff; color: #fff; }
+  /* Horizontal zoom bar along the bottom, between the thumb columns (above the scrub bar in replay) */
+  .zoombar {
+    position: fixed; z-index: 14; bottom: calc(var(--edge) + var(--sab));
+    left: calc(var(--edge) * 2 + var(--sal) + var(--rail-w)); right: calc(var(--edge) * 2 + var(--sar) + var(--rail-w));
+    height: var(--b); display: flex; align-items: center; gap: 6px; padding: 0 6px; border-radius: 12px;
+    background: rgba(18, 21, 27, var(--ctl-a)); -webkit-backdrop-filter: blur(var(--ctl-blur)); backdrop-filter: blur(var(--ctl-blur)); border: 1px solid rgba(255,255,255,0.12);
+  }
+  body.m-replay .zoombar { bottom: calc(var(--edge) + var(--sab) + var(--b) + var(--gap)); }
+  body.m-splash .zoombar { display: none; }
+  body.portrait .zoombar { left: calc(var(--edge) + var(--sal)); right: calc(var(--edge) + var(--sar)); bottom: auto; top: calc(56dvh + 8px); }
+  body.portrait.m-replay .zoombar { top: calc(56dvh + 8px + var(--b) + var(--gap)); bottom: auto; }
+  .zb-btn { flex: none; width: calc(var(--b) - 8px); height: calc(var(--b) - 8px); border-radius: 9px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); font-size: 22px; color: var(--silver); display: grid; place-items: center; }
+  .zb-reset { width: auto; min-width: calc(var(--b) + 8px); padding: 0 8px; font-family: var(--display); font-weight: 700; font-size: 14px; }
+  .zb-reset.zoomed { border-color: #fff; color: #fff; }
+  .hslider { position: relative; flex: 1; height: 100%; touch-action: none; cursor: ew-resize; min-width: 60px; }
+  .hs-track { position: absolute; left: 0; right: 0; top: 50%; height: 6px; margin-top: -3px; border-radius: 99px; background: rgba(255,255,255,0.18); overflow: hidden; }
+  .hs-fill { position: absolute; left: 0; top: 0; bottom: 0; background: rgba(255,255,255,0.7); width: 0; }
+  .hs-thumb { position: absolute; top: 50%; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; background: #fff; left: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.5); }
   .zoom-chip { display: none !important; }
   .dd-undo {
     position: fixed; z-index: 28; height: 64px; padding: 0 18px; border-radius: 14px; display: inline-flex; align-items: center; gap: 10px;
@@ -399,12 +413,6 @@
   <button class="rb only-replay" id="btn-restart" title="Back to start of the play (R)" aria-label="Back to start of the play"><svg viewBox="0 0 24 24"><path d="M19 20L9 12l10-8v16z"/><path d="M5 19V5"/></svg></button>
   <button class="rb only-replay" id="btn-prev" title="Back 1 frame (←)" aria-label="Back one frame"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
   <button class="rb only-replay" id="btn-next" title="Forward 1 frame (→)" aria-label="Forward one frame"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
-  <div class="zoom-block" id="zoom-block">
-    <div class="vslider zslider" id="zslider" role="slider" aria-label="Zoom" tabindex="0"><div class="vs-fill" id="zs-fill"></div><div class="vs-thumb" id="zs-thumb"></div></div>
-    <button class="rb" id="zoom-in" aria-label="Zoom in">+</button>
-    <button class="rb" id="zoom-reset" title="Reset zoom"><span class="zoom-lbl" id="zoom-lbl">1×</span></button>
-    <button class="rb" id="zoom-out" aria-label="Zoom out">−</button>
-  </div>
   <button class="rb wide big primary only-replay" id="btn-play" title="Play / pause (Space)" aria-label="Play or pause">
     <svg viewBox="0 0 24 24" id="ic-play"><path d="M6 4l14 8-14 8V4z" fill="currentColor"/></svg>
     <svg viewBox="0 0 24 24" id="ic-pause" style="display:none"><rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/></svg>
@@ -492,6 +500,13 @@
     <div class="scrub-knob" id="scrub-knob"></div>
   </div>
   <div class="time num" id="time">00:00.0 / 00:00.0</div>
+</div>
+
+<div class="zoombar" id="zoombar">
+  <button class="zb-btn" id="zoom-out" aria-label="Zoom out">−</button>
+  <div class="hslider" id="zslider" role="slider" aria-label="Zoom" tabindex="0"><div class="hs-track"><div class="hs-fill" id="zs-fill"></div></div><div class="hs-thumb" id="zs-thumb"></div></div>
+  <button class="zb-btn" id="zoom-in" aria-label="Zoom in">+</button>
+  <button class="zb-btn zb-reset" id="zoom-reset" title="Reset zoom"><span class="zoom-lbl" id="zoom-lbl">1×</span></button>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -599,7 +614,7 @@
     <p><b>Last Play</b> (under Start Play) opens the most recent play straight away. Tapping it during a play ends that play and shows it.</p>
     <p><b>2. Or tap Replay after the whistle.</b> It jumps back to just before the snap and plays it in slow motion. The camera keeps recording in the small tile in the corner. Tap that tile, or <b>Live</b>, to go back.</p>
     <p><b>3. Review.</b> Tap the video to pause or play. Drag across it to scrub. Use the arrow buttons to step one frame at a time. Pinch with two fingers to zoom in on a player, and drag with two fingers to move around. Tap the zoom label at the top to reset.</p>
-    <p><b>Zoom slider.</b> The white slider on the left (with + and −) zooms too; the button between them shows the zoom level, and tapping it resets to 1×.</p>
+    <p><b>Zoom slider.</b> The see-through bar along the bottom zooms too (with − and +). The button at its right end shows the zoom level; tap it to reset to 1×.</p>
     <p><b>Zoom while filming.</b> Pinch on the live view. On devices that allow it, this zooms the camera itself, so the recording is zoomed too and the label says "Camera". Otherwise only the screen picture zooms and the recording stays wide.</p>
     <p><b>4. Draw.</b> Pick a pen, arrow, circle, or stamp. Touching the video pauses it. Each drawing sticks to the moment you drew it: when the replay plays past that moment, it pauses briefly so the drawing can be seen. Each replay keeps its own drawings. On the live view, tap <b>Freeze</b> first to draw on that moment. Pinching the live view always zooms; it never freezes it.</p>
     <p><b>5. Save.</b> <b>Photo</b> saves the frame with your drawings. <b>Save Clip</b> saves the replay as a video. If you drew on it, the drawings are recorded into the video and it pauses for a beat at each one, like a TV telestrator. Everything lands in the tray (grid button). Tap <b>Save</b> there to put it in Photos or Files.</p>
@@ -1571,7 +1586,7 @@
     const zr = zoomRange(), cur = currentZoom();
     const f = zr.max > zr.min ? Math.log(cur / zr.min) / Math.log(zr.max / zr.min) : 0;
     const fc = Math.max(0, Math.min(1, f));
-    $('zs-fill').style.height = (fc * 100) + '%'; $('zs-thumb').style.bottom = (fc * 100) + '%';
+    $('zs-fill').style.width = (fc * 100) + '%'; $('zs-thumb').style.left = (fc * 100) + '%';
     $('zoom-lbl').textContent = (cur / zr.min).toFixed(1) + '×';
     $('zoom-reset').classList.toggle('zoomed', show);
   }
@@ -1596,7 +1611,7 @@
   let zsDrag = false;
   function zsSet(e) {
     const r = zs.getBoundingClientRect();
-    const f = Math.max(0, Math.min(1, (r.bottom - e.clientY) / r.height));
+    const f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
     const zr = zoomRange();
     setZoomLevel(zr.min * Math.pow(zr.max / zr.min, f));
   }
@@ -1972,7 +1987,9 @@
     document.body.classList.toggle('lay-phone', phone);
     document.body.classList.toggle('portrait', h > w * 1.1);
     const bs = document.body.style;
-    bs.setProperty('--cols', String(phone ? settings.colsPhone : settings.colsTablet));
+    const cols = phone ? settings.colsPhone : settings.colsTablet;
+    bs.setProperty('--cols', String(cols));
+    document.body.classList.toggle('cols3', cols === 3);
     const a = Math.max(0, Math.min(100, settings.ctlAlpha)) / 100;
     bs.setProperty('--ctl-a', (0.05 + a * 0.85).toFixed(2));
     bs.setProperty('--ctl-a2', (0.35 + a * 0.6).toFixed(2));
