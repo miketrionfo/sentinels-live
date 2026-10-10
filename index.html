@@ -453,7 +453,7 @@
   /* Big "what happened" panel after each play */
   .rb-panel {
     position: fixed; z-index: 27; left: 50%; top: 50%; transform: translate(-50%, -50%);
-    width: min(760px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow: auto;
+    width: min(760px, calc(100vw - 24px)); max-height: calc(100dvh - 16px); overflow: hidden;
     background: rgba(12, 14, 18, 0.94); border: 2px solid #FFC72C; border-radius: 18px; padding: 14px; display: grid; gap: 12px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.7); font-family: var(--display); text-transform: uppercase; letter-spacing: 0.04em;
   }
@@ -462,25 +462,25 @@
   .rbp-head span { font-size: 22px; color: #FFC72C; }
   .rbp-x { width: 52px; height: 52px; border-radius: 12px; background: rgba(255,255,255,0.08); font-size: 30px; color: #fff; }
   .rbp-gain { display: grid; grid-template-columns: minmax(84px, 1fr) 2.4fr minmax(84px, 1fr); gap: 10px; align-items: stretch; }
-  .rbp-step { min-height: 120px; border-radius: 16px; background: rgba(255, 199, 44, 0.16); border: 2px solid rgba(255,199,44,0.6); color: #FFC72C; font-size: 56px; font-weight: 700; }
+  .rbp-step { min-height: clamp(56px, 17dvh, 120px); border-radius: 16px; background: rgba(255, 199, 44, 0.16); border: 2px solid rgba(255,199,44,0.6); color: #FFC72C; font-size: 56px; font-weight: 700; }
   .rbp-step:active, .rbp-quick button:active, .rbp-out button:active { transform: scale(0.97); }
   .rbp-mid { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; }
-  .rbp-val { font-size: clamp(30px, 6vw, 52px); font-weight: 700; color: #fff; line-height: 1; }
-  .rbp-next { font-size: clamp(16px, 3vw, 24px); color: #FFC72C; min-height: 1.2em; }
+  .rbp-mid { min-width: 0; }
+  .rbp-val { font-size: clamp(22px, min(6vw, 7dvh), 48px); font-weight: 700; color: #fff; line-height: 1.05; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rbp-next { font-size: clamp(14px, min(3vw, 3.6dvh), 22px); color: #FFC72C; line-height: 1.1; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .rbp-quick { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
-  .rbp-quick button { min-width: 64px; height: 48px; border-radius: 12px; background: rgba(255,255,255,0.1); font-size: 20px; color: #fff; font-family: var(--display); }
+  .rbp-quick { flex-wrap: nowrap; }
+  .rbp-quick button { min-width: 56px; height: clamp(36px, 8dvh, 48px); border-radius: 12px; background: rgba(255,255,255,0.1); font-size: 20px; color: #fff; font-family: var(--display); }
   .rbp-out { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  .rbp-out button { min-height: 64px; border-radius: 14px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.18); color: #fff; font-family: var(--display); font-size: clamp(15px, 2.6vw, 21px); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+  .rbp-out button { min-height: clamp(40px, 9dvh, 64px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 4px; border-radius: 14px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.18); color: #fff; font-family: var(--display); font-size: clamp(15px, 2.6vw, 21px); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
   .rbp-out button.on { background: #FFC72C; border-color: #FFC72C; color: #111; }
   .rbp-foot { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 10px; }
-  .rbp-foot button { min-height: 60px; border-radius: 14px; background: rgba(255,255,255,0.1); color: #fff; font-family: var(--display); font-size: 20px; font-weight: 700; text-transform: uppercase; }
+  .rbp-foot button { min-height: clamp(42px, 9dvh, 60px); border-radius: 14px; background: rgba(255,255,255,0.1); color: #fff; font-family: var(--display); font-size: 20px; font-weight: 700; text-transform: uppercase; }
   .rbp-foot .rbp-done { background: var(--scarlet); border: 2px solid var(--scarlet-bright); }
-  body.lay-phone .rbp-step { min-height: 84px; font-size: 44px; }
-  body.lay-phone .rbp-out button { min-height: 54px; }
-  body.lay-phone .rbp-foot button { min-height: 52px; }
+  body.lay-phone .rbp-step { font-size: 44px; }
   body.lay-phone:not(.portrait) .rb-panel { gap: 8px; padding: 10px; }
   body.lay-phone:not(.portrait) .rbp-out { grid-template-columns: repeat(6, 1fr); }
-  body.lay-phone:not(.portrait) .rbp-out button { font-size: 13px; min-height: 48px; }
+  body.lay-phone:not(.portrait) .rbp-out button { font-size: 13px; }
   body.lay-phone:not(.portrait) .rbp-head b { font-size: 20px; } body.lay-phone:not(.portrait) .rbp-head span { font-size: 17px; }
   body.lay-phone:not(.portrait) .rbp-x { width: 44px; height: 44px; }
   /* Controls that aren't needed while a play records are dimmed and switched off */
@@ -714,7 +714,7 @@
     <button type="button" data-rk="td">Touchdown</button>
     <button type="button" data-rk="pen">Penalty</button>
     <button type="button" data-rk="to">Turnover</button>
-    <button type="button" data-rk="nop">No play / timeout</button>
+    <button type="button" data-rk="nop">No play</button>
   </div>
   <div class="rbp-foot"><button type="button" id="rbp-clear">Clear</button><button type="button" id="rbp-done">Done</button><button type="button" class="rbp-done" id="rbp-next-play">● Start next play</button></div>
 </section>
@@ -1464,7 +1464,7 @@
   function openResultBig(target) {
     if (!target) { toast('Record a play first'); return; }
     rbpTarget = target;
-    hideDDUndo();
+    hideDDUndo(); clearTimeout(toastTimer); toastEl.classList.remove('show');
     $('rbp').hidden = false;
     paintResultBig();
   }
