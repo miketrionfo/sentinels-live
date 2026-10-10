@@ -113,6 +113,7 @@
   .splash-card img { height: 110px; filter: drop-shadow(0 6px 22px var(--scarlet-glow)); }
   .splash-card h1 { font-family: var(--display); font-weight: 700; font-size: 30px; letter-spacing: 0.05em; text-transform: uppercase; line-height: 1.05; text-wrap: balance; }
   .splash-card p { color: var(--muted); line-height: 1.5; font-size: 15px; }
+  .splash-tip { font-size: 13px !important; color: #FFC72C !important; border: 1px solid rgba(255,199,44,0.45); border-radius: 8px; padding: 9px 12px; }
   .splash-err { color: #FF8A9B !important; background: rgba(186, 12, 47, 0.12); border: 1px solid rgba(186,12,47,0.5); border-radius: 8px; padding: 10px 12px; text-align: left; }
   .btn-big {
     height: 54px; padding: 0 28px; border-radius: 12px; background: var(--scarlet); color: #fff;
@@ -287,6 +288,12 @@
   .dd-opt { font-size: 15px; height: 48px; }
   .dd-done { background: var(--scarlet); border-color: var(--scarlet-bright); }
 
+  .vert-pop {
+    position: fixed; z-index: 25; right: calc(var(--edge) * 2 + var(--sar) + var(--rail-w)); width: 240px;
+    background: rgba(18, 21, 27, 0.96); border: 1px solid var(--line-bright); border-radius: 14px; padding: 12px; display: grid; gap: 8px;
+  }
+  #btn-vertical span { font-size: 14px; }
+
   /* Color + size picker that pops out beside the right rail */
   .color-pop {
     position: fixed; z-index: 25; right: calc(var(--edge) * 2 + var(--sar) + var(--rail-w)); bottom: calc(var(--edge) + var(--sab));
@@ -364,7 +371,7 @@
   .help-list b { color: #fff; }
   .help-list p { color: var(--silver); }
   .kbd { display: inline-block; font-family: ui-monospace, Menlo, monospace; font-size: 12px; background: var(--card); border: 1px solid var(--line-bright); border-radius: 4px; padding: 0 5px; }
-  .photo-view { width: 100%; border-radius: 8px; display: block; background: #000; }
+  .photo-view { width: 100%; max-height: 62dvh; object-fit: contain; border-radius: 8px; display: block; background: #000; }
   .row-btns { display: flex; gap: 8px; flex-wrap: wrap; }
 
   @media (prefers-reduced-motion: reduce) {
@@ -440,6 +447,7 @@
   <button class="rb only-review" id="btn-clear" title="Clear drawings (C)" aria-label="Clear drawings"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg></button>
   <button class="rb only-review" id="btn-photo" title="Save photo of this frame with drawings" aria-label="Save photo"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></button>
   <button class="rb only-replay" id="btn-saveclip" title="Save this replay as a video (with your drawings, if any)" aria-label="Save clip"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 4v16M17 4v16M2 9h5M2 15h5M17 9h5M17 15h5"/></svg></button>
+  <button class="rb wide only-review" id="btn-vertical" title="Save a vertical (9:16) version for social media, cropped to what's on screen"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg><span>9:16</span></button>
   <button class="rb wide only-live" id="btn-replay" disabled title="Instant replay of the last few seconds (Space)">
     <svg viewBox="0 0 24 24"><path d="M1 4v6h6"/><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/></svg>
     <span>Replay<small class="sub" id="replay-sub">10 s · ½×</small></span>
@@ -483,6 +491,12 @@
 
 <button class="dd-undo" id="dd-undo-r" hidden><svg viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></svg><span>Undo<small class="dd-undo-sub"></small></span></button>
 
+<div class="vert-pop" id="vert-pop" hidden>
+  <p class="note">Crops to the middle of what's on screen. Zoom in first to frame a player.</p>
+  <button class="ctl primary" id="vert-clip">Vertical clip</button>
+  <button class="ctl" id="vert-photo">Vertical photo</button>
+</div>
+
 <div class="color-pop" id="color-pop" hidden>
   <button class="swatch active" data-color="#E01438" style="background:#E01438" aria-label="Scarlet"></button>
   <button class="swatch" data-color="#FFFF00" style="background:#FFFF00" aria-label="Yellow"></button>
@@ -509,6 +523,7 @@
   <button class="zb-btn zb-reset" id="zoom-reset" title="Reset zoom"><span class="zoom-lbl" id="zoom-lbl">1×</span></button>
 </div>
 
+<input type="file" id="import-input" accept="video/*,image/*" multiple hidden>
 <div class="toast" id="toast"></div>
 
 <div class="export-ov" id="export-ov" hidden>
@@ -530,6 +545,7 @@
       Start Camera
     </button>
     <p id="splash-err" class="splash-err" hidden></p>
+    <p id="splash-tip" class="splash-tip" hidden>Tip: add this to your Home Screen (Share → Add to Home Screen) so your plays aren't erased if you don't open it for a week. Save keepers to Photos after each game.</p>
   </div>
 </div>
 <!-- Tray sheet -->
@@ -545,15 +561,16 @@
       <button class="chip active" id="f-all">All</button>
       <button class="chip" id="f-keep">★ Keepers</button>
       <span class="spacer" style="flex:1"></span>
+      <button class="chip" id="btn-import">Import from Photos</button>
       <button class="chip" id="btn-save-keepers">Save keepers to Photos</button>
       <button class="chip danger" id="btn-purge">Delete non-keepers</button>
     </div>
     <div class="tray-grid" id="tray-plays"></div>
-    <h3>Instant replays</h3>
+    <h3>Replays &amp; imports</h3>
     <div class="tray-grid" id="tray-clips"></div>
     <h3>Photos</h3>
     <div class="tray-grid" id="tray-photos"></div>
-    <p class="note">Plays, replays and photos are stored on this device in the browser, so they survive a reload. Tap ★ on the plays you want to keep, then <b>Save</b> (or <b>Save keepers to Photos</b>) to copy them into your Photos app. Deleting the browser's website data erases them. Only the newest <span id="clip-cap">8</span> unstarred instant replays are kept.</p>
+    <p class="note"><b>Not backed up until saved.</b> Plays, replays and photos are stored on this device in the browser, so they survive a reload, but Safari can erase them if the app isn't opened for about a week. Save keepers to Photos after each game. Tap ★ on the plays you want to keep, then <b>Save</b> (or <b>Save keepers to Photos</b>) to copy them into your Photos app. Deleting the browser's website data erases them. Only the newest <span id="clip-cap">8</span> unstarred instant replays are kept.</p>
     <p class="storage-line" id="storage-line"></p>
   </div>
 </section>
@@ -618,7 +635,10 @@
     <p><b>Zoom while filming.</b> Pinch on the live view. On devices that allow it, this zooms the camera itself, so the recording is zoomed too and the label says "Camera". Otherwise only the screen picture zooms and the recording stays wide.</p>
     <p><b>4. Draw.</b> Pick a pen, arrow, circle, or stamp. Touching the video pauses it. Each drawing sticks to the moment you drew it: when the replay plays past that moment, it pauses briefly so the drawing can be seen. Each replay keeps its own drawings. On the live view, tap <b>Freeze</b> first to draw on that moment. Pinching the live view always zooms; it never freezes it.</p>
     <p><b>5. Save.</b> <b>Photo</b> saves the frame with your drawings. <b>Save Clip</b> saves the replay as a video. If you drew on it, the drawings are recorded into the video and it pauses for a beat at each one, like a TV telestrator. Everything lands in the tray (grid button). Tap <b>Save</b> there to put it in Photos or Files.</p>
-    <p><b>Tips.</b> Hold the iPad sideways. For a full-screen app, use Share → Add to Home Screen. Keep the screen on; the page asks the device not to sleep while the camera is running.</p>
+    <p><b>Keep your plays safe.</b> Plays live in this browser's storage on this device, not in your Photos, until you save them. Safari can erase a website's stored data if the site isn't opened for about 7 days, and clearing website data in Settings erases it too. Two habits prevent losing anything: (1) open the app from its Home Screen icon (see below), and (2) after every game, open the tray, star your keepers and tap <b>Save keepers to Photos</b>.</p>
+    <p><b>Add to Home Screen.</b> In <b>Safari</b>: tap the Share button (square with an up arrow), scroll down, tap <b>Add to Home Screen</b>, then <b>Add</b>. In <b>Chrome</b> on iPhone/iPad: tap the Share button in the address bar, then <b>Add to Home Screen</b>. Open it from the new Sentinels Live icon from then on. It runs full-screen and keeps its storage much more reliably.</p>
+    <p><b>Photos in and out.</b> <b>Save</b> (tray) opens the share sheet; choose <b>Save Video</b> or <b>Save Image</b> to put it in Photos. <b>Import from Photos</b> (tray) brings in videos and pictures from your library, including clips shot with the Camera app's stabilization or Slo-Mo, so you can slow them down, draw on them and save them back. <b>9:16</b> (right side, in replay) saves a vertical clip or photo for social media, cropped to what's on screen; zoom in first to frame your player.</p>
+    <p><b>Tips.</b> Hold the iPad sideways. Keep the screen on; the page asks the device not to sleep while the camera is running.</p>
     <p><b>Keyboard.</b> <span class="kbd">Space</span> replay / play-pause · <span class="kbd">←</span><span class="kbd">→</span> frame · <span class="kbd">1</span><span class="kbd">2</span><span class="kbd">3</span> speed · <span class="kbd">Esc</span> live · <span class="kbd">F</span> freeze · <span class="kbd">P A L O B X 0 S V</span> tools · <span class="kbd">C</span> clear</p>
   </div>
 </dialog>
@@ -629,7 +649,7 @@
   <div class="dlg-body">
     <img class="photo-view" id="photo-view" alt="Saved frame">
     <video class="photo-view" id="media-video" playsinline controls muted loop></video>
-    <div class="row-btns"><button class="ctl primary" id="photo-share">Save / Share</button></div>
+    <div class="row-btns"><button class="ctl primary" id="photo-share">Save to Photos / Share</button><button class="ctl" id="photo-draw">Draw on it</button></div>
   </div>
 </dialog>
 
@@ -706,7 +726,7 @@
     if (m !== 'splash') stage.classList.add('mode-' + m);
     document.body.classList.remove('m-splash', 'm-live', 'm-replay', 'm-still');
     document.body.classList.add('m-' + m);
-    $('color-pop').hidden = true; $('dd-pop').hidden = true;
+    $('color-pop').hidden = true; $('dd-pop').hidden = true; $('vert-pop').hidden = true;
     requestAnimationFrame(positionRails);
     if (m !== 'replay') { replay.pause(); }
     renderModeTag();
@@ -1164,7 +1184,8 @@
   function metaOf(o) {
     const m = { id: o.id, kind: o.kind, n: o.n, at: o.at.getTime(), type: o.type, thumb: o.thumb || '', starred: !!o.starred };
     if (o.kind === 'photo') { m.label = o.label; }
-    else { m.est = o.est; m.duration = o.duration || 0; m.fps = o.fps; m.items = o.items || []; m.of = o.of || ''; m.dd = o.dd || null; m.playN = o.playN || 0; }
+    else { m.est = o.est; m.duration = o.duration || 0; m.fps = o.fps; m.items = o.items || []; m.of = o.of || ''; m.dd = o.dd || null; m.playN = o.playN || 0; m.vertical = !!o.vertical; }
+    if (o.kind === 'photo') m.vertical = !!o.vertical;
     return m;
   }
   function persist(o) {
@@ -1208,6 +1229,7 @@
   function clipLabel(c) {
     if (c.kind === 'play') return 'Play ' + c.n + (ddLabel(c.dd) ? ' · ' + ddLabel(c.dd) : '');
     if (c.kind === 'markup') return (c.of || 'Clip') + ' ✎';
+    if (c.kind === 'import') return 'Import ' + c.n;
     return 'Replay ' + c.n;
   }
   function addClip(blob, est, fps, kind, extra) {
@@ -1399,10 +1421,54 @@
     x.restore();
   }
   let exportCancel = false;
-  async function saveClip() {
+  // Crop of the video (in video pixels) for a 9:16 vertical export, centered on what's on screen
+  // and as tight as the current zoom.
+  function cropRect(vw, vh) {
+    const r = stage.getBoundingClientRect();
+    const ox = parseFloat(ink.style.left) || 0, oy = parseFloat(ink.style.top) || 0;
+    const dw = parseFloat(ink.style.width) || r.width, dh = parseFloat(ink.style.height) || r.height;
+    const qx = (r.width / 2 - view.tx) / view.s, qy = (r.height / 2 - view.ty) / view.s;
+    const cx = (qx - ox) / dw * vw, cy = (qy - oy) / dh * vh;
+    let sh = Math.min(vh, (r.height / view.s) / dh * vh), sw = sh * 9 / 16;
+    if (sw > vw) { sw = vw; sh = sw * 16 / 9; }
+    return { sx: Math.max(0, Math.min(vw - sw, cx - sw / 2)), sy: Math.max(0, Math.min(vh - sh, cy - sh / 2)), sw, sh };
+  }
+  function drawCropped(x, src, vw, vh, crop, W, H, list) {
+    x.drawImage(src, crop.sx, crop.sy, crop.sw, crop.sh, 0, 0, W, H);
+    const kk = vw / (parseFloat(ink.style.width) || vw);
+    x.save(); x.scale(W / crop.sw, H / crop.sh); x.translate(-crop.sx, -crop.sy);
+    drawSpot(x, vw, vh, kk);
+    list.forEach((it) => drawItem(it, x, vw, vh, kk));
+    x.restore();
+  }
+  function saveVerticalPhoto() {
+    let src, vw, vh;
+    if (mode === 'replay') { src = replay; vw = replay.videoWidth; vh = replay.videoHeight; }
+    else if (mode === 'still') { src = frozen; vw = frozen.width; vh = frozen.height; }
+    else return;
+    if (!vw || !vh) { toast('Nothing to capture yet.'); return; }
+    const W = 1080, H = 1920, c = document.createElement('canvas'); c.width = W; c.height = H;
+    const x = c.getContext('2d');
+    drawCropped(x, src, vw, vh, cropRect(vw, vh), W, H, visibleItems());
+    const stamp = mode === 'replay' && currentClip ? clipLabel(currentClip).toUpperCase() : clockStr(new Date());
+    drawBadge(x, W, H, stamp);
+    const pdd = mode === 'replay' && currentClip ? currentClip.dd : null;
+    if (ddLabel(pdd)) drawDD(x, W, H, ddLabel(pdd).toUpperCase());
+    c.toBlob((blob) => {
+      if (!blob) { toast('Could not save the photo.'); return; }
+      const thumbC = document.createElement('canvas'); thumbC.width = 180; thumbC.height = 320;
+      thumbC.getContext('2d').drawImage(c, 0, 0, 180, 320);
+      const ph = { id: uid(), kind: 'photo', n: 0, type: blob.type, blob, url: URL.createObjectURL(blob), thumb: thumbC.toDataURL('image/jpeg', 0.7), at: new Date(), label: stamp + ' · vertical', starred: false, vertical: true };
+      photos.push(ph); persist(ph); updateCounts(); flash();
+      openMedia({ blob, url: ph.url, name: 'Sentinels_Vertical_' + stampName(ph.at) + '.jpg', title: 'Vertical photo ready', video: false });
+    }, 'image/jpeg', 0.92);
+  }
+
+  async function saveClip(vertical) {
+    vertical = vertical === true;
     if (mode !== 'replay' || !currentClip || exporting) return;
     const timed = items.filter((it) => it.t != null);
-    if (!timed.length && !(currentClip.dd && currentClip.dd.down)) {
+    if (!vertical && !timed.length && !(currentClip.dd && currentClip.dd.down)) {
       // No drawings and no down & distance: hand the original clip straight to the share sheet.
       shareClip(currentClip);
       return;
@@ -1418,7 +1484,8 @@
     const end = clipDuration();
     const vw = replay.videoWidth, vh = replay.videoHeight;
     const sc = Math.min(1, 1280 / vw);
-    const W = Math.round(vw * sc / 2) * 2, H = Math.round(vh * sc / 2) * 2;
+    const crop = vertical ? cropRect(vw, vh) : null;
+    const W = vertical ? 1080 : Math.round(vw * sc / 2) * 2, H = vertical ? 1920 : Math.round(vh * sc / 2) * 2;
     const c = document.createElement('canvas'); c.width = W; c.height = H;
     const x = c.getContext('2d');
     const k = W / (parseFloat(ink.style.width) || W);
@@ -1430,8 +1497,8 @@
     replay.currentTime = start;
     await waitFor(replay, 'seeked', 2000);
     const paint = () => {
-      x.drawImage(replay, 0, 0, W, H);
-      visibleItems().forEach((it) => drawItem(it, x, W, H, k));
+      if (crop) drawCropped(x, replay, vw, vh, crop, W, H, visibleItems());
+      else { x.drawImage(replay, 0, 0, W, H); visibleItems().forEach((it) => drawItem(it, x, W, H, k)); }
       drawBadge(x, W, H, label);
       if (ddText) drawDD(x, W, H, ddText);
     };
@@ -1473,7 +1540,7 @@
     if (exportCancel || !finished) { toast('Export canceled'); return; }
     const blob = new Blob(chunks, { type: mr.mimeType || mime || 'video/mp4' });
     if (!blob.size) { toast('Export failed. Try saving photos instead.', 3000); return; }
-    const clip = addClip(blob, (end - start) / rate + holds.length * HOLD_MS / 1000, currentClip.fps, 'markup', { of: clipLabel(currentClip), thumb: c.toDataURL('image/jpeg', 0.6), dd: currentClip.dd || null, playN: currentClip.kind === 'play' ? currentClip.n : 0 });
+    const clip = addClip(blob, (end - start) / rate + holds.length * HOLD_MS / 1000, currentClip.fps, 'markup', { of: clipLabel(currentClip) + (vertical ? ' · vertical' : ''), thumb: c.toDataURL('image/jpeg', 0.6), dd: currentClip.dd || null, playN: currentClip.kind === 'play' ? currentClip.n : 0, vertical });
     renderTray();
     openMedia({ blob: clip.blob, url: clip.url, name: fileName(clip), title: 'Clip ready', video: true });
   }
@@ -1850,7 +1917,7 @@
   function fileName(o) {
     if (o.kind === 'photo') return 'Sentinels_Photo_' + stampName(o.at) + '.jpg';
     const base = (o.kind === 'markup' && o.playN) ? 'Play_' + o.playN + (o.dd && o.dd.down ? '_' + ddFile(o.dd) : '') + '_edited' : o.kind === 'play' ? 'Play_' + o.n + (o.dd && o.dd.down ? '_' + ddFile(o.dd) : '') : clipLabel(o).replace(/[^A-Za-z0-9]+/g, '_').replace(/_+$/, '');
-    return 'Sentinels_' + base + (o.marked ? '_markup' : '') + '_' + stampName(o.at) + '.' + extFor(o.type || (o.blob && o.blob.type) || '');
+    return 'Sentinels_' + base + (o.vertical ? '_vertical' : '') + '_' + stampName(o.at) + '.' + extFor(o.type || (o.blob && o.blob.type) || '');
   }
   async function shareClip(o) {
     if (!(await ensureBlob(o))) return;
@@ -1932,6 +1999,57 @@
       }).catch(() => {});
     }
   }
+  // Bring videos or photos in from the device's photo library to review and mark up.
+  $('btn-import').onclick = () => $('import-input').click();
+  $('import-input').addEventListener('change', async (e) => {
+    const files = Array.from(e.target.files || []); e.target.value = '';
+    if (!files.length) return;
+    let lastVid = null, lastPic = null;
+    for (const f of files) {
+      if (/^video\//.test(f.type) || /\.(mov|mp4|m4v)$/i.test(f.name)) {
+        lastVid = addClip(f, 0, 30, 'import');
+      } else if (/^image\//.test(f.type)) {
+        const thumb = await imageThumb(f);
+        const ph = { id: uid(), kind: 'photo', n: 0, type: f.type, blob: f, url: URL.createObjectURL(f), thumb, at: new Date(), label: 'Imported · ' + (f.name || 'photo'), starred: false };
+        photos.push(ph); persist(ph); lastPic = ph;
+      }
+    }
+    updateCounts();
+    toast('Imported ' + files.length + ' item' + (files.length === 1 ? '' : 's'));
+    if (files.length === 1 && lastVid) openClip(lastVid, true);
+    else if (files.length === 1 && lastPic) openStillFromBlob(lastPic.blob);
+  });
+  async function loadImage(blob) {
+    const url = URL.createObjectURL(blob);
+    try {
+      const img = new Image(); img.src = url;
+      await img.decode();
+      return img;
+    } finally { setTimeout(() => URL.revokeObjectURL(url), 2000); }
+  }
+  async function imageThumb(blob) {
+    try {
+      const img = await loadImage(blob);
+      const c = document.createElement('canvas'); const w = 320; c.width = w; c.height = Math.round(w * img.naturalHeight / img.naturalWidth);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      return c.toDataURL('image/jpeg', 0.7);
+    } catch (_) { return ''; }
+  }
+  // Open a photo on the drawing screen (frozen-frame mode).
+  async function openStillFromBlob(blob) {
+    try {
+      const img = await loadImage(blob);
+      const max = 4096, s = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+      frozen.width = Math.round(img.naturalWidth * s); frozen.height = Math.round(img.naturalHeight * s);
+      frozen.getContext('2d').drawImage(img, 0, 0, frozen.width, frozen.height);
+      still.src = frozen.toDataURL('image/jpeg', 0.92);
+      items = []; redo = []; current = null; spot = null;
+      closeTray(); if ($('dlg-photo').open) $('dlg-photo').close();
+      setMode('still');
+    } catch (_) { toast('Could not open that photo.'); }
+  }
+  $('photo-draw').onclick = () => { if (openItem && openItem.blob && /^image\//.test(openItem.blob.type)) openStillFromBlob(openItem.blob); };
+
   $('f-all').onclick = () => { trayFilter = 'all'; renderTray(); };
   $('f-keep').onclick = () => { trayFilter = 'keep'; renderTray(); };
   $('btn-purge').onclick = () => {
@@ -1962,6 +2080,7 @@
     const img = $('photo-view'), vid = $('media-video');
     openItem = { blob: o.blob, name: o.name };
     $('media-title').textContent = o.title || 'Saved';
+    $('photo-draw').hidden = !!o.video;
     if (o.video) { img.hidden = true; vid.hidden = false; vid.src = o.url; vid.play().catch(() => {}); }
     else { vid.hidden = true; vid.pause(); vid.removeAttribute('src'); img.hidden = false; img.src = o.url; }
     $('dlg-photo').showModal();
@@ -2067,7 +2186,17 @@
     } else { pop.style.top = ''; pop.style.bottom = ''; }
   };
   $('btn-photo').onclick = savePhoto;
-  $('btn-saveclip').onclick = saveClip;
+  $('btn-saveclip').onclick = () => saveClip(false);
+  $('btn-vertical').onclick = () => {
+    if (mode === 'still') { saveVerticalPhoto(); return; }
+    const pop = $('vert-pop'); pop.hidden = !pop.hidden;
+    if (!pop.hidden) {
+      const r = $('btn-vertical').getBoundingClientRect();
+      pop.style.top = Math.max(8, Math.min(window.innerHeight - pop.offsetHeight - 8, r.top + r.height / 2 - pop.offsetHeight / 2)) + 'px';
+    }
+  };
+  $('vert-clip').onclick = () => { $('vert-pop').hidden = true; saveClip(true); };
+  $('vert-photo').onclick = () => { $('vert-pop').hidden = true; saveVerticalPhoto(); };
   $('export-cancel').onclick = () => { exportCancel = true; };
   $('btn-tray').onclick = openTray;
   $('btn-tray-close').onclick = closeTray; $('sheet-backdrop').onclick = closeTray;
@@ -2112,6 +2241,10 @@
   // Stop iOS Safari from zooming the whole page on pinch.
   ['gesturestart', 'gesturechange'].forEach((ev) => document.addEventListener(ev, (e) => e.preventDefault(), { passive: false }));
   updateCounts();
+  try {
+    const installed = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+    $('splash-tip').hidden = installed;
+  } catch (_) {}
   setMode('splash');
   renderDD();
   loadStored();
