@@ -51,8 +51,8 @@
     --rail-w: calc(var(--b) * var(--cols) + var(--gap) * (var(--cols) - 1));
   }
   body.lay-phone { --b: 40px; --bb: 56px; --gap: 5px; --edge: 8px; --hud: 34px; }
-  body.lay-phone.portrait { --b: 46px; --bb: 60px; --gap: 6px; }
-  body.portrait { --cols: 3; }
+  body.lay-phone.portrait { --b: 42px; --bb: 56px; --gap: 5px; }
+  body { --ctl-a: 0.5; --ctl-a2: 0.75; --ctl-blur: 6px; }
   button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; touch-action: manipulation; }
   button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--scarlet-bright); outline-offset: 2px; }
   svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
@@ -168,18 +168,19 @@
   .rail-left { left: calc(var(--edge) + var(--sal)); }
   .rail-right { right: calc(var(--edge) + var(--sar)); }
   body.portrait .rail { max-height: calc(44dvh - 64px - var(--sab)); }
+  body.portrait:not(.m-replay) .rail { max-height: calc(44dvh - 14px - var(--sab)); }
   body.m-splash .rail, body.m-splash .scrubbar { display: none; }
   .rb {
     width: var(--b); height: var(--b); border-radius: 12px; display: grid; place-items: center; position: relative;
-    background: rgba(18, 21, 27, 0.78); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.09); color: var(--silver);
+    background: rgba(18, 21, 27, var(--ctl-a)); -webkit-backdrop-filter: blur(var(--ctl-blur)); backdrop-filter: blur(var(--ctl-blur));
+    border: 1px solid rgba(255, 255, 255, 0.12); color: var(--silver); text-shadow: 0 1px 3px rgba(0,0,0,0.8);
     font-family: var(--display); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; font-size: 13px;
   }
   .rb:active { transform: scale(0.95); }
   .rb.wide { grid-column: 1 / -1; width: auto; display: flex; gap: 8px; justify-content: center; align-items: center; }
   .rb.big { height: var(--bb); font-size: 16px; }
   .rb.big svg { width: 28px; height: 28px; }
-  .rb.primary { background: rgba(186, 12, 47, 0.92); border-color: var(--scarlet-bright); color: #fff; }
+  .rb.primary { background: rgba(186, 12, 47, var(--ctl-a2)); border-color: var(--scarlet-bright); color: #fff; }
   .rb.active { background: var(--scarlet); border-color: var(--scarlet-bright); color: #fff; box-shadow: 0 0 12px var(--scarlet-glow); }
   .rb.on { border-color: var(--scarlet-bright); color: #fff; }
   .rb .glyph { font-size: 22px; line-height: 1; }
@@ -206,7 +207,7 @@
     position: fixed; z-index: 14; bottom: calc(var(--edge) + var(--sab));
     left: calc(var(--edge) * 2 + var(--sal) + var(--rail-w)); right: calc(var(--edge) * 2 + var(--sar) + var(--rail-w));
     display: flex; align-items: center; gap: 10px; padding: 0 12px; height: var(--b); border-radius: 12px;
-    background: rgba(18, 21, 27, 0.78); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.09);
+    background: rgba(18, 21, 27, var(--ctl-a)); -webkit-backdrop-filter: blur(var(--ctl-blur)); backdrop-filter: blur(var(--ctl-blur)); border: 1px solid rgba(255,255,255,0.12);
   }
   body:not(.m-replay) .scrubbar { display: none; }
   body.portrait .scrubbar { left: calc(var(--edge) + var(--sal)); right: calc(var(--edge) + var(--sar)); bottom: auto; top: calc(56dvh + 8px); }
@@ -224,12 +225,13 @@
   }
   .dd-chip.empty { border-color: var(--line-bright); color: var(--muted); }
   body.m-splash .dd-chip, body.m-still .dd-chip { display: none; }
+  body.m-live:not(.lay-phone) .dd-chip { pointer-events: none; }
   .down-btn { font-size: 17px; color: #FFC72C; letter-spacing: 0.02em; text-transform: none; }
   .down-btn.active { background: #FFC72C; color: #111; border-color: #FFC72C; }
-  .dist-block { grid-column: 1 / -1; display: grid; grid-template-columns: var(--b) var(--b); grid-template-rows: repeat(4, var(--b)); gap: var(--gap); }
+  .dist-block { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr var(--b); grid-template-rows: repeat(4, var(--b)); gap: var(--gap); }
   .vslider {
     grid-row: 1 / 5; position: relative; border-radius: 12px; touch-action: none; cursor: ns-resize;
-    background: rgba(18, 21, 27, 0.78); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border: 1px solid rgba(255, 199, 44, 0.5); overflow: hidden;
+    background: rgba(18, 21, 27, var(--ctl-a)); -webkit-backdrop-filter: blur(var(--ctl-blur)); backdrop-filter: blur(var(--ctl-blur)); border: 1px solid rgba(255, 199, 44, 0.5); overflow: hidden;
   }
   .vs-fill { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(255, 199, 44, 0.35); }
   .vs-thumb { position: absolute; left: 4px; right: 4px; height: 10px; margin-bottom: -5px; border-radius: 6px; background: #FFC72C; box-shadow: 0 0 10px rgba(255,199,44,0.7); }
@@ -239,15 +241,14 @@
   .dist-goal { font-size: 13px; color: #FFC72C; }
   .dist-goal.active { background: #FFC72C; color: #111; border-color: #FFC72C; }
   body.lay-phone .dist-block { display: none !important; }
-  .zoom-block { grid-column: 1 / -1; display: grid; grid-template-columns: var(--b) var(--b); grid-template-rows: repeat(3, var(--b)); gap: var(--gap); }
+  .zoom-block { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr var(--b); grid-template-rows: repeat(3, var(--b)); gap: var(--gap); }
   .zslider { grid-row: 1 / 4; border-color: rgba(255, 255, 255, 0.25) !important; }
   .zslider .vs-fill { background: rgba(255, 255, 255, 0.18); }
   .zslider .vs-thumb { background: #fff; box-shadow: 0 0 8px rgba(255,255,255,0.6); }
   #zoom-in, #zoom-out { font-size: 26px; }
   .zoom-lbl { font-size: 14px; letter-spacing: 0.02em; text-transform: none; }
   #zoom-reset.zoomed { border-color: #fff; color: #fff; }
-  body.lay-phone .zoom-block { display: none !important; }
-  body:not(.lay-phone) .zoom-chip { display: none !important; }
+  .zoom-chip { display: none !important; }
   .dd-undo {
     position: fixed; z-index: 28; height: 64px; padding: 0 18px; border-radius: 14px; display: inline-flex; align-items: center; gap: 10px;
     background: #FFC72C; color: #111; border: 2px solid #fff; box-shadow: 0 8px 26px rgba(0,0,0,0.6);
@@ -342,7 +343,7 @@
   .seg { display: flex; flex-wrap: wrap; gap: 6px; }
   .seg button { height: 40px; padding: 0 14px; border-radius: 9px; background: var(--card); border: 1px solid var(--line); font-weight: 600; }
   .seg button.active { background: var(--scarlet); border-color: var(--scarlet-bright); }
-  #rail-y { width: 100%; accent-color: var(--scarlet-bright); height: 32px; }
+  #rail-y, #ctl-alpha { width: 100%; accent-color: var(--scarlet-bright); height: 32px; }
   .note { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
   .actual { font-size: 13px; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px; font-variant-numeric: tabular-nums; }
   .help-list { display: grid; gap: 10px; line-height: 1.45; font-size: 14px; }
@@ -472,7 +473,6 @@
   </div>
 </div>
 
-<button class="dd-undo" id="dd-undo-l" hidden><svg viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></svg><span>Undo<small class="dd-undo-sub"></small></span></button>
 <button class="dd-undo" id="dd-undo-r" hidden><svg viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></svg><span>Undo<small class="dd-undo-sub"></small></span></button>
 
 <div class="color-pop" id="color-pop" hidden>
@@ -562,6 +562,16 @@
       <input type="range" id="rail-y" min="0" max="100" step="1" aria-label="Fine-tune control height">
       <p class="note">Drag to move both side columns up or down so they sit under your thumbs. Applies when the device is held sideways.</p>
     </div>
+    <div class="field"><span>Columns of controls on each side · iPad</span>
+      <div class="seg" data-setting="colsTablet"><button data-v="2">2 columns</button><button data-v="3">3 columns</button></div>
+    </div>
+    <div class="field"><span>Columns of controls on each side · Phone</span>
+      <div class="seg" data-setting="colsPhone"><button data-v="2">2 columns</button><button data-v="3">3 columns</button></div>
+    </div>
+    <div class="field"><span>Control see-through</span>
+      <input type="range" id="ctl-alpha" min="0" max="100" step="5" aria-label="How solid the controls are">
+      <p class="note">Left = see-through (more video shows), right = solid.</p>
+    </div>
     <div class="field"><span>Control size</span>
       <div class="seg" data-setting="layout"><button data-v="auto">Auto</button><button data-v="tablet">iPad (large)</button><button data-v="phone">Phone (compact)</button></div>
     </div>
@@ -585,7 +595,7 @@
   <div class="dlg-body help-list">
     <p><b>1. Always recording.</b> Once the camera is on, it records nonstop in the background. Nothing is uploaded; it all stays on this device.</p>
     <p><b>Record every play.</b> Tap <b>Start Play</b> (big button, bottom right) when the teams line up, and <b>End Play</b> at the whistle. Each play is saved as its own numbered clip on this device. In the tray (grid button), tap ★ on the ones you want to keep, then save them to Photos.</p>
-    <p><b>Down &amp; distance.</b> On the live view, tap the down (1st–4th) with your left thumb and slide the yards with your right thumb (+ / − for fine steps, Goal for goal-to-go). Tapping 1st resets to 10 yards. When you end a play, the down moves on by one automatically (4th goes back to 1st &amp; 10). A gold <b>Undo</b> button shows beside each thumb for 3 seconds if it shouldn't have (timeout, penalty). On a phone, or to edit a play you're watching, tap the gold chip in the top strip. The next play you start gets that label. While watching a play, the chip edits that play. The label goes in the clip's file name, and <b>Save Clip</b> writes it onto the video itself in a gold box.</p>
+    <p><b>Down &amp; distance.</b> On the live view, tap the down (1st–4th) with your left thumb and slide the yards with your right thumb (+ / − for fine steps, Goal for goal-to-go). Tapping 1st resets to 10 yards. When you end a play, the down moves on by one automatically (4th goes back to 1st &amp; 10). A gold <b>Undo</b> button shows next to Start Play for 3 seconds if it shouldn't have (timeout, penalty). On a phone, or to edit a play you're watching, tap the gold chip in the top strip. The next play you start gets that label. While watching a play, the chip edits that play. The label goes in the clip's file name, and <b>Save Clip</b> writes it onto the video itself in a gold box.</p>
     <p><b>Last Play</b> (under Start Play) opens the most recent play straight away. Tapping it during a play ends that play and shows it.</p>
     <p><b>2. Or tap Replay after the whistle.</b> It jumps back to just before the snap and plays it in slow motion. The camera keeps recording in the small tile in the corner. Tap that tile, or <b>Live</b>, to go back.</p>
     <p><b>3. Review.</b> Tap the video to pause or play. Drag across it to scrub. Use the arrow buttons to step one frame at a time. Pinch with two fingers to zoom in on a player, and drag with two fingers to move around. Tap the zoom label at the top to reset.</p>
@@ -625,7 +635,7 @@
   $('brand-logo').src = LOGO; $('fav').href = LOGO; $('touch-icon').href = LOGO; $('splash-logo').src = LOGO;
 
   // ---------- Settings ----------
-  const DEFAULTS = { replayLen: 10, speed: 0.5, facing: 'environment', res: 1080, fps: 60, layout: 'auto', afterPlay: 'live', railY: 50 };
+  const DEFAULTS = { replayLen: 10, speed: 0.5, facing: 'environment', res: 1080, fps: 60, layout: 'auto', afterPlay: 'live', railY: 50, colsTablet: 2, colsPhone: 3, ctlAlpha: 45 };
   let settings = Object.assign({}, DEFAULTS);
   try { Object.assign(settings, JSON.parse(localStorage.getItem('sentinels-live-settings') || '{}')); } catch (_) {}
   function saveSettings() { try { localStorage.setItem('sentinels-live-settings', JSON.stringify(settings)); } catch (_) {} }
@@ -1005,17 +1015,18 @@
   function placeUndo() {
     const L = document.querySelector('.rail-left').getBoundingClientRect();
     const R = document.querySelector('.rail-right').getBoundingClientRect();
-    const ul = $('dd-undo-l'), ur = $('dd-undo-r');
-    const portrait = document.body.classList.contains('portrait');
-    if (portrait) {
-      ul.style.left = '12px'; ul.style.top = (L.top - 74) + 'px'; ur.hidden = true;
+    const ur = $('dd-undo-r');
+    const mark = $('btn-mark').getBoundingClientRect();
+    if (document.body.classList.contains('portrait')) {
+      ur.style.left = 'auto'; ur.style.right = (window.innerWidth - R.right) + 'px'; ur.style.top = Math.max(8, R.top - 74) + 'px';
       return;
     }
-    ul.style.left = (L.right + 10) + 'px'; ul.style.top = (L.top + L.height / 2 - 32) + 'px';
-    ur.style.left = 'auto'; ur.style.right = (window.innerWidth - R.left + 10) + 'px'; ur.style.top = (R.top + R.height / 2 - 32) + 'px';
+    // Right beside the Start/End Play button, where the thumb just was.
+    const midY = mark.height ? mark.top + mark.height / 2 : R.top + R.height / 2;
+    ur.style.left = 'auto'; ur.style.right = (window.innerWidth - R.left + 10) + 'px'; ur.style.top = (midY - 32) + 'px';
   }
   function showDDUndo(nowLbl, backLbl) {
-    ['dd-undo-l', 'dd-undo-r'].forEach((id) => {
+    ['dd-undo-r'].forEach((id) => {
       const b = $(id); b.hidden = false;
       b.querySelector('.dd-undo-sub').textContent = 'Now ' + nowLbl + ' · back to ' + backLbl;
     });
@@ -1023,13 +1034,13 @@
     clearTimeout(ddUndoTimer);
     ddUndoTimer = setTimeout(hideDDUndo, 3000);
   }
-  function hideDDUndo() { $('dd-undo-l').hidden = true; $('dd-undo-r').hidden = true; }
+  function hideDDUndo() { $('dd-undo-r').hidden = true; }
   function undoDD() {
     clearTimeout(ddUndoTimer); hideDDUndo();
     ddTarget = 'next'; setDD(ddUndoPrev);
     toast('Down set back to ' + (ddLabel(ddUndoPrev) || 'none'));
   }
-  $('dd-undo-l').onclick = undoDD; $('dd-undo-r').onclick = undoDD;
+  $('dd-undo-r').onclick = undoDD;
 
   // ---------- Play-by-play recording ----------
   function dayKey(d) { return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
@@ -1613,7 +1624,10 @@
   }
   stage.addEventListener('pointerdown', (e) => {
     if (mode === 'splash' || e.target.closest('.pip-hit, .zoom-chip, .export-ov')) return;
+    // A first finger always starts fresh, so a lift we never saw can't leave a "ghost" finger behind.
+    if (e.isPrimary) { touches.clear(); pinch = null; }
     touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (touches.size > 2) return;
     if (touches.size === 2) {
       // Second finger: cancel any stroke or scrub in progress and start pinching.
       drawing = false; current = null; jog = null; redraw();
@@ -1621,7 +1635,7 @@
       pinch = { d0: p.d, s0: view.s, cam0: camZoom, qx: (p.cx - view.tx) / view.s, qy: (p.cy - view.ty) / view.s };
     }
   }, true);
-  stage.addEventListener('pointermove', (e) => {
+  window.addEventListener('pointermove', (e) => {
     if (!touches.has(e.pointerId)) return;
     touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (!pinch || touches.size < 2) return;
@@ -1638,8 +1652,8 @@
     if (touches.size === 0) setTimeout(() => { pinchEnded = false; }, 0);
   };
   let pinchEnded = false;
-  stage.addEventListener('pointerup', liftFinger, true);
-  stage.addEventListener('pointercancel', liftFinger, true);
+  window.addEventListener('pointerup', liftFinger, true);
+  window.addEventListener('pointercancel', liftFinger, true);
   window.addEventListener('resize', () => { clampView(); applyView(); });
 
   ink.addEventListener('pointerdown', (e) => {
@@ -1957,6 +1971,12 @@
     const phone = settings.layout === 'phone' || (settings.layout !== 'tablet' && Math.min(w, h) < 560);
     document.body.classList.toggle('lay-phone', phone);
     document.body.classList.toggle('portrait', h > w * 1.1);
+    const bs = document.body.style;
+    bs.setProperty('--cols', String(phone ? settings.colsPhone : settings.colsTablet));
+    const a = Math.max(0, Math.min(100, settings.ctlAlpha)) / 100;
+    bs.setProperty('--ctl-a', (0.05 + a * 0.85).toFixed(2));
+    bs.setProperty('--ctl-a2', (0.35 + a * 0.6).toFixed(2));
+    bs.setProperty('--ctl-blur', Math.round(a * 10) + 'px');
   }
   window.addEventListener('resize', () => { applyLayout(); requestAnimationFrame(fitInk); });
 
@@ -1981,6 +2001,7 @@
   if (window.ResizeObserver) { const ro = new ResizeObserver(positionRails); rails.forEach((r) => ro.observe(r)); }
   window.addEventListener('resize', positionRails);
   $('rail-y').addEventListener('input', (e) => { settings.railY = Number(e.target.value); saveSettings(); syncSettingsUI(); });
+  $('ctl-alpha').addEventListener('input', (e) => { settings.ctlAlpha = Number(e.target.value); saveSettings(); syncSettingsUI(); });
 
   // ---------- Settings UI ----------
   function syncSettingsUI() {
@@ -1990,6 +2011,7 @@
     });
     replaySub.textContent = settings.replayLen + ' s · ' + (settings.speed === 1 ? '1×' : speedLabel(settings.speed).replace(' slow', ''));
     const ry = $('rail-y'); if (ry && Number(ry.value) !== settings.railY) ry.value = settings.railY;
+    const ca = $('ctl-alpha'); if (ca && Number(ca.value) !== settings.ctlAlpha) ca.value = settings.ctlAlpha;
     applyLayout();
     if (typeof positionRails === 'function' && rails) positionRails();
   }
