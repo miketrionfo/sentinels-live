@@ -45,98 +45,72 @@
   body {
     font-family: var(--body);
     font-size: 14px;
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr) auto;
-    height: 100dvh;
+    position: fixed; inset: 0;
     user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
-    padding-left: var(--sal); padding-right: var(--sar);
+    --b: 54px; --bb: 76px; --gap: 8px; --edge: 10px; --hud: 40px; --cols: 2;
+    --rail-w: calc(var(--b) * var(--cols) + var(--gap) * (var(--cols) - 1));
   }
+  body.lay-phone { --b: 40px; --bb: 56px; --gap: 5px; --edge: 8px; --hud: 34px; }
+  body.lay-phone.portrait { --b: 46px; --bb: 60px; --gap: 6px; }
+  body.portrait { --cols: 3; }
   button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; touch-action: manipulation; }
   button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--scarlet-bright); outline-offset: 2px; }
   svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
   .display { font-family: var(--display); text-transform: uppercase; letter-spacing: 0.06em; }
   .num { font-variant-numeric: tabular-nums; }
 
-  /* ---------- Header ---------- */
-  .top {
-    display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    padding: calc(var(--sat) + 6px) 14px 6px;
-    background: linear-gradient(180deg, #181D26, #0F131A);
-    border-bottom: 2px solid var(--scarlet);
-  }
-  .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
-  .brand img { height: 40px; width: auto; filter: drop-shadow(0 2px 6px var(--scarlet-glow)); }
-  .brand-name { font-family: var(--display); font-weight: 700; font-size: 19px; letter-spacing: 0.05em; text-transform: uppercase; line-height: 1; white-space: nowrap; }
-  .brand-name b { color: var(--scarlet-bright); font-weight: 700; }
-  .brand-sub { font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 3px; white-space: nowrap; }
-  .status { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-  .pill {
-    display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px;
-    border-radius: 999px; background: var(--card); border: 1px solid var(--line);
-    font-family: var(--display); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
-  }
-  .pill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gray); }
-  .pill.rec .dot { background: var(--scarlet-bright); box-shadow: 0 0 8px var(--scarlet-bright); animation: blink 1.2s infinite; }
-  .pill.rec { border-color: rgba(224, 20, 56, 0.5); }
-  @keyframes blink { 50% { opacity: 0.25; } }
-  .icon-btn { width: 40px; height: 40px; display: grid; place-items: center; border-radius: var(--r); background: var(--card); border: 1px solid var(--line); }
-  .icon-btn:active { background: var(--line); }
-
-  /* ---------- Main: stage + tools ---------- */
-  .main { display: grid; grid-template-columns: minmax(0, 1fr) auto; min-height: 0; min-width: 0; }
-  .dock, .top { min-width: 0; }
-  .stage { position: relative; background: #000; overflow: hidden; min-height: 0; touch-action: none; }
+  /* ---------- Full-screen stage ---------- */
+  .stage { position: fixed; inset: 0; background: #000; overflow: hidden; touch-action: none; }
+  body.portrait .stage { bottom: 44dvh; }
   .stage video, .stage img.still { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
   .zoomer { position: absolute; inset: 0; transform-origin: 0 0; z-index: 2; }
   .stage.mode-live .zoomer { pointer-events: none; }
   .stage.mode-live #ink { pointer-events: auto; }
-  .zoom-chip {
-    position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 12; display: inline-flex; align-items: center; gap: 8px;
-    height: 34px; padding: 0 12px; border-radius: 999px; background: rgba(9, 11, 14, 0.85); border: 1px solid var(--scarlet);
-    font-family: var(--display); font-weight: 700; font-size: 14px; letter-spacing: 0.06em;
-  }
-  .zoom-chip .zoom-x { font-size: 12px; color: var(--silver); border-left: 1px solid var(--line-bright); padding-left: 8px; text-transform: uppercase; }
   #live { transform-origin: 0 0; }
   #ink { position: absolute; left: 0; top: 0; touch-action: none; z-index: 5; }
   .stage.mode-live #replay, .stage.mode-live #still { display: none; }
   .stage.mode-replay #still { display: none; }
   .stage.mode-still #replay { display: none; }
-  /* Live camera becomes a picture-in-picture tile while reviewing */
-  .stage.mode-replay #live, .stage.mode-still #live {
-    inset: auto; top: 10px; right: 10px; width: clamp(110px, 20%, 220px); height: auto; aspect-ratio: 16 / 9;
-    object-fit: cover; border: 2px solid var(--scarlet); border-radius: 8px; z-index: 8; box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+
+  /* Live camera tile while reviewing: top-left, just inside the left controls */
+  .stage.mode-replay #live, .stage.mode-still #live, .pip-hit {
+    inset: auto; top: calc(var(--hud) + var(--sat) + 6px); left: calc(var(--edge) * 2 + var(--sal) + var(--rail-w));
+    width: clamp(110px, 18vw, 220px); height: auto; aspect-ratio: 16 / 9; border-radius: 8px;
   }
+  .stage.mode-replay #live, .stage.mode-still #live { object-fit: cover; border: 2px solid var(--scarlet); z-index: 8; box-shadow: 0 6px 18px rgba(0,0,0,0.6); }
+  .pip-hit { position: absolute; z-index: 10; display: none; }
+  .stage.mode-replay .pip-hit, .stage.mode-still .pip-hit { display: block; }
   .pip-label {
-    position: absolute; top: 14px; right: 14px; z-index: 9; display: none; pointer-events: none;
+    position: absolute; z-index: 9; display: none; pointer-events: none;
+    top: calc(var(--hud) + var(--sat) + 10px); left: calc(var(--edge) * 2 + var(--sal) + var(--rail-w) + 6px);
     font-family: var(--display); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; background: var(--scarlet); padding: 2px 6px; border-radius: 4px;
   }
   .stage.mode-replay .pip-label, .stage.mode-still .pip-label { display: block; }
-  .pip-hit { position: absolute; top: 10px; right: 10px; width: clamp(110px, 20%, 220px); aspect-ratio: 16 / 9; z-index: 10; display: none; border-radius: 8px; }
-  .stage.mode-replay .pip-hit, .stage.mode-still .pip-hit { display: block; }
+  body.portrait .stage.mode-replay #live, body.portrait .stage.mode-still #live, body.portrait .pip-hit { left: auto; right: var(--edge); }
+  body.portrait .pip-label { left: auto; right: calc(var(--edge) + 6px); }
 
-  .mode-tag {
-    position: absolute; left: 12px; top: 12px; z-index: 9; display: flex; gap: 6px; align-items: center; pointer-events: none;
+  .zoom-chip {
+    position: absolute; top: calc(var(--hud) + var(--sat) + 6px); left: 50%; transform: translateX(-50%); z-index: 12; display: inline-flex; align-items: center; gap: 8px;
+    height: 34px; padding: 0 12px; border-radius: 999px; background: rgba(9, 11, 14, 0.85); border: 1px solid var(--scarlet);
+    font-family: var(--display); font-weight: 700; font-size: 14px; letter-spacing: 0.06em;
   }
-  .mode-tag span {
-    font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase;
-    background: rgba(9, 11, 14, 0.82); border: 1px solid var(--line-bright); padding: 4px 9px; border-radius: 6px;
-  }
-  .mode-tag .tag-main { background: var(--scarlet); border-color: var(--scarlet); }
+  .zoom-chip .zoom-x { font-size: 12px; color: var(--silver); border-left: 1px solid var(--line-bright); padding-left: 8px; text-transform: uppercase; }
 
   .toast {
-    position: absolute; left: 50%; bottom: 18px; transform: translate(-50%, 12px); z-index: 30;
+    position: fixed; left: 50%; bottom: calc(var(--edge) + var(--sab) + var(--b) + 26px); transform: translate(-50%, 12px); z-index: 30;
     background: rgba(9, 11, 14, 0.92); border: 1px solid var(--scarlet); color: #fff; padding: 9px 16px; border-radius: 999px;
     font-family: var(--display); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; font-size: 13px;
-    opacity: 0; transition: opacity .18s, transform .18s; pointer-events: none; white-space: nowrap; max-width: 92%; overflow: hidden; text-overflow: ellipsis;
+    opacity: 0; transition: opacity .18s, transform .18s; pointer-events: none; white-space: nowrap; max-width: 60%; overflow: hidden; text-overflow: ellipsis;
   }
+  body.portrait .toast { bottom: calc(44dvh + 10px); max-width: 90%; }
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
   .splash {
-    position: absolute; inset: 0; z-index: 40; display: grid; place-items: center; padding: 24px;
+    position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 24px;
     background: radial-gradient(ellipse at 50% 30%, #1B1F28 0%, #090B0E 70%);
   }
   .splash-card { max-width: 440px; text-align: center; display: grid; gap: 14px; justify-items: center; }
-  .splash-card img { height: 120px; filter: drop-shadow(0 6px 22px var(--scarlet-glow)); }
+  .splash-card img { height: 110px; filter: drop-shadow(0 6px 22px var(--scarlet-glow)); }
   .splash-card h1 { font-family: var(--display); font-weight: 700; font-size: 30px; letter-spacing: 0.05em; text-transform: uppercase; line-height: 1.05; text-wrap: balance; }
   .splash-card p { color: var(--muted); line-height: 1.5; font-size: 15px; }
   .splash-err { color: #FF8A9B !important; background: rgba(186, 12, 47, 0.12); border: 1px solid rgba(186,12,47,0.5); border-radius: 8px; padding: 10px 12px; text-align: left; }
@@ -147,75 +121,119 @@
   }
   .btn-big:active { background: var(--scarlet-bright); transform: scale(0.98); }
 
-  /* Tool rail */
-  .tools {
-    display: flex; flex-direction: column; gap: 6px; padding: 8px; background: var(--surface); border-left: 1px solid var(--line);
-    overflow-y: auto; overflow-x: hidden; scrollbar-width: none;
+  /* ---------- Minimal top strip ---------- */
+  .hud {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 20; height: calc(var(--hud) + var(--sat));
+    padding: var(--sat) calc(var(--edge) + var(--sar)) 0 calc(var(--edge) + var(--sal));
+    display: flex; align-items: center; gap: 8px;
+    background: linear-gradient(180deg, rgba(9,11,14,0.88), rgba(9,11,14,0.35) 70%, rgba(9,11,14,0));
+    pointer-events: none;
   }
-  .tools::-webkit-scrollbar { display: none; }
-  .tool-group { display: flex; flex-direction: column; gap: 6px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
-  .tool-group:last-child { border-bottom: 0; }
-  .tool {
-    width: 48px; height: 46px; border-radius: 9px; display: grid; place-items: center; color: var(--silver);
-    background: var(--card); border: 1px solid var(--line); position: relative;
+  .hud > * { pointer-events: auto; }
+  .brand { display: flex; align-items: center; gap: 7px; min-width: 0; }
+  .brand img { height: calc(var(--hud) - 12px); width: auto; filter: drop-shadow(0 1px 4px var(--scarlet-glow)); }
+  .brand-name { font-family: var(--display); font-weight: 700; font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+  .brand-name b { color: var(--scarlet-bright); font-weight: 700; }
+  .mode-tag { flex: 1; display: flex; gap: 6px; justify-content: center; align-items: center; pointer-events: none; min-width: 0; }
+  .mode-tag span {
+    font-family: var(--display); font-weight: 700; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;
+    background: rgba(9, 11, 14, 0.8); border: 1px solid var(--line-bright); padding: 3px 8px; border-radius: 6px;
   }
-  .tool.active { background: var(--scarlet); border-color: var(--scarlet-bright); color: #fff; box-shadow: 0 0 12px var(--scarlet-glow); }
-  .tool:active { transform: scale(0.96); }
-  .tool .glyph { font-family: var(--display); font-weight: 700; font-size: 22px; line-height: 1; }
-  .swatch { width: 48px; height: 32px; border-radius: 8px; border: 2px solid var(--line); }
-  .swatch.active { border-color: #fff; box-shadow: 0 0 0 2px var(--scarlet); }
-  .size { width: 48px; height: 34px; border-radius: 8px; background: var(--card); border: 1px solid var(--line); display: grid; place-items: center; }
-  .size i { display: block; background: var(--silver); border-radius: 99px; width: 22px; }
-  .size.active { border-color: var(--scarlet-bright); background: #2A1218; }
+  .mode-tag .tag-main { background: var(--scarlet); border-color: var(--scarlet); }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 9px;
+    border-radius: 999px; background: rgba(25, 30, 38, 0.85); border: 1px solid var(--line);
+    font-family: var(--display); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
+  }
+  .pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gray); }
+  .pill.rec .dot { background: var(--scarlet-bright); box-shadow: 0 0 8px var(--scarlet-bright); animation: blink 1.2s infinite; }
+  .pill.rec { border-color: rgba(224, 20, 56, 0.5); }
+  @keyframes blink { 50% { opacity: 0.25; } }
+  .icon-btn { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; background: rgba(25, 30, 38, 0.85); border: 1px solid var(--line); }
+  .icon-btn svg { width: 18px; height: 18px; }
+  .icon-btn:active { background: var(--line); }
+  body.lay-phone .brand-name, body.lay-phone #spec-pill { display: none; }
+  body.lay-phone .rec-long { display: none; }
+  body.lay-phone.portrait .brand, body.lay-phone .mode-tag span:not(.tag-main) { display: none; }
+  body.m-splash .hud .pill, body.m-splash .mode-tag { visibility: hidden; }
 
-  /* ---------- Dock ---------- */
-  .dock { background: var(--surface); border-top: 1px solid var(--line); padding: 8px 12px calc(var(--sab) + 8px); }
-  .dock-row { display: flex; align-items: center; gap: 8px; }
-  .dock-live, .dock-replay, .dock-still { display: none; }
-  body.m-live .dock-live, body.m-replay .dock-replay, body.m-still .dock-still { display: flex; }
-  body.m-splash .dock, body.m-splash .tools { visibility: hidden; }
-  .dock-live { justify-content: space-between; }
-  .dock-replay { flex-direction: column; align-items: stretch; gap: 8px; }
-  .dock-still { justify-content: space-between; }
-  .grp { display: flex; align-items: center; gap: 8px; }
-  .ctl {
-    height: 48px; min-width: 48px; padding: 0 12px; border-radius: 10px; background: var(--card); border: 1px solid var(--line);
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    font-family: var(--display); font-weight: 600; font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
+  /* ---------- Thumb rails (left and right edges, anchored to the bottom corners) ---------- */
+  .rail {
+    position: fixed; z-index: 15; bottom: calc(var(--edge) + var(--sab));
+    display: grid; grid-template-columns: repeat(var(--cols), var(--b)); gap: var(--gap); align-content: end;
+    max-height: calc(100dvh - var(--hud) - var(--sat) - var(--sab) - var(--edge) * 2 - 6px);
+    overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none;
   }
-  .ctl:active { background: var(--line); }
-  .ctl.primary { background: var(--scarlet); border-color: var(--scarlet-bright); }
-  .ctl.primary:active { background: var(--scarlet-bright); }
-  .ctl.on { border-color: var(--scarlet-bright); color: #fff; background: #2A1218; }
-  .ctl .badge { background: var(--scarlet); color: #fff; border-radius: 99px; font-size: 12px; min-width: 20px; height: 20px; display: inline-grid; place-items: center; padding: 0 6px; }
-  .replay-btn {
-    height: 64px; padding: 0 30px; border-radius: 14px; background: var(--scarlet); border: 2px solid var(--scarlet-bright);
-    font-family: var(--display); font-weight: 700; font-size: 22px; letter-spacing: 0.1em; text-transform: uppercase;
-    display: inline-flex; align-items: center; gap: 12px; box-shadow: 0 6px 24px var(--scarlet-glow);
+  .rail::-webkit-scrollbar { display: none; }
+  .rail-left { left: calc(var(--edge) + var(--sal)); }
+  .rail-right { right: calc(var(--edge) + var(--sar)); }
+  body.portrait .rail { max-height: calc(44dvh - 64px - var(--sab)); }
+  body.m-splash .rail, body.m-splash .scrubbar { display: none; }
+  .rb {
+    width: var(--b); height: var(--b); border-radius: 12px; display: grid; place-items: center; position: relative;
+    background: rgba(18, 21, 27, 0.78); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.09); color: var(--silver);
+    font-family: var(--display); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; font-size: 13px;
   }
-  .replay-btn svg { width: 28px; height: 28px; stroke-width: 2.6; }
-  .replay-btn small { font-family: var(--body); font-size: 12px; font-weight: 600; letter-spacing: 0.02em; text-transform: none; opacity: 0.85; display: block; margin-top: 2px; }
-  .replay-btn:active { transform: scale(0.97); background: var(--scarlet-bright); }
+  .rb:active { transform: scale(0.95); }
+  .rb.wide { grid-column: 1 / -1; width: auto; display: flex; gap: 8px; justify-content: center; align-items: center; }
+  .rb.big { height: var(--bb); font-size: 16px; }
+  .rb.big svg { width: 28px; height: 28px; }
+  .rb.primary { background: rgba(186, 12, 47, 0.92); border-color: var(--scarlet-bright); color: #fff; }
+  .rb.active { background: var(--scarlet); border-color: var(--scarlet-bright); color: #fff; box-shadow: 0 0 12px var(--scarlet-glow); }
+  .rb.on { border-color: var(--scarlet-bright); color: #fff; }
+  .rb .glyph { font-size: 22px; line-height: 1; }
+  .rb .badge { position: absolute; top: -5px; right: -5px; background: var(--scarlet); color: #fff; border-radius: 99px; font-size: 11px; min-width: 19px; height: 19px; display: grid; place-items: center; padding: 0 5px; font-family: var(--body); letter-spacing: 0; }
+  .rb .sub { display: block; font-family: var(--body); font-size: 11px; font-weight: 600; letter-spacing: 0.01em; text-transform: none; opacity: 0.85; }
+  .rb.wide.big:not(#btn-play) { flex-direction: column; gap: 3px; font-size: 13px; overflow: hidden; text-align: center; line-height: 1.1; }
+  .replay-btn { height: calc(var(--bb) * 1.45) !important; font-size: 16px !important; letter-spacing: 0.1em; box-shadow: 0 6px 24px var(--scarlet-glow); }
+  #btn-freeze { height: calc(var(--bb) * 1.2); }
   .replay-btn[disabled] { opacity: 0.45; }
-  .speeds { display: flex; background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
-  .speeds button { height: 46px; padding: 0 12px; font-family: var(--display); font-weight: 600; font-size: 14px; letter-spacing: 0.04em; color: var(--muted); }
-  .speeds button.active { background: var(--scarlet); color: #fff; }
-  .spacer { flex: 1; }
+  .color-dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #fff; }
+  .speed-lbl { font-size: 17px; letter-spacing: 0.02em; }
 
-  /* Scrubber */
-  .scrub-row { display: flex; align-items: center; gap: 10px; }
-  .time { font-family: var(--display); font-size: 14px; font-weight: 600; color: var(--silver); min-width: 104px; text-align: right; }
-  .scrub { position: relative; flex: 1; height: 36px; touch-action: none; cursor: pointer; }
+  body:not(.m-live) .only-live, body:not(.m-replay) .only-replay, body:not(.m-still) .only-still,
+  body:not(.m-replay):not(.m-still) .only-review { display: none !important; }
+
+  /* Scrub bar between the two rails */
+  .scrubbar {
+    position: fixed; z-index: 14; bottom: calc(var(--edge) + var(--sab));
+    left: calc(var(--edge) * 2 + var(--sal) + var(--rail-w)); right: calc(var(--edge) * 2 + var(--sar) + var(--rail-w));
+    display: flex; align-items: center; gap: 10px; padding: 0 12px; height: var(--b); border-radius: 12px;
+    background: rgba(18, 21, 27, 0.78); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.09);
+  }
+  body:not(.m-replay) .scrubbar { display: none; }
+  body.portrait .scrubbar { left: calc(var(--edge) + var(--sal)); right: calc(var(--edge) + var(--sar)); bottom: auto; top: calc(56dvh + 8px); }
+  .time { font-family: var(--display); font-size: 13px; font-weight: 600; color: var(--silver); white-space: nowrap; }
+  .scrub { position: relative; flex: 1; height: 100%; touch-action: none; cursor: pointer; min-width: 60px; }
   .scrub-track { position: absolute; left: 0; right: 0; top: 50%; height: 8px; margin-top: -4px; border-radius: 99px; background: #2A303B; overflow: hidden; }
   .scrub-window { position: absolute; top: 0; bottom: 0; background: rgba(186, 12, 47, 0.35); }
   .scrub-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--scarlet-bright); width: 0; }
   .scrub-knob { position: absolute; top: 50%; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; background: #fff; border: 3px solid var(--scarlet); left: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.5); }
 
-  .export-ov { position: absolute; inset: 0; z-index: 35; display: grid; place-items: end center; padding: 16px; background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.6)); }
+  /* Color + size picker that pops out beside the right rail */
+  .color-pop {
+    position: fixed; z-index: 25; right: calc(var(--edge) * 2 + var(--sar) + var(--rail-w)); bottom: calc(var(--edge) + var(--sab));
+    background: rgba(18, 21, 27, 0.95); border: 1px solid var(--line-bright); border-radius: 14px; padding: 10px;
+    display: grid; grid-template-columns: repeat(5, 40px); gap: 8px;
+  }
+  body.portrait .color-pop { right: var(--edge); bottom: calc(44dvh - 60px); }
+  .swatch { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--line); }
+  .swatch.active { border-color: #fff; box-shadow: 0 0 0 2px var(--scarlet); }
+  .size { height: 36px; border-radius: 8px; background: var(--card); border: 1px solid var(--line); display: grid; place-items: center; grid-column: span 1; }
+  .size i { display: block; background: var(--silver); border-radius: 99px; width: 20px; }
+  .size.active { border-color: var(--scarlet-bright); background: #2A1218; }
+
+  .export-ov { position: fixed; inset: 0; z-index: 35; display: grid; place-items: center; padding: 16px; background: rgba(0,0,0,0.35); }
   .export-card { background: rgba(18, 21, 27, 0.95); border: 1px solid var(--scarlet); border-radius: 12px; padding: 14px 16px; display: grid; gap: 10px; width: min(420px, 100%); justify-items: start; }
   .export-track { width: 100%; height: 8px; border-radius: 99px; background: #2A303B; overflow: hidden; }
   .export-bar { height: 100%; width: 0; background: var(--scarlet-bright); }
-
+  .ctl {
+    height: 44px; min-width: 44px; padding: 0 14px; border-radius: 10px; background: var(--card); border: 1px solid var(--line);
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    font-family: var(--display); font-weight: 600; font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
+  }
+  .ctl.primary { background: var(--scarlet); border-color: var(--scarlet-bright); }
   /* ---------- Tray sheet ---------- */
   .sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 50; display: none; }
   .sheet-backdrop.open { display: block; }
@@ -262,36 +280,6 @@
   .photo-view { width: 100%; border-radius: 8px; display: block; background: #000; }
   .row-btns { display: flex; gap: 8px; flex-wrap: wrap; }
 
-  /* ---------- Narrow / portrait ---------- */
-  @media (max-aspect-ratio: 1/1), (max-width: 640px) {
-    .main { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
-    .tools { flex-direction: row; border-left: 0; border-top: 1px solid var(--line); overflow-x: auto; overflow-y: hidden; padding: 6px 8px; }
-    .tool-group { flex-direction: row; border-bottom: 0; border-right: 1px solid var(--line); padding: 0 6px 0 0; }
-    .tool-group:last-child { border-right: 0; }
-    .tool { width: 44px; height: 42px; }
-    .swatch { width: 34px; height: 42px; }
-    .size { width: 38px; height: 42px; }
-    .brand-sub { display: none; }
-  }
-  @media (max-width: 640px) {
-    .top { padding-left: 10px; padding-right: 10px; }
-    .brand img { height: 32px; }
-    .brand-name { font-size: 16px; }
-    #spec-pill { display: none; }
-    .ctl .lbl { display: none; }
-    .replay-btn { padding: 0 18px; font-size: 19px; height: 58px; }
-    .speeds button { padding: 0 9px; }
-    .time { min-width: 0; font-size: 12px; }
-    .hide-sm { display: none !important; }
-    .dock-row { flex-wrap: wrap; justify-content: center; row-gap: 8px; }
-    .dock-live { justify-content: space-between; flex-wrap: nowrap; }
-    .ctl { height: 44px; min-width: 44px; padding: 0 10px; }
-    .speeds button { height: 42px; }
-    #btn-help { display: none; }
-    .rec-long { display: none; }
-    .status { flex-wrap: nowrap; gap: 6px; }
-    .top { gap: 8px; }
-  }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
   }
@@ -299,155 +287,115 @@
 </head>
 <body class="m-splash">
 
-<header class="top">
+<div class="stage mode-live" id="stage">
+  <video id="live" playsinline muted autoplay></video>
+  <div class="zoomer" id="zoomer">
+    <video id="replay" playsinline muted preload="auto"></video>
+    <img id="still" class="still" alt="">
+    <canvas id="ink"></canvas>
+  </div>
+  <div class="pip-label">● Live</div>
+  <button class="pip-hit" id="pip-hit" aria-label="Back to live camera"></button>
+  <button class="zoom-chip" id="zoom-chip" hidden><span id="zoom-val">1.0×</span><span class="zoom-x">Reset</span></button>
+</div>
+
+<header class="hud">
   <div class="brand">
     <img id="brand-logo" alt="Sentinels helmet">
-    <div>
-      <div class="brand-name">Sentinels <b>Live</b></div>
-      <div class="brand-sub">Sideline Replay · Mountain Ridge Football</div>
-    </div>
+    <div class="brand-name">Sentinels <b>Live</b></div>
   </div>
-  <div class="status">
-    <span class="pill" id="rec-pill"><span class="dot"></span><span id="rec-text" class="num">Camera off</span></span>
-    <span class="pill" id="spec-pill"><span id="spec-text" class="num">—</span></span>
-    <button class="icon-btn" id="btn-settings" aria-label="Settings" title="Settings">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-    </button>
-    <button class="icon-btn" id="btn-help" aria-label="How it works" title="How it works">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
-    </button>
-  </div>
+  <div class="mode-tag" id="mode-tag"></div>
+  <span class="pill" id="rec-pill"><span class="dot"></span><span id="rec-text" class="num">Camera off</span></span>
+  <span class="pill" id="spec-pill"><span id="spec-text" class="num">—</span></span>
+  <button class="icon-btn" id="btn-settings" aria-label="Settings" title="Settings">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </button>
+  <button class="icon-btn" id="btn-help" aria-label="How it works" title="How it works">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+  </button>
 </header>
 
-<main class="main">
-  <div class="stage mode-live" id="stage">
-    <video id="live" playsinline muted autoplay></video>
-    <div class="zoomer" id="zoomer">
-      <video id="replay" playsinline muted preload="auto"></video>
-      <img id="still" class="still" alt="">
-      <canvas id="ink"></canvas>
-    </div>
-    <button class="zoom-chip" id="zoom-chip" hidden><span id="zoom-val">1.0×</span><span class="zoom-x">Reset</span></button>
-    <div class="pip-label">● Live</div>
-    <button class="pip-hit" id="pip-hit" aria-label="Back to live camera"></button>
-    <div class="mode-tag" id="mode-tag"></div>
-    <div class="toast" id="toast"></div>
-    <div class="export-ov" id="export-ov" hidden>
-      <div class="export-card">
-        <div class="display" style="font-weight:700;font-size:17px">Building marked-up clip</div>
-        <div class="export-track"><div class="export-bar" id="export-bar"></div></div>
-        <p class="note">It plays through once in real time to record your drawings into the video.</p>
-        <button class="ctl" id="export-cancel">Cancel</button>
-      </div>
-    </div>
+<!-- LEFT THUMB: playback -->
+<nav class="rail rail-left" aria-label="Playback controls">
+  <button class="rb wide primary only-review" id="btn-live" title="Back to live (Esc)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"/><path d="M5.6 5.6a9 9 0 0 0 0 12.8M18.4 5.6a9 9 0 0 1 0 12.8"/></svg>Live</button>
+  <button class="rb" id="btn-tray" title="Saved replays and photos" aria-label="Saved replays and photos"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span class="badge num" id="tray-count">0</span></button>
+  <button class="rb only-live" id="btn-flip" title="Switch camera" aria-label="Switch camera"><svg viewBox="0 0 24 24"><path d="M20 7h-3l-2-3H9L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M9 13.5a3 3 0 0 1 5.2-2"/><path d="M15 12.5a3 3 0 0 1-5.2 2"/></svg></button>
+  <button class="rb on only-replay" id="btn-loop" title="Loop the play" aria-label="Loop"><svg viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></button>
+  <button class="rb only-replay" id="btn-speed" title="Speed (1 2 3)" aria-label="Playback speed"><span class="speed-lbl" id="speed-lbl">½×</span></button>
+  <button class="rb only-replay" id="btn-restart" title="Back to start of the play (R)" aria-label="Back to start of the play"><svg viewBox="0 0 24 24"><path d="M19 20L9 12l10-8v16z"/><path d="M5 19V5"/></svg></button>
+  <button class="rb only-replay" id="btn-prev" title="Back 1 frame (←)" aria-label="Back one frame"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+  <button class="rb only-replay" id="btn-next" title="Forward 1 frame (→)" aria-label="Forward one frame"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+  <button class="rb wide big primary only-replay" id="btn-play" title="Play / pause (Space)" aria-label="Play or pause">
+    <svg viewBox="0 0 24 24" id="ic-play"><path d="M6 4l14 8-14 8V4z" fill="currentColor"/></svg>
+    <svg viewBox="0 0 24 24" id="ic-pause" style="display:none"><rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/></svg>
+  </button>
+  <button class="rb wide big only-live" id="btn-freeze" title="Freeze this moment to draw on it (F)"><svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>Freeze</button>
+</nav>
 
-    <div class="splash" id="splash">
-      <div class="splash-card">
-        <img id="splash-logo" alt="Sentinels helmet">
-        <h1>Sideline Instant Replay</h1>
-        <p>Point the camera at the field. It records the whole time. When a play ends, tap <b>Replay</b> to watch it again in slow motion, draw on it, and save stills.</p>
-        <button class="btn-big" id="btn-start">
-          <svg viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-          Start Camera
-        </button>
-        <p id="splash-err" class="splash-err" hidden></p>
-      </div>
-    </div>
+<!-- RIGHT THUMB: replay button, drawing, saving -->
+<nav class="rail rail-right" aria-label="Drawing and saving">
+  <button class="rb active only-review" data-tool="pointer" title="Watch: tap to play/pause, drag to scrub (V)" aria-label="Watch"><svg viewBox="0 0 24 24"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg></button>
+  <button class="rb only-review" data-tool="spotlight" title="Spotlight (S)" aria-label="Spotlight"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+  <button class="rb only-review" data-tool="line" title="Line (L)" aria-label="Line"><svg viewBox="0 0 24 24"><path d="M4 20L20 4"/></svg></button>
+  <button class="rb only-review" data-tool="rect" title="Box (B)" aria-label="Box"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="1"/></svg></button>
+  <button class="rb only-review" data-tool="stamp_x" title="X stamp (X)" aria-label="X stamp"><span class="glyph">X</span></button>
+  <button class="rb only-review" data-tool="stamp_o" title="O stamp (0)" aria-label="O stamp"><span class="glyph">O</span></button>
+  <button class="rb only-review" data-tool="circle" title="Circle a player (O)" aria-label="Circle"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9" ry="7"/></svg></button>
+  <button class="rb only-review" id="btn-color" title="Color and thickness" aria-label="Color and thickness"><span class="color-dot" id="color-dot" style="background:#E01438"></span></button>
+  <button class="rb only-review" data-tool="pen" title="Pen (P)" aria-label="Pen"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
+  <button class="rb only-review" data-tool="arrow" title="Route arrow (A)" aria-label="Arrow"><svg viewBox="0 0 24 24"><path d="M5 19L19 5"/><path d="M9 5h10v10"/></svg></button>
+  <button class="rb only-review" id="btn-undo" title="Undo (Ctrl+Z)" aria-label="Undo"><svg viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></svg></button>
+  <button class="rb only-review" id="btn-clear" title="Clear drawings (C)" aria-label="Clear drawings"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg></button>
+  <button class="rb only-review" id="btn-photo" title="Save photo of this frame with drawings" aria-label="Save photo"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></button>
+  <button class="rb only-replay" id="btn-saveclip" title="Save this replay as a video (with your drawings, if any)" aria-label="Save clip"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 4v16M17 4v16M2 9h5M2 15h5M17 9h5M17 15h5"/></svg></button>
+  <button class="rb wide big primary replay-btn only-live" id="btn-replay" disabled>
+    <svg viewBox="0 0 24 24"><path d="M1 4v6h6"/><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/></svg>
+    <span>Replay<small class="sub" id="replay-sub">10 s · ½×</small></span>
+  </button>
+</nav>
+
+<div class="color-pop" id="color-pop" hidden>
+  <button class="swatch active" data-color="#E01438" style="background:#E01438" aria-label="Scarlet"></button>
+  <button class="swatch" data-color="#FFFF00" style="background:#FFFF00" aria-label="Yellow"></button>
+  <button class="swatch" data-color="#FFFFFF" style="background:#FFFFFF" aria-label="White"></button>
+  <button class="swatch" data-color="#00E5FF" style="background:#00E5FF" aria-label="Cyan"></button>
+  <button class="swatch" data-color="#00E676" style="background:#00E676" aria-label="Green"></button>
+  <button class="size" data-size="3" aria-label="Thin"><i style="height:3px"></i></button>
+  <button class="size active" data-size="6" aria-label="Medium"><i style="height:6px"></i></button>
+  <button class="size" data-size="11" aria-label="Thick"><i style="height:10px"></i></button>
+</div>
+
+<div class="scrubbar">
+  <div class="scrub" id="scrub">
+    <div class="scrub-track"><div class="scrub-window" id="scrub-window"></div><div class="scrub-fill" id="scrub-fill"></div></div>
+    <div class="scrub-knob" id="scrub-knob"></div>
   </div>
+  <div class="time num" id="time">00:00.0 / 00:00.0</div>
+</div>
 
-  <aside class="tools" id="tools" aria-label="Drawing tools">
-    <div class="tool-group">
-      <button class="tool active" data-tool="pointer" title="Watch: tap to play/pause, drag to scrub (V)" aria-label="Watch">
-        <svg viewBox="0 0 24 24"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg></button>
-      <button class="tool" data-tool="pen" title="Pen (P)" aria-label="Pen">
-        <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
-      <button class="tool" data-tool="arrow" title="Route arrow (A)" aria-label="Arrow">
-        <svg viewBox="0 0 24 24"><path d="M5 19L19 5"/><path d="M9 5h10v10"/></svg></button>
-      <button class="tool" data-tool="line" title="Line (L)" aria-label="Line">
-        <svg viewBox="0 0 24 24"><path d="M4 20L20 4"/></svg></button>
-      <button class="tool" data-tool="circle" title="Circle a player (O)" aria-label="Circle">
-        <svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9" ry="7"/></svg></button>
-      <button class="tool" data-tool="rect" title="Box (B)" aria-label="Box">
-        <svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="1"/></svg></button>
-      <button class="tool" data-tool="stamp_x" title="X stamp (X)" aria-label="X stamp"><span class="glyph">X</span></button>
-      <button class="tool" data-tool="stamp_o" title="O stamp (0)" aria-label="O stamp"><span class="glyph">O</span></button>
-      <button class="tool" data-tool="spotlight" title="Spotlight (S)" aria-label="Spotlight">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
-    </div>
-    <div class="tool-group" id="swatches">
-      <button class="swatch active" data-color="#E01438" style="background:#E01438" aria-label="Scarlet"></button>
-      <button class="swatch" data-color="#FFFF00" style="background:#FFFF00" aria-label="Yellow"></button>
-      <button class="swatch" data-color="#FFFFFF" style="background:#FFFFFF" aria-label="White"></button>
-      <button class="swatch" data-color="#00E5FF" style="background:#00E5FF" aria-label="Cyan"></button>
-      <button class="swatch" data-color="#00E676" style="background:#00E676" aria-label="Green"></button>
-    </div>
-    <div class="tool-group">
-      <button class="size" data-size="3" aria-label="Thin"><i style="height:3px"></i></button>
-      <button class="size active" data-size="6" aria-label="Medium"><i style="height:6px"></i></button>
-      <button class="size" data-size="11" aria-label="Thick"><i style="height:10px"></i></button>
-    </div>
-    <div class="tool-group">
-      <button class="tool" id="btn-undo" title="Undo (Ctrl+Z)" aria-label="Undo"><svg viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></svg></button>
-      <button class="tool" id="btn-redo" title="Redo (Ctrl+Shift+Z)" aria-label="Redo"><svg viewBox="0 0 24 24"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 15-6.7L21 13"/></svg></button>
-      <button class="tool" id="btn-clear" title="Clear drawings (C)" aria-label="Clear drawings"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg></button>
-    </div>
-  </aside>
-</main>
+<div class="toast" id="toast"></div>
 
-<footer class="dock">
-  <!-- LIVE -->
-  <div class="dock-row dock-live">
-    <div class="grp">
-      <button class="ctl" id="btn-flip" title="Switch camera"><svg viewBox="0 0 24 24"><path d="M20 7h-3l-2-3H9L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M9 13.5a3 3 0 0 1 5.2-2"/><path d="M15 12.5a3 3 0 0 1-5.2 2"/></svg><span class="lbl">Flip</span></button>
-      <button class="ctl" id="btn-freeze" title="Freeze this moment to draw on it (F)"><svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg><span class="lbl">Freeze</span></button>
-    </div>
-    <button class="replay-btn" id="btn-replay" disabled>
-      <svg viewBox="0 0 24 24"><path d="M1 4v6h6"/><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/></svg>
-      <span>Replay<small id="replay-sub">last 10 s at 0.5×</small></span>
+<div class="export-ov" id="export-ov" hidden>
+  <div class="export-card">
+    <div class="display" style="font-weight:700;font-size:17px">Building marked-up clip</div>
+    <div class="export-track"><div class="export-bar" id="export-bar"></div></div>
+    <p class="note">It plays through once in real time to record your drawings into the video.</p>
+    <button class="ctl" id="export-cancel">Cancel</button>
+  </div>
+</div>
+
+<div class="splash" id="splash">
+  <div class="splash-card">
+    <img id="splash-logo" alt="Sentinels helmet">
+    <h1>Sideline Instant Replay</h1>
+    <p>Point the camera at the field. It records the whole time. When a play ends, tap <b>Replay</b> to watch it again in slow motion, draw on it, and save stills.</p>
+    <button class="btn-big" id="btn-start">
+      <svg viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      Start Camera
     </button>
-    <div class="grp">
-      <button class="ctl" id="btn-tray" title="Saved clips and photos"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span class="lbl">Clips</span><span class="badge num" id="tray-count">0</span></button>
-    </div>
+    <p id="splash-err" class="splash-err" hidden></p>
   </div>
-
-  <!-- REPLAY -->
-  <div class="dock-replay">
-    <div class="scrub-row">
-      <div class="scrub" id="scrub">
-        <div class="scrub-track"><div class="scrub-window" id="scrub-window"></div><div class="scrub-fill" id="scrub-fill"></div></div>
-        <div class="scrub-knob" id="scrub-knob"></div>
-      </div>
-      <div class="time num" id="time">00:00.0 / 00:00.0</div>
-    </div>
-    <div class="dock-row">
-      <button class="ctl primary" id="btn-live" title="Back to live (Esc)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"/><path d="M5.6 5.6a9 9 0 0 0 0 12.8M18.4 5.6a9 9 0 0 1 0 12.8"/></svg><span class="lbl">Live</span></button>
-      <div class="spacer hide-sm"></div>
-      <button class="ctl" id="btn-restart" title="Back to start of the play (R)"><svg viewBox="0 0 24 24"><path d="M19 20L9 12l10-8v16z"/><path d="M5 19V5"/></svg></button>
-      <button class="ctl" id="btn-prev" title="Back 1 frame (←)"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
-      <button class="ctl primary" id="btn-play" title="Play / pause (Space)" style="min-width:64px">
-        <svg viewBox="0 0 24 24" id="ic-play"><path d="M6 4l14 8-14 8V4z" fill="currentColor"/></svg>
-        <svg viewBox="0 0 24 24" id="ic-pause" style="display:none"><rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/></svg>
-      </button>
-      <button class="ctl" id="btn-next" title="Forward 1 frame (→)"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
-      <div class="speeds" id="speeds">
-        <button data-speed="0.25">¼×</button><button data-speed="0.5">½×</button><button data-speed="1">1×</button>
-      </div>
-      <button class="ctl on" id="btn-loop" title="Loop the play"><svg viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></button>
-      <div class="spacer hide-sm"></div>
-      <button class="ctl" id="btn-saveclip" title="Save this replay as a video (with your drawings, if any)"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 4v16M17 4v16M2 9h5M2 15h5M17 9h5M17 15h5"/></svg><span class="lbl">Save Clip</span></button>
-      <button class="ctl" id="btn-photo" title="Save photo of this frame with drawings"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span class="lbl">Photo</span></button>
-      <button class="ctl" id="btn-tray2" title="Saved clips and photos"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span class="badge num" id="tray-count2">0</span></button>
-    </div>
-  </div>
-
-  <!-- STILL -->
-  <div class="dock-row dock-still">
-    <button class="ctl primary" id="btn-live2"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"/><path d="M5.6 5.6a9 9 0 0 0 0 12.8M18.4 5.6a9 9 0 0 1 0 12.8"/></svg><span class="lbl">Live</span></button>
-    <span class="note hide-sm">Frozen frame. Draw on it, then save a photo.</span>
-    <button class="ctl" id="btn-photo2"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span class="lbl">Save Photo</span></button>
-  </div>
-</footer>
-
+</div>
 <!-- Tray sheet -->
 <div class="sheet-backdrop" id="sheet-backdrop"></div>
 <section class="sheet" id="tray" aria-label="Clips and photos">
@@ -474,6 +422,9 @@
     </div>
     <div class="field"><span>Replay starts at</span>
       <div class="seg" data-setting="speed"><button data-v="0.25">¼× speed</button><button data-v="0.5">½× speed</button><button data-v="1">Full speed</button></div>
+    </div>
+    <div class="field"><span>Control size</span>
+      <div class="seg" data-setting="layout"><button data-v="auto">Auto</button><button data-v="tablet">iPad (large)</button><button data-v="phone">Phone (compact)</button></div>
     </div>
     <div class="field"><span>Camera</span>
       <div class="seg" data-setting="facing"><button data-v="environment">Back</button><button data-v="user">Front (selfie)</button></div>
@@ -531,7 +482,7 @@
   $('brand-logo').src = LOGO; $('fav').href = LOGO; $('touch-icon').href = LOGO; $('splash-logo').src = LOGO;
 
   // ---------- Settings ----------
-  const DEFAULTS = { replayLen: 10, speed: 0.5, facing: 'environment', res: 1080, fps: 60 };
+  const DEFAULTS = { replayLen: 10, speed: 0.5, facing: 'environment', res: 1080, fps: 60, layout: 'auto' };
   let settings = Object.assign({}, DEFAULTS);
   try { Object.assign(settings, JSON.parse(localStorage.getItem('sentinels-live-settings') || '{}')); } catch (_) {}
   function saveSettings() { try { localStorage.setItem('sentinels-live-settings', JSON.stringify(settings)); } catch (_) {} }
@@ -581,7 +532,9 @@
     mode = m;
     stage.classList.remove('mode-live', 'mode-replay', 'mode-still');
     if (m !== 'splash') stage.classList.add('mode-' + m);
-    document.body.className = 'm-' + m;
+    document.body.classList.remove('m-splash', 'm-live', 'm-replay', 'm-still');
+    document.body.classList.add('m-' + m);
+    $('color-pop').hidden = true;
     if (m !== 'replay') { replay.pause(); }
     renderModeTag();
     requestAnimationFrame(fitInk);
@@ -831,7 +784,7 @@
 
   function setSpeed(r) {
     replay.playbackRate = r;
-    document.querySelectorAll('#speeds button').forEach((b) => b.classList.toggle('active', parseFloat(b.dataset.speed) === r));
+    $('speed-lbl').textContent = r === 0.25 ? '¼×' : r === 0.5 ? '½×' : '1×';
     renderModeTag();
   }
   function togglePlay() {
@@ -1336,7 +1289,7 @@
   // ---------- Tray ----------
   function updateCounts() {
     const n = clips.length + photos.length;
-    $('tray-count').textContent = n; $('tray-count2').textContent = n;
+    $('tray-count').textContent = n;
     renderTray();
   }
   function renderTray() {
@@ -1402,13 +1355,23 @@
     setMode('live');
   }
 
+  // ---------- Layout: iPad vs phone sizing, portrait vs landscape ----------
+  function applyLayout() {
+    const w = window.innerWidth, h = window.innerHeight;
+    const phone = settings.layout === 'phone' || (settings.layout !== 'tablet' && Math.min(w, h) < 560);
+    document.body.classList.toggle('lay-phone', phone);
+    document.body.classList.toggle('portrait', h > w * 1.1);
+  }
+  window.addEventListener('resize', () => { applyLayout(); requestAnimationFrame(fitInk); });
+
   // ---------- Settings UI ----------
   function syncSettingsUI() {
     document.querySelectorAll('[data-setting]').forEach((g) => {
       const key = g.dataset.setting;
       g.querySelectorAll('button').forEach((b) => b.classList.toggle('active', String(settings[key]) === b.dataset.v));
     });
-    replaySub.textContent = 'last ' + settings.replayLen + ' s at ' + (settings.speed === 1 ? 'full speed' : speedLabel(settings.speed).replace(' slow', ''));
+    replaySub.textContent = settings.replayLen + ' s · ' + (settings.speed === 1 ? '1×' : speedLabel(settings.speed).replace(' slow', ''));
+    applyLayout();
   }
   document.querySelectorAll('[data-setting]').forEach((g) => {
     g.addEventListener('click', (e) => {
@@ -1427,17 +1390,18 @@
   btnReplay.onclick = instantReplay;
   $('btn-freeze').onclick = () => freezeFrame();
   $('btn-flip').onclick = () => { settings.facing = settings.facing === 'user' ? 'environment' : 'user'; saveSettings(); syncSettingsUI(); restartCamera(); };
-  $('btn-live').onclick = goLive; $('btn-live2').onclick = goLive; $('pip-hit').onclick = goLive;
+  $('btn-live').onclick = goLive; $('pip-hit').onclick = goLive;
   $('btn-play').onclick = togglePlay;
   $('btn-prev').onclick = () => stepFrame(-1);
   $('btn-next').onclick = () => stepFrame(1);
   $('btn-restart').onclick = () => { replay.currentTime = windowStart; replay.play().catch(() => {}); };
   $('btn-loop').onclick = () => { loopOn = !loopOn; $('btn-loop').classList.toggle('on', loopOn); toast(loopOn ? 'Loop on' : 'Loop off'); };
-  document.querySelectorAll('#speeds button').forEach((b) => b.onclick = () => { setSpeed(parseFloat(b.dataset.speed)); toast(speedLabel(replay.playbackRate)); });
+  $('btn-speed').onclick = () => { const r = replay.playbackRate; setSpeed(r === 0.25 ? 0.5 : r === 0.5 ? 1 : 0.25); toast(speedLabel(replay.playbackRate)); };
+  $('btn-color').onclick = () => { $('color-pop').hidden = !$('color-pop').hidden; };
   $('btn-photo').onclick = savePhoto;
   $('btn-saveclip').onclick = saveClip;
-  $('export-cancel').onclick = () => { exportCancel = true; }; $('btn-photo2').onclick = savePhoto;
-  $('btn-tray').onclick = openTray; $('btn-tray2').onclick = openTray;
+  $('export-cancel').onclick = () => { exportCancel = true; };
+  $('btn-tray').onclick = openTray;
   $('btn-tray-close').onclick = closeTray; $('sheet-backdrop').onclick = closeTray;
   $('btn-settings').onclick = () => { reportActual(); $('dlg-settings').showModal(); };
   $('btn-help').onclick = () => $('dlg-help').showModal();
@@ -1448,20 +1412,21 @@
   document.querySelectorAll('[data-tool]').forEach((b) => b.onclick = () => setTool(b.dataset.tool));
   document.querySelectorAll('.swatch').forEach((s) => s.onclick = () => {
     document.querySelectorAll('.swatch').forEach((x) => x.classList.remove('active')); s.classList.add('active'); color = s.dataset.color;
+    $('color-dot').style.background = color; $('color-pop').hidden = true;
   });
   document.querySelectorAll('.size').forEach((s) => s.onclick = () => {
     document.querySelectorAll('.size').forEach((x) => x.classList.remove('active')); s.classList.add('active'); size = parseInt(s.dataset.size, 10);
   });
   $('btn-undo').onclick = () => { if (items.length) { redo.push(items.pop()); redraw(); } };
-  $('btn-redo').onclick = () => { if (redo.length) { items.push(redo.pop()); redraw(); } };
+  const doRedo = () => { if (redo.length) { items.push(redo.pop()); redraw(); } };
   $('btn-clear').onclick = () => clearInk(false);
 
   // Keyboard (iPad with keyboard, laptops). Letter shortcuts ignore Ctrl/Cmd/Alt.
   window.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || document.querySelector('dialog[open]')) return;
     const k = e.key, mod = e.ctrlKey || e.metaKey;
-    if (mod && (k === 'z' || k === 'Z')) { e.preventDefault(); (e.shiftKey ? $('btn-redo') : $('btn-undo')).click(); return; }
-    if (mod && (k === 'y' || k === 'Y')) { e.preventDefault(); $('btn-redo').click(); return; }
+    if (mod && (k === 'z' || k === 'Z')) { e.preventDefault(); if (e.shiftKey) doRedo(); else $('btn-undo').click(); return; }
+    if (mod && (k === 'y' || k === 'Y')) { e.preventDefault(); doRedo(); return; }
     if (mod || e.altKey) return;
     const tools = { v: 'pointer', p: 'pen', a: 'arrow', l: 'line', o: 'circle', b: 'rect', x: 'stamp_x', '0': 'stamp_o', s: 'spotlight' };
     if (k === ' ') { e.preventDefault(); if (mode === 'live') instantReplay(); else togglePlay(); }
