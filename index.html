@@ -65,7 +65,7 @@
   body.side-rails:not(.portrait) .stage.mode-replay #live, body.side-rails:not(.portrait) .stage.mode-still #live,
   body.side-rails:not(.portrait) .pip-hit { left: 8px; }
   body.side-rails:not(.portrait) .pip-label { left: 14px; }
-  body.portrait .stage { bottom: 44dvh; }
+  /* The video always uses the whole screen (whole picture visible, letterboxed if needed); controls float over it. */
   .stage video, .stage img.still { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
   .zoomer { position: absolute; inset: 0; transform-origin: 0 0; z-index: 2; }
   .stage.mode-live .zoomer { pointer-events: none; }
