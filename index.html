@@ -405,6 +405,8 @@
   }
   body.editing .edit-bar { display: flex; }
   .edit-bar .ctl { height: 40px; font-size: 13px; }
+  .edit-bar.moved { transform: none; width: min(440px, calc(100vw - 24px)); }
+  .eb-grip { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 9px; background: rgba(255,199,44,0.18); color: #FFC72C; font-size: 20px; line-height: 1; touch-action: none; cursor: grab; }
   .edit-bar .eb-key { font: 600 11px var(--body); color: var(--muted); align-self: center; padding: 0 4px; text-transform: none; letter-spacing: 0; }
   .edit-bar input[type=range] { width: 110px; accent-color: #FFC72C; }
   .edit-bar label { display: flex; align-items: center; gap: 6px; font: 600 12px var(--body); color: var(--silver); }
@@ -719,6 +721,7 @@
   <div class="rbp-foot"><button type="button" id="rbp-clear">Clear</button><button type="button" id="rbp-done">Done</button><button type="button" class="rbp-done" id="rbp-next-play">● Start next play</button></div>
 </section>
 <div class="edit-bar" id="edit-bar">
+  <span class="eb-grip" id="eb-grip" aria-label="Drag to move this bar" title="Drag to move this bar">✥</span>
   <span class="eb-key" id="eb-key"></span>
   <button class="ctl primary" id="eb-add">+ Add</button>
   <label>See-through <input type="range" id="eb-alpha" min="0" max="100" step="5"></label>
@@ -883,7 +886,7 @@
   <div class="dlg-head"><h2>How It Works</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
   <div class="dlg-body help-list">
     <p><b>Getting started.</b> Tap Start Camera. The video fills the screen (the whole picture always shows; black bars only where the shapes don't match). The camera records nonstop in the background, and nothing is uploaded.</p>
-    <p><b>Your live controls.</b> Every control is a see-through block on a grid over the video. Tap <b>Layout</b> to arrange them: drag to move, <b>↻</b> changes shape or turns a slider, <b>⤡</b> stretches sliders, <b>×</b> removes, <b>+ Add</b> opens the catalog of every control (new controls show up there). Tap <b>Done</b> to save. There's a separate layout for phone and iPad, upright and sideways, and each block stays pinned to its nearest corner. <b>Export</b> shares your layouts as a file (also copied); a friend uses <b>Import file</b> or <b>Paste</b>. The see-through slider is in the edit bar and in Settings.</p>
+    <p><b>Your live controls.</b> Every control is a see-through block on a grid over the video. Tap <b>Layout</b> to arrange them: drag to move, <b>↻</b> changes shape or turns a slider, <b>⤡</b> stretches sliders, <b>×</b> removes, <b>+ Add</b> opens the catalog of every control (new controls show up there). If the edit bar is in the way, drag it by its <b>✥</b> grip (double-tap the grip to send it back to the top). Tap <b>Done</b> to save. There's a separate layout for phone and iPad, upright and sideways, and each block stays pinned to its nearest corner. <b>Export</b> shares your layouts as a file (also copied); a friend uses <b>Import file</b> or <b>Paste</b>. The see-through slider is in the edit bar and in Settings.</p>
     <p><b>Record every play.</b> <b>Start Play</b> when the teams line up, <b>End Play</b> at the whistle. Each play is saved as its own numbered clip in the current game. <b>Last</b> opens the most recent play; tapping it during a play ends and shows that play. <b>Replay</b> looks back at the last few seconds even if you didn't start a play.</p>
     <p><b>Down &amp; distance.</b> Tap the down on the <b>Downs</b> block (1st resets to 10 yards), or <b>Goal</b>. Set yards with the <b>Yards slider</b> or <b>Yards + / −</b>. The next play you start gets that label. When a play ends the down moves on by one (4th goes to 1st &amp; 10), and a gold <b>Undo</b> shows for 3 seconds for timeouts.</p>
     <p><b>What happened on the play.</b> When you tap End Play, a big panel pops up. Use the big <b>−</b> / <b>+</b> (or −5, +5, +10, +20) for yards gained, or tap Incomplete, 1st Down, Touchdown, Penalty, Turnover or No play / timeout. It shows the next down &amp; distance and sets it for you (1st &amp; 10 plus 4 yards becomes 2nd &amp; 6; gaining the distance resets to 1st &amp; 10; a penalty or no play keeps the same down). Tap <b>Done</b>, or <b>Start next play</b> right from the panel. Reopen it from the <b>Play result</b> block, or from <b>Result</b> at the top while watching a play. You can turn the pop-up off in Settings.</p>
@@ -3289,6 +3292,31 @@
     };
     $('eb-alpha').addEventListener('input', (e) => { settings.ctlAlpha = Number(e.target.value); saveSettings(); syncSettingsUI(); });
     $('eb-key').textContent = '';
+    // The edit bar can be dragged by its grip so it never hides the blocks under it.
+    (() => {
+      const bar = $('edit-bar'), grip = $('eb-grip');
+      let pos = null, d = null;
+      try { pos = JSON.parse(localStorage.getItem('sentinels-live-editbar') || 'null'); } catch (_) {}
+      const put = () => {
+        if (!pos) { bar.classList.remove('moved'); bar.style.left = bar.style.top = ''; return; }
+        const r = bar.getBoundingClientRect();
+        const x = Math.max(4, Math.min(window.innerWidth - r.width - 4, pos.x)), y = Math.max(4, Math.min(window.innerHeight - r.height - 4, pos.y));
+        bar.classList.add('moved'); bar.style.left = x + 'px'; bar.style.top = y + 'px';
+      };
+      grip.addEventListener('pointerdown', (e) => {
+        e.preventDefault(); e.stopPropagation();
+        const r = bar.getBoundingClientRect();
+        d = { ox: e.clientX - r.left, oy: e.clientY - r.top };
+        grip.setPointerCapture(e.pointerId);
+      });
+      grip.addEventListener('pointermove', (e) => { if (!d) return; pos = { x: e.clientX - d.ox, y: e.clientY - d.oy }; put(); });
+      const end = () => { if (!d) return; d = null; try { localStorage.setItem('sentinels-live-editbar', JSON.stringify(pos)); } catch (_) {} };
+      grip.addEventListener('pointerup', end); grip.addEventListener('pointercancel', end);
+      // double-tap the grip to send the bar back to the top
+      grip.addEventListener('dblclick', () => { pos = null; try { localStorage.removeItem('sentinels-live-editbar'); } catch (_) {} put(); });
+      window.addEventListener('resize', () => requestAnimationFrame(put));
+      new MutationObserver(() => { if (document.body.classList.contains('editing')) requestAnimationFrame(put); }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    })();
 
     let lastKey = '';
     function relayout() {
