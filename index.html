@@ -345,14 +345,14 @@
   #grid-layer { position: fixed; inset: 0; z-index: 16; pointer-events: none; display: none; }
   body.m-live #grid-layer { display: block; }
   body.m-live .rail, body.m-live .hud, body.m-live > .zoombar, body.m-live .scrubbar { display: none !important; }
-  body.editing #grid-layer {
-    pointer-events: auto;
+  body.editing #grid-layer { pointer-events: auto; background-color: rgba(0,0,0,0.15); }
+  body.editing #grid-layer::before {
+    content: ''; position: absolute; left: var(--gx); top: var(--gy); width: var(--gw); height: var(--gh); pointer-events: none;
+    border-right: 1px solid rgba(255,255,255,0.22); border-bottom: 1px solid rgba(255,255,255,0.22);
     background-image:
       linear-gradient(to right, rgba(255,255,255,0.22) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(255,255,255,0.22) 1px, transparent 1px);
     background-size: var(--cell) var(--cell);
-    background-position: var(--gx) var(--gy);
-    background-color: rgba(0,0,0,0.15);
   }
   .gc {
     position: absolute; pointer-events: auto; border-radius: 12px; overflow: hidden;
@@ -2973,7 +2973,9 @@
     };
 
     // ---------- geometry ----------
-    let cell = 56, cols = 10, rows = 6, gx = 0, gy = 0;
+    // inL/inR: columns at each side that sit in the safe area (camera cutout, rounded corners).
+    // Blocks may go there, but the default layout stays clear of them.
+    let cell = 56, cols = 10, rows = 6, gx = 0, gy = 0, inL = 0, inR = 0;
     function layoutKey() {
       const phone = document.body.classList.contains('lay-phone');
       const portrait = window.innerHeight > window.innerWidth;
@@ -2983,13 +2985,15 @@
       const cs = getComputedStyle(document.documentElement);
       const px = (n) => parseFloat(cs.getPropertyValue(n)) || 0;
       const sat = px('--sat'), sab = px('--sab'), sal = px('--sal'), sar = px('--sar');
-      const W = window.innerWidth - sal - sar - 8, H = window.innerHeight - sat - sab - 8;
+      const W = window.innerWidth - 8, H = window.innerHeight - sat - sab - 8;
       const phone = document.body.classList.contains('lay-phone');
       cell = Math.round(Math.max(phone ? 44 : 52, Math.min(phone ? 54 : 66, Math.min(W, H) / (phone ? 7.2 : 11))));
       cols = Math.max(4, Math.floor(W / cell)); rows = Math.max(4, Math.floor(H / cell));
-      gx = sal + 4 + (W - cols * cell) / 2; gy = sat + 4 + (H - rows * cell) / 2;
+      gx = 4 + (W - cols * cell) / 2; gy = sat + 4 + (H - rows * cell) / 2;
+      inL = Math.max(0, Math.round((sal - gx) / cell)); inR = Math.max(0, Math.round((sar - gx) / cell));
       layer.style.setProperty('--cell', cell + 'px');
       layer.style.setProperty('--gx', gx + 'px'); layer.style.setProperty('--gy', gy + 'px');
+      layer.style.setProperty('--gw', cols * cell + 'px'); layer.style.setProperty('--gh', rows * cell + 'px');
       document.body.style.setProperty('--cell', cell + 'px');
     }
 
@@ -2999,17 +3003,22 @@
     function saveStore() { try { localStorage.setItem('sentinels-live-layouts', JSON.stringify(store)); } catch (_) {} }
     function toAnch(p) {
       const ax = (p.x + p.w / 2) <= cols / 2 ? 'l' : 'r', ay = (p.y + p.h / 2) <= rows / 2 ? 't' : 'b';
-      return { c: p.c, w: p.w, h: p.h, a: ax + ay, dx: ax === 'l' ? p.x : cols - p.x - p.w, dy: ay === 't' ? p.y : rows - p.y - p.h };
+      return { c: p.c, w: p.w, h: p.h, g: 1, a: ax + ay, dx: ax === 'l' ? p.x : cols - p.x - p.w, dy: ay === 't' ? p.y : rows - p.y - p.h };
     }
     function fromAnch(s) {
       const w = Math.min(s.w, cols), h = Math.min(s.h, rows);
-      let x = s.a[0] === 'l' ? s.dx : cols - w - s.dx, y = s.a[1] === 't' ? s.dy : rows - h - s.dy;
+      const dx = s.dx + (s.g ? 0 : s.a[0] === 'l' ? inL : inR);
+      let x = s.a[0] === 'l' ? dx : cols - w - dx, y = s.a[1] === 't' ? s.dy : rows - h - s.dy;
       x = Math.max(0, Math.min(cols - w, x)); y = Math.max(0, Math.min(rows - h, y));
       return { c: s.c, w, h, x, y };
     }
     // Default layout: thumb columns on both sides (middle of the screen sideways on an iPad, the
     // whole side on a phone, the bottom when upright), status along the top, zoom along the bottom.
     function defaults() {
+      const all = cols; cols = Math.max(4, all - inL - inR);
+      try { return layoutDefaults().map((p) => Object.assign(p, { x: p.x + Math.min(inL, all - cols) })); } finally { cols = all; }
+    }
+    function layoutDefaults() {
       const key = layoutKey(), portrait = key.endsWith('portrait'), tablet = key.startsWith('tablet');
       const out = [], put = (c, x, y, w, h) => out.push({ c, x, y, w: w || CAT[c].w, h: h || CAT[c].h });
       const stack = 6;
@@ -3254,7 +3263,7 @@
       if (!data || data.app !== 'sentinels-live-layout' || typeof data.layouts !== 'object') throw new Error('Not a Sentinels Live layout file');
       Object.keys(data.layouts).forEach((k) => {
         if (!/^(phone|tablet)-(portrait|landscape)$/.test(k) || !Array.isArray(data.layouts[k])) return;
-        store[k] = data.layouts[k].filter((s) => s && CAT[s.c] && /^[lr][tb]$/.test(s.a)).map((s) => ({ c: s.c, w: Math.max(1, s.w | 0), h: Math.max(1, s.h | 0), a: s.a, dx: Math.max(0, s.dx | 0), dy: Math.max(0, s.dy | 0) }));
+        store[k] = data.layouts[k].filter((s) => s && CAT[s.c] && /^[lr][tb]$/.test(s.a)).map((s) => ({ c: s.c, w: Math.max(1, s.w | 0), h: Math.max(1, s.h | 0), g: s.g ? 1 : 0, a: s.a, dx: Math.max(0, s.dx | 0), dy: Math.max(0, s.dy | 0) }));
       });
       saveStore(); load(); render();
     }
