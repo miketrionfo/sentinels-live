@@ -309,6 +309,7 @@
   .dd-step { font-size: 28px; }
   #dd-range { width: 100%; height: 40px; accent-color: #FFC72C; }
   .dd-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  #dd-st .dd-opt { font-size: 14px; }
   .dd-opt { font-size: 15px; height: 48px; }
   .dd-done { background: var(--scarlet); border-color: var(--scarlet-bright); }
 
@@ -380,6 +381,7 @@
   .gc.recording .rec-dot { border-radius: 4px; background: var(--scarlet); }
   .g-downs { display: grid; gap: 3px; padding: 3px; place-items: stretch; width: 100%; height: 100%; box-sizing: border-box; }
   .g-downs button { border-radius: 9px; background: rgba(255,255,255,0.06); color: #FFC72C; font-size: clamp(13px, calc(var(--cell) * 0.3), 20px); text-transform: none; }
+  .g-downs .g-st { font-size: clamp(11px, calc(var(--cell) * 0.22), 16px); }
   .g-downs button.active, .gc button.g-on { background: #FFC72C; color: #111; text-shadow: none; }
   .g-slider { position: relative; width: 100%; height: 100%; touch-action: none; cursor: pointer; }
   .g-slider .gtrack { position: absolute; border-radius: 99px; background: rgba(255,255,255,0.2); }
@@ -656,6 +658,9 @@
     <input type="range" id="dd-range" min="0" max="30" step="1" value="10" aria-label="Yards to go">
     <button class="dd-step" id="dd-plus" aria-label="More">+</button>
   </div>
+  <div class="dd-row" id="dd-st">
+    <button class="dd-opt" data-st="ko">Kickoff</button><button class="dd-opt" data-st="punt">Punt</button><button class="dd-opt" data-st="fg">FG</button><button class="dd-opt" data-st="pat">PAT</button>
+  </div>
   <div class="dd-row">
     <button class="dd-opt" id="dd-inches">Inches</button>
     <button class="dd-opt" id="dd-goal">Goal</button>
@@ -711,6 +716,8 @@
     <button type="button" class="rbp-step" data-step="1" aria-label="One yard more">+</button>
   </div>
   <div class="rbp-out">
+    <button type="button" data-rk="good" hidden>Good</button>
+    <button type="button" data-rk="miss" hidden>No good</button>
     <button type="button" data-rk="inc">Incomplete</button>
     <button type="button" data-rk="first">1st Down</button>
     <button type="button" data-rk="td">Touchdown</button>
@@ -889,6 +896,7 @@
     <p><b>Your live controls.</b> Every control is a see-through block on a grid over the video. Tap <b>Layout</b> to arrange them: drag to move, <b>↻</b> changes shape or turns a slider, <b>⤡</b> stretches sliders, <b>×</b> removes, <b>+ Add</b> opens the catalog of every control (new controls show up there). If the edit bar is in the way, drag it by its <b>✥</b> grip (double-tap the grip to send it back to the top). Tap <b>Done</b> to save. There's a separate layout for phone and iPad, upright and sideways, and each block stays pinned to its nearest corner. <b>Export</b> shares your layouts as a file (also copied); a friend uses <b>Import file</b> or <b>Paste</b>. The see-through slider is in the edit bar and in Settings.</p>
     <p><b>Record every play.</b> <b>Start Play</b> when the teams line up, <b>End Play</b> at the whistle. Each play is saved as its own numbered clip in the current game. <b>Last</b> opens the most recent play; tapping it during a play ends and shows that play. <b>Replay</b> looks back at the last few seconds even if you didn't start a play.</p>
     <p><b>Down &amp; distance.</b> Tap the down on the <b>Downs</b> block (1st resets to 10 yards), or <b>Goal</b>. Set yards with the <b>Yards slider</b> or <b>Yards + / −</b>. The next play you start gets that label. When a play ends the down moves on by one (4th goes to 1st &amp; 10), and a gold <b>Undo</b> shows for 3 seconds for timeouts.</p>
+    <p><b>Special teams.</b> Add the <b>Kickoff · Punt · FG · PAT</b> block from <b>+ Add</b> (it's also in the down &amp; distance panel). Tap one before the play to label it; tap it again to turn it off. Set the down first for a punt or field goal (4th &amp; 8 · Punt). A touchdown sets up the PAT, a PAT or made field goal sets up the kickoff, and a kickoff or punt sets up 1st &amp; 10. Field goals and PATs get <b>Good</b> / <b>No good</b> buttons in the result panel.</p>
     <p><b>What happened on the play.</b> When you tap End Play, a big panel pops up. Use the big <b>−</b> / <b>+</b> (or −5, +5, +10, +20) for yards gained, or tap Incomplete, 1st Down, Touchdown, Penalty, Turnover or No play / timeout. It shows the next down &amp; distance and sets it for you (1st &amp; 10 plus 4 yards becomes 2nd &amp; 6; gaining the distance resets to 1st &amp; 10; a penalty or no play keeps the same down). Tap <b>Done</b>, or <b>Start next play</b> right from the panel. Reopen it from the <b>Play result</b> block, or from <b>Result</b> at the top while watching a play. You can turn the pop-up off in Settings.</p>
     <p><b>While a play records</b>, controls you don't need (result, replay, freeze, tray, camera flip, settings, help, game, quarter, layout) are dimmed and switched off so they can't be bumped. Downs, yards, tags, zoom, photo and Last stay live.</p>
     <p><b>Player tags.</b> Enter jersey numbers in Settings. The <b>Tag players</b> block tags the play being recorded (or the last play). Tag your kid's number and the play is starred as a keeper automatically. While watching a play, the number chips at the top tag it too. In the tray, tap a number to see just those plays.</p>
@@ -1221,11 +1229,30 @@
 
   // ---------- Down & distance ----------
   const ORD = ['', '1st', '2nd', '3rd', '4th'];
+  // Special teams plays ride on the down & distance as dd.st. Punts and field goals keep their down.
+  const ST = { ko: 'Kickoff', punt: 'Punt', fg: 'Field goal', pat: 'PAT' };
+  const ST_SHORT = { ko: 'Kickoff', punt: 'Punt', fg: 'FG', pat: 'PAT' };
+  function hasDD(dd) { return !!(dd && (dd.down || ST[dd.st])); }
+  function isKick(dd) { return !!(dd && (dd.st === 'fg' || dd.st === 'pat')); }
   function ddLabel(dd) {
-    if (!dd || !dd.down) return '';
-    return ORD[dd.down] + ' & ' + (dd.goal ? 'Goal' : dd.dist === 0 ? 'Inches' : dd.dist);
+    if (!hasDD(dd)) return '';
+    const dn = dd.down ? ORD[dd.down] + ' & ' + (dd.goal ? 'Goal' : dd.dist === 0 ? 'Inches' : dd.dist) : '';
+    if (!ST[dd.st]) return dn;
+    return (dn && (dd.st === 'punt' || dd.st === 'fg') ? dn + ' · ' : '') + ST[dd.st];
   }
-  function ddFile(dd) { return ddLabel(dd).replace(' & ', '-and-'); }
+  function ddFile(dd) { return ddLabel(dd).replace(' & ', '-and-').replace(/[^A-Za-z0-9-]+/g, '-'); }
+  // Tapping a special teams type turns it on (or off again). Kickoff and PAT have no down.
+  function withST(base, k) {
+    if (base && base.st === k) { const o = Object.assign({}, base); delete o.st; return o.down ? o : null; }
+    if (k === 'ko' || k === 'pat') return { st: k };
+    return Object.assign({}, base && base.down ? base : {}, { st: k });
+  }
+  // A down or yards change means a regular play again (punt and FG keep their type for yard tweaks).
+  function ddPatch(base, patch) {
+    const v = Object.assign({ down: 1, dist: 10, goal: false }, base || {}, patch);
+    if (v.st && ('down' in patch || v.st === 'ko' || v.st === 'pat')) delete v.st;
+    return v;
+  }
   let ddTarget = 'next';
   function ddValue() {
     if (ddTarget === 'clip' && currentClip) return currentClip.dd || null;
@@ -1251,7 +1278,7 @@
     chip.hidden = dd === undefined;
     chip.textContent = ddLabel(dd) || 'Set down';
     chip.classList.toggle('empty', !ddLabel(dd));
-    const ld = playRec ? playRec.dd : curDD;
+    const ld0 = playRec ? playRec.dd : curDD, ld = ld0 && ld0.down ? ld0 : null;
     document.querySelectorAll('[data-rdown]').forEach((b) => b.classList.toggle('active', !!(ld && ld.down === Number(b.dataset.rdown))));
     const dist = ld ? (ld.goal ? null : ld.dist) : 10;
     $('dist-val').textContent = ld && ld.goal ? 'G' : dist === 0 ? 'In.' : dist;
@@ -1266,6 +1293,7 @@
       $('dd-preview').textContent = ddLabel(v) || '—';
       document.querySelectorAll('#dd-downs button').forEach((b) => b.classList.toggle('active', !!v && Number(b.dataset.down) === v.down));
       $('dd-goal').classList.toggle('active', !!(v && v.goal));
+      document.querySelectorAll('#dd-st [data-st]').forEach((b) => b.classList.toggle('active', !!(v && v.st === b.dataset.st)));
       $('dd-inches').classList.toggle('active', !!(v && !v.goal && v.dist === 0));
       if (v && !v.goal) $('dd-range').value = v.dist;
     }
@@ -1277,8 +1305,7 @@
     $('dd-pop').hidden = false; renderDD();
   }
   function ddEdit(patch) {
-    const v = Object.assign({ down: 1, dist: 10, goal: false }, ddValue() || {}, patch);
-    setDD(v);
+    setDD(ddPatch(ddValue(), patch));
   }
   document.querySelectorAll('#dd-downs button').forEach((b) => b.onclick = () => ddEdit(Number(b.dataset.down) === 1 && !(ddValue() && ddValue().down) ? { down: 1, dist: 10, goal: false } : { down: Number(b.dataset.down) }));
   $('dd-range').addEventListener('input', (e) => ddEdit({ dist: Number(e.target.value), goal: false }));
@@ -1293,9 +1320,10 @@
   const DIST_MAX = 25;
   function liveDDEdit(patch) {
     ddTarget = playRec ? 'rec' : 'next';
-    const base = Object.assign({ down: 1, dist: 10, goal: false }, (playRec ? playRec.dd : curDD) || {});
-    setDD(Object.assign(base, patch));
+    setDD(ddPatch(playRec ? playRec.dd : curDD, patch));
   }
+  function liveST(k) { ddTarget = playRec ? 'rec' : 'next'; setDD(withST(playRec ? playRec.dd : curDD, k)); }
+  document.querySelectorAll('#dd-st [data-st]').forEach((b) => b.onclick = () => setDD(withST(ddValue(), b.dataset.st)));
   document.querySelectorAll('[data-rdown]').forEach((b) => b.onclick = () => {
     const d = Number(b.dataset.rdown);
     liveDDEdit(d === 1 ? { down: 1, dist: 10, goal: false } : { down: d });
@@ -1319,10 +1347,10 @@
   // appears beside both thumb columns for 3 seconds in case it was a timeout or penalty.
   let ddUndoTimer = null, ddUndoPrev = null;
   function autoAdvanceDown(playDD) {
-    const base = playDD && playDD.down ? playDD : null;
+    const base = hasDD(playDD) ? playDD : null;
     if (!base) return;
     ddUndoPrev = curDD ? Object.assign({}, curDD) : null;
-    const next = base.down >= 4 ? { down: 1, dist: 10, goal: false } : Object.assign({}, base, { down: base.down + 1 });
+    const next = autoNext(base);
     ddTarget = 'next'; setDD(next);
     showDDUndo(ddLabel(next), ddLabel(ddUndoPrev) || 'none');
   }
@@ -1429,14 +1457,21 @@
     if (r.kind === 'nop') return 'No play';
     if (r.kind === 'to') return 'Turnover';
     if (r.kind === 'first') return '1st down' + (r.g ? ' (' + (r.g > 0 ? '+' : '') + r.g + ')' : '');
+    if (r.kind === 'good') return 'Good';
+    if (r.kind === 'miss') return 'No good';
     const g = r.g || 0;
     return (g > 0 ? '+' : '') + g + ' yd' + (Math.abs(g) === 1 ? '' : 's') + (r.firstDown ? ', 1st down' : '');
   }
   function computeNext(pre, r) {
-    if (!pre || !pre.down || !r) return null;
+    if (!hasDD(pre) || !r) return null;
     if (r.kind === 'pen' || r.kind === 'nop') return Object.assign({}, pre);
+    if (r.kind === 'td') return { st: 'pat' };
+    if (pre.st) {
+      if (pre.st === 'pat') return { st: 'ko' };
+      if (pre.st === 'fg') return r.kind === 'miss' || r.kind === 'to' ? { down: 1, dist: 10, goal: false } : { st: 'ko' };
+      return { down: 1, dist: 10, goal: false };  // after a kickoff or punt the other team starts a series
+    }
     if (r.kind === 'to' || r.kind === 'first') return { down: 1, dist: 10, goal: false };
-    if (r.kind === 'td') return null;
     const g = r.kind === 'inc' ? 0 : (r.g || 0);
     if (!pre.goal && g >= pre.dist) return { down: 1, dist: 10, goal: false };
     if (pre.down >= 4) return { down: 1, dist: 10, goal: false };
@@ -1446,12 +1481,12 @@
   function resultTarget() { return playRec || latestPlay(); }
   function setResult(target, r) {
     if (!target) { toast('Record a play first'); return; }
-    if (r && r.kind === 'gain' && target.dd && target.dd.down && !target.dd.goal) r.firstDown = (r.g || 0) >= target.dd.dist;
+    if (r && r.kind === 'gain' && target.dd && target.dd.down && !target.dd.st && !target.dd.goal) r.firstDown = (r.g || 0) >= target.dd.dist;
     target.result = r;
     if (target !== playRec) {
       saveMetaSoon(target); renderTray();
       // Only the most recent play drives the next down & distance.
-      if (target === latestPlay() && !playRec && target.dd && target.dd.down) {
+      if (target === latestPlay() && !playRec && hasDD(target.dd)) {
         ddTarget = 'next';
         setDD(r ? computeNext(target.dd, r) : autoNext(target.dd));
         hideDDUndo();
@@ -1478,11 +1513,16 @@
     $('rbp-title').textContent = 'Play ' + tg.n;
     $('rbp-dd').textContent = ddLabel(tg.dd) || '';
     $('rbp-val').textContent = r ? resultLabel(r) : 'What happened?';
-    const nx = tg.dd && tg.dd.down ? (r ? computeNext(tg.dd, r) : autoNext(tg.dd)) : null;
-    $('rbp-next').textContent = tg.dd && tg.dd.down ? 'Next: ' + (nx ? ddLabel(nx) : (r && r.kind === 'td' ? 'kickoff' : '—')) : 'Set the down before the next play to get next-down math';
+    const nx = hasDD(tg.dd) ? (r ? computeNext(tg.dd, r) : autoNext(tg.dd)) : null;
+    $('rbp-next').textContent = hasDD(tg.dd) ? 'Next: ' + (nx ? ddLabel(nx) : '—') : 'Set the down before the next play to get next-down math';
     document.querySelectorAll('#rbp [data-rk]').forEach((b) => b.classList.toggle('on', !!(r && r.kind === b.dataset.rk)));
+    showKickButtons($('rbp'), tg);
   }
-  function autoNext(pre) { return pre.down >= 4 ? { down: 1, dist: 10, goal: false } : Object.assign({}, pre, { down: pre.down + 1 }); }
+  function autoNext(pre) {
+    if (pre.st === 'fg' || pre.st === 'pat') return { st: 'ko' };
+    if (pre.st) return { down: 1, dist: 10, goal: false };
+    return pre.down >= 4 ? { down: 1, dist: 10, goal: false } : Object.assign({}, pre, { down: pre.down + 1 });
+  }
   document.querySelectorAll('#rbp [data-step]').forEach((b) => b.addEventListener('click', () => {
     const tg = rbpTarget; if (!tg) return;
     const cur = tg.result && (tg.result.kind === 'gain' || tg.result.kind === 'first') ? (tg.result.g || 0) : 0;
@@ -1503,7 +1543,7 @@
   // Builds the result controls into a container (used by the live block and the replay popover).
   function buildResultUI(box, getTarget) {
     box.innerHTML = '<div class="g-result"><div class="gr-top"><button type="button" data-rs="-">−</button><div class="gr-mid"><div class="gr-val">Gain —</div><input type="range" min="-15" max="40" step="1" value="0" aria-label="Yards gained"><div class="gr-next"></div></div><button type="button" data-rs="+">+</button></div>' +
-      '<div class="gr-btns"><button type="button" data-rk="inc">Inc</button><button type="button" data-rk="first">1st dn</button><button type="button" data-rk="td">TD</button><button type="button" data-rk="pen">Pen</button><button type="button" data-rk="to">TO</button><button type="button" data-rk="clear">Clear</button></div></div>';
+      '<div class="gr-btns"><button type="button" data-rk="good" hidden>Good</button><button type="button" data-rk="miss" hidden>No good</button><button type="button" data-rk="inc">Inc</button><button type="button" data-rk="first">1st dn</button><button type="button" data-rk="td">TD</button><button type="button" data-rk="pen">Pen</button><button type="button" data-rk="to">TO</button><button type="button" data-rk="clear">Clear</button></div></div>';
     const step = (d) => { const tg = getTarget(); if (!tg) { toast('Record a play first'); return; } const g = (tg.result && tg.result.kind === 'gain' ? tg.result.g : 0) + d; setResult(tg, { kind: 'gain', g: Math.max(-15, Math.min(40, g)) }); };
     box.querySelector('[data-rs="-"]').addEventListener('click', () => { if (!G_editing()) step(-1); });
     box.querySelector('[data-rs="+"]').addEventListener('click', () => { if (!G_editing()) step(1); });
@@ -1528,7 +1568,14 @@
     if (r && (r.kind === 'gain' || r.kind === 'first')) { if (document.activeElement !== rng) rng.value = r.g || 0; } else if (document.activeElement !== rng) rng.value = 0;
     box.querySelectorAll('[data-rk]').forEach((b) => b.classList.toggle('on', !!(r && r.kind === b.dataset.rk)));
     const nx = tg && tg.dd && r ? computeNext(tg.dd, r) : null;
-    n.textContent = tg && tg.dd && tg.dd.down ? (ddLabel(tg.dd) + (r ? ' → ' + (nx ? ddLabel(nx) : (r.kind === 'td' ? 'score!' : '—')) : '')) : (tg ? 'Play ' + tg.n : '');
+    n.textContent = tg && hasDD(tg.dd) ? (ddLabel(tg.dd) + (r ? ' → ' + (nx ? ddLabel(nx) : '—') : '')) : (tg ? 'Play ' + tg.n : '');
+    showKickButtons(box, tg);
+  }
+  // Field goals and PATs get Good / No good in place of Incomplete / 1st down.
+  function showKickButtons(box, tg) {
+    const k = isKick(tg && tg.dd);
+    box.querySelectorAll('[data-rk="good"],[data-rk="miss"]').forEach((b) => { b.hidden = !k; });
+    box.querySelectorAll('[data-rk="inc"],[data-rk="first"]').forEach((b) => { b.hidden = k; });
   }
   function G_editing() { try { return !!(window.__sentinelsGrid && window.__sentinelsGrid().editing); } catch (_) { return false; } }
 
@@ -1676,12 +1723,12 @@
     if (!blob.size) { toast('Nothing was recorded for that play.'); return null; }
     const clip = addClip(blob, secs, actualFps(), 'play', { n: pr.n, thumb: pr.thumb || '', dd: pr.dd || null, tags: pr.tags || [], result: pr.result || null, starred: !!pr.starred,
       gameId: pr.gameId, opp: pr.opp, q: pr.q, us: pr.us, them: pr.them });
-    if (pr.result && pr.dd && pr.dd.down) { ddTarget = 'next'; setDD(computeNext(pr.dd, pr.result)); }
+    if (pr.result && hasDD(pr.dd)) { ddTarget = 'next'; setDD(computeNext(pr.dd, pr.result)); }
     else autoAdvanceDown(pr.dd);
     renderDD();
     lastPlay = clip; lastPlayEnd = now();
     updateMarkUI();
-    toast('Play ' + pr.n + (pr.dd ? ' (' + ddLabel(pr.dd) + ')' : '') + ' saved · ' + fmtShort(secs) + (pr.dd && pr.dd.down ? ' · next ' + ddLabel(curDD) : ''));
+    toast('Play ' + pr.n + (pr.dd ? ' (' + ddLabel(pr.dd) + ')' : '') + ' saved · ' + fmtShort(secs) + (hasDD(pr.dd) ? ' · next ' + ddLabel(curDD) : ''));
     if (openAfter || settings.afterPlay === 'replay') openClip(clip, true);
     else if (settings.resultPopup !== 'off' && mode === 'live') openResultBig(clip);
     return clip;
@@ -2022,7 +2069,7 @@
     vertical = vertical === true;
     if (mode !== 'replay' || !currentClip || exporting) return;
     const timed = items.filter((it) => it.t != null);
-    if (!vertical && !timed.length && !(currentClip.dd && currentClip.dd.down) && !steadyOn() && currentClip.us == null && !currentClip.result) {
+    if (!vertical && !timed.length && !hasDD(currentClip.dd) && !steadyOn() && currentClip.us == null && !currentClip.result) {
       // No drawings and no down & distance: hand the original clip straight to the share sheet.
       shareClip(currentClip);
       return;
@@ -2478,7 +2525,7 @@
   function fileName(o) {
     if (o.kind === 'photo') return 'Sentinels_Photo_' + stampName(o.at) + '.jpg';
     if (o.kind === 'reel') return 'Sentinels_Highlights_' + stampName(o.at) + '.' + extFor(o.type || (o.blob && o.blob.type) || '');
-    const base = (o.kind === 'markup' && o.playN) ? 'Play_' + o.playN + (o.dd && o.dd.down ? '_' + ddFile(o.dd) : '') + '_edited' : o.kind === 'play' ? 'Play_' + o.n + (o.dd && o.dd.down ? '_' + ddFile(o.dd) : '') : clipLabel(o).replace(/[^A-Za-z0-9]+/g, '_').replace(/_+$/, '');
+    const base = (o.kind === 'markup' && o.playN) ? 'Play_' + o.playN + (hasDD(o.dd) ? '_' + ddFile(o.dd) : '') + '_edited' : o.kind === 'play' ? 'Play_' + o.n + (hasDD(o.dd) ? '_' + ddFile(o.dd) : '') : clipLabel(o).replace(/[^A-Za-z0-9]+/g, '_').replace(/_+$/, '');
     return 'Sentinels_' + base + (o.vertical ? '_vertical' : '') + '_' + stampName(o.at) + '.' + extFor(o.type || (o.blob && o.blob.type) || '');
   }
   async function shareClip(o) {
@@ -2952,6 +2999,7 @@
       last:      { name: 'Last Play', desc: 'Watch the most recent play', w: 2, h: 1, sizes: [[2, 1], [1, 1], [2, 2]], render: () => btn(ICON.play + '<span class="gl">Last</span><span class="gs g-last-s"></span>', () => watchLastPlay(), 'data-k="last"') },
       replay:    { name: 'Instant Replay', desc: 'Look back at the last few seconds', w: 2, h: 1, sizes: [[2, 1], [1, 1], [2, 2]], render: () => btn(ICON.replay + '<span class="gl">Replay</span><span class="gs g-rep-s"></span>', () => instantReplay(), 'data-k="replay"') },
       downs:     { name: 'Downs 1st–4th', desc: 'Set the down', w: 2, h: 2, sizes: [[2, 2], [4, 1], [1, 4]], render: (p) => ({ html: '<div class="g-downs" style="grid-template-columns:repeat(' + (p.w >= 4 ? 4 : p.w >= 2 ? 2 : 1) + ',1fr)">' + [1, 2, 3, 4].map((d) => '<button type="button" data-down="' + d + '">' + ORD[d] + '</button>').join('') + '</div>', act: null }) },
+      special:   { name: 'Kickoff · Punt · FG · PAT', desc: 'Mark a special teams play', w: 2, h: 2, sizes: [[2, 2], [4, 1], [1, 4]], render: (p) => ({ html: '<div class="g-downs" style="grid-template-columns:repeat(' + (p.w >= 4 ? 4 : p.w >= 2 ? 2 : 1) + ',1fr)">' + ['ko', 'punt', 'fg', 'pat'].map((k) => '<button type="button" class="g-st" data-st="' + k + '">' + ST_SHORT[k] + '</button>').join('') + '</div>', act: null }) },
       goal:      { name: 'Goal', desc: 'Goal to go', w: 1, h: 1, cls: 'g-gold', render: () => btn('<span class="gl">Goal</span>', () => $('dist-goal').click(), 'data-k="goal"') },
       ydsSlider: { name: 'Yards slider', desc: 'Slide yards to go (stretch or turn it)', w: 1, h: 3, resize: { min: 2, max: 10 }, rotate: true, cls: 'g-gold', render: () => ({ html: '<div class="g-slider gold" data-sl="yds"><div class="gtrack"></div><div class="gfill"></div><div class="gknob"></div></div>' }) },
       ydsPlus:   { name: 'Yards +', desc: 'One more yard', w: 1, h: 1, cls: 'g-gold', render: () => btn('<span class="gbig">+</span>', () => $('dist-plus').click()) },
@@ -3085,6 +3133,7 @@
         const b = el.querySelector(':scope > button');
         if (b && r.act) b.addEventListener('click', (e) => { if (editing) return; r.act(); });
         el.querySelectorAll('[data-down]').forEach((d) => d.addEventListener('click', () => { if (!editing) document.querySelector('[data-rdown="' + d.dataset.down + '"]').click(); }));
+        el.querySelectorAll('[data-st]').forEach((d) => d.addEventListener('click', () => { if (!editing) liveST(d.dataset.st); }));
         const sl = el.querySelector('[data-sl]'); if (sl) wireSlider(sl, p);
         if (r.mount) { place(el, p); layer.appendChild(el); r.mount(el); return; }
         place(el, p);
@@ -3146,8 +3195,9 @@
       const ld = playRec ? playRec.dd : curDD;
       q('[data-down]').forEach((b) => b.classList.toggle('active', !!(ld && ld.down === Number(b.dataset.down))));
       q('[data-c="goal"] button').forEach((b) => b.classList.toggle('g-on', !!(ld && ld.goal)));
+      q('.g-st').forEach((b) => b.classList.toggle('active', !!(ld && ld.st === b.dataset.st)));
       q('.g-yds-v').forEach((s) => { s.textContent = $('dist-val').textContent; });
-      const dist = ld ? (ld.goal ? 25 : ld.dist) : 10;
+      const dist = ld && ld.down ? (ld.goal ? 25 : ld.dist) : 10;
       q('[data-sl="yds"]').forEach((sl) => setSlider(sl, dist / 25));
       const zr = zoomRange(), cz = currentZoom();
       q('[data-sl="zoom"]').forEach((sl) => setSlider(sl, zr.max > zr.min ? Math.log(cz / zr.min) / Math.log(zr.max / zr.min) : 0));
