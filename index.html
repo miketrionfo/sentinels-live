@@ -475,7 +475,7 @@
   .rbp-quick { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
   .rbp-quick { flex-wrap: nowrap; }
   .rbp-quick button { min-width: 56px; height: clamp(36px, 8dvh, 48px); border-radius: 12px; background: rgba(255,255,255,0.1); font-size: 20px; color: #fff; font-family: var(--display); }
-  .rbp-out { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .rbp-out { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
   .rbp-out button { min-height: clamp(40px, 9dvh, 64px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 4px; border-radius: 14px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.18); color: #fff; font-family: var(--display); font-size: clamp(15px, 2.6vw, 21px); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
   .rbp-out button.on { background: #FFC72C; border-color: #FFC72C; color: #111; }
   .rbp-foot { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 10px; }
@@ -483,7 +483,7 @@
   .rbp-foot .rbp-done { background: var(--scarlet); border: 2px solid var(--scarlet-bright); }
   body.lay-phone .rbp-step { font-size: 44px; }
   body.lay-phone:not(.portrait) .rb-panel { gap: 8px; padding: 10px; }
-  body.lay-phone:not(.portrait) .rbp-out { grid-template-columns: repeat(6, 1fr); }
+  body.lay-phone:not(.portrait) .rbp-out { grid-template-columns: repeat(7, 1fr); }
   body.lay-phone:not(.portrait) .rbp-out button { font-size: 13px; }
   body.lay-phone:not(.portrait) .rbp-head b { font-size: 20px; } body.lay-phone:not(.portrait) .rbp-head span { font-size: 17px; }
   body.lay-phone:not(.portrait) .rbp-x { width: 44px; height: 44px; }
@@ -724,6 +724,7 @@
     <button type="button" data-rk="pen">Penalty</button>
     <button type="button" data-rk="to">Turnover</button>
     <button type="button" data-rk="nop">No play</button>
+    <button type="button" data-rk="punt">Punt</button>
   </div>
   <div class="rbp-foot"><button type="button" id="rbp-clear">Clear</button><button type="button" id="rbp-done">Done</button><button type="button" class="rbp-done" id="rbp-next-play">● Start next play</button></div>
 </section>
@@ -896,7 +897,7 @@
     <p><b>Your live controls.</b> Every control is a see-through block on a grid over the video. Tap <b>Layout</b> to arrange them: drag to move, <b>↻</b> changes shape or turns a slider, <b>⤡</b> stretches sliders, <b>×</b> removes, <b>+ Add</b> opens the catalog of every control (new controls show up there). If the edit bar is in the way, drag it by its <b>✥</b> grip (double-tap the grip to send it back to the top). Tap <b>Done</b> to save. There's a separate layout for phone and iPad, upright and sideways, and each block stays pinned to its nearest corner. <b>Export</b> shares your layouts as a file (also copied); a friend uses <b>Import file</b> or <b>Paste</b>. The see-through slider is in the edit bar and in Settings.</p>
     <p><b>Record every play.</b> <b>Start Play</b> when the teams line up, <b>End Play</b> at the whistle. Each play is saved as its own numbered clip in the current game. <b>Last</b> opens the most recent play; tapping it during a play ends and shows that play. <b>Replay</b> looks back at the last few seconds even if you didn't start a play.</p>
     <p><b>Down &amp; distance.</b> Tap the down on the <b>Downs</b> block (1st resets to 10 yards), or <b>Goal</b>. Set yards with the <b>Yards slider</b> or <b>Yards + / −</b>. The next play you start gets that label. When a play ends the down moves on by one (4th goes to 1st &amp; 10), and a gold <b>Undo</b> shows for 3 seconds for timeouts.</p>
-    <p><b>Special teams.</b> Add the <b>Kickoff · Punt · FG · PAT</b> block from <b>+ Add</b> (it's also in the down &amp; distance panel). Tap one before the play to label it; tap it again to turn it off. Set the down first for a punt or field goal (4th &amp; 8 · Punt). A touchdown sets up the PAT, a PAT or made field goal sets up the kickoff, and a kickoff or punt sets up 1st &amp; 10. Field goals and PATs get <b>Good</b> / <b>No good</b> buttons in the result panel.</p>
+    <p><b>Special teams.</b> Add the <b>Kickoff · Punt · FG · PAT</b> block from <b>+ Add</b> (it's also in the down &amp; distance panel). Tap one before the play to label it; tap it again to turn it off. Set the down first for a punt or field goal (4th &amp; 8 · Punt). A touchdown sets up the PAT, a PAT or made field goal sets up the kickoff, and a kickoff or punt sets up 1st &amp; 10. Field goals and PATs get <b>Good</b> / <b>No good</b> buttons in the result panel. There are also one-tap <b>Kickoff</b>, <b>Punt</b>, <b>Field goal</b> and <b>PAT</b> blocks, and if you forgot to mark a punt, tap <b>Punt</b> in the result panel after the play.</p>
     <p><b>What happened on the play.</b> When you tap End Play, a big panel pops up. Use the big <b>−</b> / <b>+</b> (or −5, +5, +10, +20) for yards gained, or tap Incomplete, 1st Down, Touchdown, Penalty, Turnover or No play / timeout. It shows the next down &amp; distance and sets it for you (1st &amp; 10 plus 4 yards becomes 2nd &amp; 6; gaining the distance resets to 1st &amp; 10; a penalty or no play keeps the same down). Tap <b>Done</b>, or <b>Start next play</b> right from the panel. Reopen it from the <b>Play result</b> block, or from <b>Result</b> at the top while watching a play. You can turn the pop-up off in Settings.</p>
     <p><b>While a play records</b>, controls you don't need (result, replay, freeze, tray, camera flip, settings, help, game, quarter, layout) are dimmed and switched off so they can't be bumped. Downs, yards, tags, zoom, photo and Last stay live.</p>
     <p><b>Player tags.</b> Enter jersey numbers in Settings. The <b>Tag players</b> block tags the play being recorded (or the last play). Tag your kid's number and the play is starred as a keeper automatically. While watching a play, the number chips at the top tag it too. In the tray, tap a number to see just those plays.</p>
@@ -1457,6 +1458,7 @@
     if (r.kind === 'nop') return 'No play';
     if (r.kind === 'to') return 'Turnover';
     if (r.kind === 'first') return '1st down' + (r.g ? ' (' + (r.g > 0 ? '+' : '') + r.g + ')' : '');
+    if (r.kind === 'punt') return 'Punt';
     if (r.kind === 'good') return 'Good';
     if (r.kind === 'miss') return 'No good';
     const g = r.g || 0;
@@ -1466,6 +1468,7 @@
     if (!hasDD(pre) || !r) return null;
     if (r.kind === 'pen' || r.kind === 'nop') return Object.assign({}, pre);
     if (r.kind === 'td') return { st: 'pat' };
+    if (r.kind === 'punt') return { down: 1, dist: 10, goal: false };
     if (pre.st) {
       if (pre.st === 'pat') return { st: 'ko' };
       if (pre.st === 'fg') return r.kind === 'miss' || r.kind === 'to' ? { down: 1, dist: 10, goal: false } : { st: 'ko' };
@@ -1543,7 +1546,7 @@
   // Builds the result controls into a container (used by the live block and the replay popover).
   function buildResultUI(box, getTarget) {
     box.innerHTML = '<div class="g-result"><div class="gr-top"><button type="button" data-rs="-">−</button><div class="gr-mid"><div class="gr-val">Gain —</div><input type="range" min="-15" max="40" step="1" value="0" aria-label="Yards gained"><div class="gr-next"></div></div><button type="button" data-rs="+">+</button></div>' +
-      '<div class="gr-btns"><button type="button" data-rk="good" hidden>Good</button><button type="button" data-rk="miss" hidden>No good</button><button type="button" data-rk="inc">Inc</button><button type="button" data-rk="first">1st dn</button><button type="button" data-rk="td">TD</button><button type="button" data-rk="pen">Pen</button><button type="button" data-rk="to">TO</button><button type="button" data-rk="clear">Clear</button></div></div>';
+      '<div class="gr-btns"><button type="button" data-rk="good" hidden>Good</button><button type="button" data-rk="miss" hidden>No good</button><button type="button" data-rk="inc">Inc</button><button type="button" data-rk="first">1st dn</button><button type="button" data-rk="td">TD</button><button type="button" data-rk="pen">Pen</button><button type="button" data-rk="to">TO</button><button type="button" data-rk="punt">Punt</button><button type="button" data-rk="clear">Clear</button></div></div>';
     const step = (d) => { const tg = getTarget(); if (!tg) { toast('Record a play first'); return; } const g = (tg.result && tg.result.kind === 'gain' ? tg.result.g : 0) + d; setResult(tg, { kind: 'gain', g: Math.max(-15, Math.min(40, g)) }); };
     box.querySelector('[data-rs="-"]').addEventListener('click', () => { if (!G_editing()) step(-1); });
     box.querySelector('[data-rs="+"]').addEventListener('click', () => { if (!G_editing()) step(1); });
@@ -1576,6 +1579,7 @@
     const k = isKick(tg && tg.dd);
     box.querySelectorAll('[data-rk="good"],[data-rk="miss"]').forEach((b) => { b.hidden = !k; });
     box.querySelectorAll('[data-rk="inc"],[data-rk="first"]').forEach((b) => { b.hidden = k; });
+    box.querySelectorAll('[data-rk="punt"]').forEach((b) => { b.hidden = !!(tg && tg.dd && tg.dd.st); });
   }
   function G_editing() { try { return !!(window.__sentinelsGrid && window.__sentinelsGrid().editing); } catch (_) { return false; } }
 
@@ -3000,6 +3004,10 @@
       replay:    { name: 'Instant Replay', desc: 'Look back at the last few seconds', w: 2, h: 1, sizes: [[2, 1], [1, 1], [2, 2]], render: () => btn(ICON.replay + '<span class="gl">Replay</span><span class="gs g-rep-s"></span>', () => instantReplay(), 'data-k="replay"') },
       downs:     { name: 'Downs 1st–4th', desc: 'Set the down', w: 2, h: 2, sizes: [[2, 2], [4, 1], [1, 4]], render: (p) => ({ html: '<div class="g-downs" style="grid-template-columns:repeat(' + (p.w >= 4 ? 4 : p.w >= 2 ? 2 : 1) + ',1fr)">' + [1, 2, 3, 4].map((d) => '<button type="button" data-down="' + d + '">' + ORD[d] + '</button>').join('') + '</div>', act: null }) },
       special:   { name: 'Kickoff · Punt · FG · PAT', desc: 'Mark a special teams play', w: 2, h: 2, sizes: [[2, 2], [4, 1], [1, 4]], render: (p) => ({ html: '<div class="g-downs" style="grid-template-columns:repeat(' + (p.w >= 4 ? 4 : p.w >= 2 ? 2 : 1) + ',1fr)">' + ['ko', 'punt', 'fg', 'pat'].map((k) => '<button type="button" class="g-st" data-st="' + k + '">' + ST_SHORT[k] + '</button>').join('') + '</div>', act: null }) },
+      stKo:      { name: 'Kickoff', desc: 'Mark the next play as a kickoff', w: 1, h: 1, cls: 'g-gold', render: () => btn('<span class="gl">Kick<br>off</span>', () => liveST('ko'), 'data-st1="ko"') },
+      stPunt:    { name: 'Punt', desc: 'Mark the next play as a punt', w: 1, h: 1, cls: 'g-gold', render: () => btn('<span class="gl">Punt</span>', () => liveST('punt'), 'data-st1="punt"') },
+      stFg:      { name: 'Field goal', desc: 'Mark the next play as a field goal', w: 1, h: 1, cls: 'g-gold', render: () => btn('<span class="gl">FG</span>', () => liveST('fg'), 'data-st1="fg"') },
+      stPat:     { name: 'PAT', desc: 'Mark the next play as a PAT', w: 1, h: 1, cls: 'g-gold', render: () => btn('<span class="gl">PAT</span>', () => liveST('pat'), 'data-st1="pat"') },
       goal:      { name: 'Goal', desc: 'Goal to go', w: 1, h: 1, cls: 'g-gold', render: () => btn('<span class="gl">Goal</span>', () => $('dist-goal').click(), 'data-k="goal"') },
       ydsSlider: { name: 'Yards slider', desc: 'Slide yards to go (stretch or turn it)', w: 1, h: 3, resize: { min: 2, max: 10 }, rotate: true, cls: 'g-gold', render: () => ({ html: '<div class="g-slider gold" data-sl="yds"><div class="gtrack"></div><div class="gfill"></div><div class="gknob"></div></div>' }) },
       ydsPlus:   { name: 'Yards +', desc: 'One more yard', w: 1, h: 1, cls: 'g-gold', render: () => btn('<span class="gbig">+</span>', () => $('dist-plus').click()) },
@@ -3196,6 +3204,7 @@
       q('[data-down]').forEach((b) => b.classList.toggle('active', !!(ld && ld.down === Number(b.dataset.down))));
       q('[data-c="goal"] button').forEach((b) => b.classList.toggle('g-on', !!(ld && ld.goal)));
       q('.g-st').forEach((b) => b.classList.toggle('active', !!(ld && ld.st === b.dataset.st)));
+      q('[data-st1]').forEach((b) => b.classList.toggle('g-on', !!(ld && ld.st === b.dataset.st1)));
       q('.g-yds-v').forEach((s) => { s.textContent = $('dist-val').textContent; });
       const dist = ld && ld.down ? (ld.goal ? 25 : ld.dist) : 10;
       q('[data-sl="yds"]').forEach((sl) => setSlider(sl, dist / 25));
